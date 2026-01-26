@@ -2,123 +2,322 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Vitaliy Couch Fitness</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:-apple-system,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:white;overflow-x:hidden;}
-        .hero{text-align:center;padding:30px 20px;}
-        .avatar{width:120px;height:120px;border-radius:50%;border:4px solid rgba(255,255,255,0.3);margin-bottom:15px;background:gray;box-shadow:0 10px 30px rgba(0,0,0,0.3);}
-        h1{font-size:28px;margin:10px 0;}
-        .section{background:rgba(255,255,255,0.15);margin:20px;padding:25px;border-radius:25px;box-shadow:0 10px 40px rgba(0,0,0,0.2);}
-        button{background:linear-gradient(45deg,#ff6b6b,#feca57);color:white;border:none;padding:18px;border-radius:30px;font-size:16px;width:100%;margin:10px 0;cursor:pointer;}
-        input{width:100%;padding:15px;border:none;border-radius:15px;background:rgba(255,255,255,0.9);font-size:16px;}
-        #formSection{display:none;}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #ff6b6b 100%);
+            min-height: 100vh; 
+            color: white; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .container { max-width: 400px; margin: 0 auto; padding: 20px; }
+        .hero { 
+            text-align: center; 
+            padding: 40px 20px; 
+            background: rgba(255,255,255,0.1);
+            border-radius: 24px; 
+            margin-bottom: 24px;
+            backdrop-filter: blur(20px);
+        }
+        .avatar { 
+            width: 100px; height: 100px; 
+            border-radius: 50%; 
+            border: 4px solid rgba(255,255,255,0.3); 
+            margin: 0 auto 20px;
+            display: block;
+            object-fit: cover;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        h1 { 
+            font-size: 28px; 
+            font-weight: 800; 
+            margin-bottom: 12px;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle { 
+            font-size: 16px; 
+            opacity: 0.9; 
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+        .section { 
+            background: rgba(255,255,255,0.12); 
+            margin-bottom: 20px; 
+            padding: 24px; 
+            border-radius: 20px; 
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .section h2 { 
+            font-size: 20px; 
+            margin-bottom: 16px; 
+            display: flex; 
+            align-items: center;
+            font-weight: 700;
+        }
+        .section h2::before {
+            content: attr(data-icon); 
+            margin-right: 12px; 
+            font-size: 24px;
+        }
+        .features { display: grid; gap: 12px; margin-top: 16px; }
+        .feature { 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 12px; 
+            padding: 12px; 
+            background: rgba(255,255,255,0.05); 
+            border-radius: 12px;
+        }
+        .feature-icon { font-size: 20px; margin-top: 2px; }
+        .services { display: grid; gap: 12px; }
+        .service-btn { 
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e); 
+            color: white; 
+            border: none; 
+            padding: 20px; 
+            border-radius: 16px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255,107,107,0.4);
+            text-align: left;
+        }
+        .service-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 12px 35px rgba(255,107,107,0.6);
+        }
+        .service-price { 
+            font-size: 18px; 
+            font-weight: 800; 
+            color: #fff;
+            margin-top: 4px;
+        }
+        .input-group { 
+            margin-bottom: 16px; 
+        }
+        input { 
+            width: 100%; 
+            padding: 16px 20px; 
+            border: none; 
+            border-radius: 16px; 
+            background: rgba(255,255,255,0.95); 
+            font-size: 16px; 
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+        }
+        input:focus { 
+            outline: none; 
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255,107,107,0.2);
+        }
+        .cta-btn { 
+            background: linear-gradient(45deg, #28a745, #20c997); 
+            color: white; 
+            border: none; 
+            padding: 20px; 
+            border-radius: 16px; 
+            font-size: 18px; 
+            font-weight: 700; 
+            width: 100%; 
+            margin-top: 8px;
+            box-shadow: 0 12px 35px rgba(40,167,69,0.4);
+            transition: all 0.3s ease;
+        }
+        .cta-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 16px 45px rgba(40,167,69,0.5);
+        }
+        .results { display: grid; gap: 16px; }
+        .result-item { 
+            background: rgba(255,255,255,0.1); 
+            padding: 16px; 
+            border-radius: 12px; 
+            border-left: 4px solid #ff6b6b;
+        }
+        .before-after { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            margin: 16px 0;
+        }
+        .ba-item { 
+            background: rgba(255,255,255,0.1); 
+            padding: 12px; 
+            text-align: center; 
+            border-radius: 12px;
+        }
+        #formSection { display: none; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .urgency { 
+            background: linear-gradient(45deg, #ffc107, #ff6b6b); 
+            color: #000; 
+            padding: 12px; 
+            border-radius: 12px; 
+            text-align: center; 
+            font-weight: 700; 
+            margin: 16px 0;
+        }
+        @media (max-width: 400px) { .container { padding: 16px; } }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <img src="https://i.postimg.cc/63VNDgFT/SAVE-20260125-184124.jpg" alt="Тренер" class="avatar">
-        <h1>💪 Vitaliy Couch Fitness</h1>
-<p>Персональный тренер для занятых людей: минус 5–10 кг за 8 недель без жёстких диет и часов в зале.</p>
-<p>Работаем онлайн и офлайн, подстраиваюсь под твой график и здоровье.</p>
-<button onclick="showForm()">Получить бесплатную консультацию</button>
-    </div>
-    <div class="section">
-  <h2>Кому подойдёт тренировка со мной</h2>
-  <ul>
-    <li>Если хочешь похудеть без срывов и вечного чувства голода.</li>
-    <li>Если давно не занимался, и нужен мягкий вход без травм.</li>
-    <li>Если хочешь подтянуть форму и набрать мышечную массу.</li>
-    <li>Если нужен понятный план: что делать дома или в зале.</li>
-  </ul>
-</div>
-    <div class="section">
-  <h2>Что ты получишь</h2>
-  <ul>
-    <li>Индивидуальный план тренировок под твой уровень и здоровье.</li>
-    <li>Рекомендации по питанию без «запретных» продуктов.</li>
-    <li>Поддержку и контроль прогресса в Telegram.</li>
-    <li>Видео‑разбор техники, чтобы не травмироваться.</li>
-    <li>Измеримый результат: вес, объёмы, сила, выносливость.</li>
-  </ul>
-</div>
-    <div class="section">
-  <h2>Реальные результаты клиентов</h2>
-  <p>«За 3 месяца скинула 9 кг, ушли боли в спине, стало легче подниматься по лестнице» — Анна, 34.</p>
-  <p>«Набрал 6 кг мышц, перестал стесняться футболок и чувствую себя увереннее» — Максим, 29.</p>
-  <p>«Наконец-то понял, как тренироваться без изнуряющих кардио и голодовок» — Дмитрий, 41.</p>
-</div>
-    <div class="section" id="formSection">
-  <h2>Заявка на бесплатную стратегию‑сессию</h2>
-  <p>Оставь контакты — я задам пару вопросов, помогу обозначить цели и расскажу, как можем работать.</p>
-  <input id="name" placeholder="Имя">
-  <input id="phone" placeholder="Телеграм или WhatsApp">
-  <input id="goal" placeholder="Твоя цель (похудеть, набрать массу, здоровье...)">
-  <button onclick="submitForm()">Записаться на бесплатную консультацию</button>
-</div>
-  <div class="section">
-  <h2>Форматы работы и цены</h2>
-  <div class="services">
-    <button onclick="book('Персональные тренировки в зале')">
-      Персональные тренировки<br>от $60/час
-    </button>
-    <button onclick="book('Онлайн-ведение 4 недели')">
-      Онлайн‑ведение 4 недели<br>$150
-    </button>
-    <button onclick="book('План питания')">
-      Персональный план питания<br>$80
-    </button>
-    <button onclick="book('Разовая консультация 30 минут')">
-      Консультация 30 минут<br>$30
-    </button>
-  </div>
-  <p>Первый разбор целей и возможностей — бесплатно.</p>
-</div>
-    <div class="section">
-  <h2>О тренере</h2>
-  <p>Я — Виталий, сертифицированный фитнес‑тренер с X лет опыта. Помогаю занятым людям привести тело и здоровье в порядок без крайностей.</p>
-  <p>Специализация: снижение веса, набор мышечной массы, работа с начальным уровнем и «диванным» стилем жизни.</p>
-  <p>Работаю через Telegram: удобно, понятно, без лишних приложений.</p>
-</div>
-    <div class="section" id="formSection">
-  <h2>Заявка на бесплатную стратегию‑сессию</h2>
-  <p>Оставь контакты — я задам пару вопросов, помогу обозначить цели и расскажу, как можем работать.</p>
-  <input id="name" placeholder="Имя">
-  <input id="phone" placeholder="Телеграм или WhatsApp">
-  <input id="goal" placeholder="Твоя цель (похудеть, набрать массу, здоровье...)">
-  <button onclick="submitForm()">Записаться на бесплатную консультацию</button>
-</div>
-  <div class="section">
-        <h2>💪 Услуги</h2>
-        <button onclick="book('Персоналка')">Персоналки $60/час</button>
-        <button onclick="book('Групповые')">Групповые $25/чел</button>
-        <button onclick="book('Онлайн')">Онлайн $150/мес</button>
-  </div>
-    <div class="section" id="formSection">
-        <h2>📅 Запись</h2>
-        <input id="name" placeholder="Имя">
-        <input id="phone" placeholder="Телефон">
-        <button onclick="submitForm()">Записаться!</button>
-    </div>
-    <script>
-        const tg=window.Telegram.WebApp;tg.expand();tg.MainButton.setText('Записаться!').show().onClick(()=>document.getElementById('formSection').style.display='block');
-        function book(s){tg.sendData(JSON.stringify({action:'book',service:s}));tg.close();}
-        function submitForm(){tg.sendData(JSON.stringify({name:document.getElementById('name').value,phone:document.getElementById('phone').value}));tg.showAlert('✅ Отправлено!');}
-        tg.ready();
-        <script>
-  // ...
-  function submitForm() {
-    const data = {
-      name: document.getElementById('name').value,
-      phone: document.getElementById('phone').value,
-      goal: document.getElementById('goal').value
-    };
-    tg.sendData(JSON.stringify(data));
-    tg.showAlert('✅ Заявка отправлена! В ближайшее время свяжусь с тобой в Telegram.');
-  }
-</script>
+    <div class="container">
+        <!-- 🏆 ГЕРОЙ БЛОК -->
+        <div class="hero">
+            <img src="photo.jpg" alt="Vitaliy Couch Fitness" class="avatar">
+            <h1>Vitaliy Couch Fitness</h1>
+            <p class="subtitle">Персональный тренер • 500+ трансформаций • Phoenix, AZ</p>
+            <p style="font-size: 16px; font-weight: 600; margin-bottom: 24px;">
+                🔥 Минус 8-15 кг за 8 недель без голодовок и травм
+            </p>
+            <button class="cta-btn" onclick="showForm()">Записаться на БЕСПЛАТНУЮ консультацию</button>
+        </div>
 
+        <!-- 🎯 КОМУ ПОДХОДИТ -->
+        <div class="section" data-icon="🎯">
+            <h2>Кому я помогу</h2>
+            <div class="features">
+                <div class="feature">
+                    <span class="feature-icon">📉</span>
+                    <div>Хочешь <strong>похудеть</strong> без срывов и жёстких диет</div>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">💪</span>
+                    <div>Нужно <strong>набрать массу</strong> и силу без химии</div>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">🏠</span>
+                    <div>Тренировки <strong>дома без оборудования</strong></div>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">⏰</span>
+                    <div><strong>Занятой график</strong> — тренируюсь когда удобно</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🏆 РЕЗУЛЬТАТЫ -->
+        <div class="section" data-icon="🏆">
+            <h2>Реальные результаты</h2>
+            <div class="results">
+                <div class="result-item">
+                    <strong>Анна, 34 года</strong><br>
+                    <span style="color: #28a745">−12 кг за 3 месяца</span><br>
+                    «Ушли боли в спине, стала носить любимые джинсы!»
+                </div>
+                <div class="result-item">
+                    <strong>Максим, 29 лет</strong><br>
+                    <span style="color: #28a745">+7 кг мышц за 12 недель</span><br>
+                    «Жим вырос с 60 до 90 кг, появились кубики!»
+                </div>
+                <div class="result-item">
+                    <strong>Елена, 41 год</strong><br>
+                    <span style="color: #28a745">−8 кг за 2 месяца</span><br>
+                    «Тренируюсь дома по 30 минут — результат огонь!»
+                </div>
+            </div>
+        </div>
+
+        <!-- 💰 УСЛУГИ -->
+        <div class="section" data-icon="💰">
+            <h2>Тарифы</h2>
+            <div class="services">
+                <button class="service-btn" onclick="book('Персоналка в зале')">
+                    🏋️ Персоналки в зале<br>
+                    <span class="service-price">$60/час</span>
+                </button>
+                <button class="service-btn" onclick="book('Онлайн 4 недели')">
+                    📱 Онлайн-ведение 4 нед<br>
+                    <span class="service-price">$150</span>
+                </button>
+                <button class="service-btn" onclick="book('План питания')">
+                    🍎 План питания + тренировки<br>
+                    <span class="service-price">$80</span>
+                </button>
+                <button class="service-btn" onclick="book('Консультация')">
+                    🆓 Бесплатная консультация<br>
+                    <span class="service-price">0₽</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 📋 ФОРМА -->
+        <div class="section" id="formSection">
+            <h2 data-icon="📋">Заявка на бесплатную консультацию</h2>
+            <div class="urgency">
+                🎁 Только сегодня: первая консультация + план на неделю БЕСПЛАТНО!
+            </div>
+            <div class="input-group">
+                <input id="name" placeholder="👤 Имя" required>
+            </div>
+            <div class="input-group">
+                <input id="phone" placeholder="📱 Telegram / WhatsApp" required>
+            </div>
+            <div class="input-group">
+                <input id="goal" placeholder="🎯 Цель (похудеть/масса/здоровье)" required>
+            </div>
+            <button class="cta-btn" onclick="submitForm()">
+                Записаться на БЕСПЛАТНУЮ консультацию
+            </button>
+            <p style="text-align: center; opacity: 0.8; font-size: 14px; margin-top: 12px;">
+                Я свяжусь в течение 30 минут 📲
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingAnimation();
+        
+        // Главная кнопка снизу
+        tg.MainButton.setText('🎯 Записаться на консультацию').setColor('#28a745').show().onClick(showForm);
+
+        function showForm() {
+            document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('formSection').style.display = 'block';
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function book(service) {
+            tg.sendData(JSON.stringify({ action: 'book', service }));
+            tg.showAlert(`✅ Запрос на "${service}" отправлен!`);
+            tg.close();
+        }
+
+        function submitForm() {
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const goal = document.getElementById('goal').value;
+
+            if (!name || !phone || !goal) {
+                tg.showAlert('⚠️ Заполни все поля, пожалуйста!');
+                return;
+            }
+
+            const data = {
+                action: 'consultation',
+                name: name,
+                phone: phone,
+                goal: goal,
+                timestamp: new Date().toISOString()
+            };
+
+            tg.sendData(JSON.stringify(data));
+            tg.showAlert('✅ Заявка отправлена! Я свяжусь в течение 30 минут 📲');
+            tg.close();
+        }
+
+        tg.ready();
     </script>
 </body>
 </html>
-
