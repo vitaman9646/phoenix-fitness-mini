@@ -105,6 +105,19 @@
         function book(s){tg.sendData(JSON.stringify({action:'book',service:s}));tg.close();}
         function submitForm(){tg.sendData(JSON.stringify({name:document.getElementById('name').value,phone:document.getElementById('phone').value}));tg.showAlert('✅ Отправлено!');}
         tg.ready();
+        <script>
+  // ...
+  function submitForm() {
+    const data = {
+      name: document.getElementById('name').value,
+      phone: document.getElementById('phone').value,
+      goal: document.getElementById('goal').value
+    };
+    tg.sendData(JSON.stringify(data));
+    tg.showAlert('✅ Заявка отправлена! В ближайшее время свяжусь с тобой в Telegram.');
+  }
+</script>
+
     </script>
 </body>
 </html>
