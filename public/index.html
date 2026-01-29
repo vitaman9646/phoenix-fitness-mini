@@ -10,285 +10,1374 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    /* ... (весь предыдущий стиль остаётся без изменений, добавляю только новые стили ниже) ... */
-
-    /* НОВАЯ СЕКЦИЯ: Реальные результаты */
-
-    .results-section {
-      background: var(--section-bg);
-      border-radius: var(--radius-md);
-      padding: 28px 20px;
-      margin-bottom: 24px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
+    :root {
+      --primary: #28a745;
+      --primary-dark: #218838;
+      --accent: #20c997;
+      --danger: #dc3545;
+      --warning: #ffc107;
+      --bg: var(--tg-theme-bg-color, #f8f9fa);
+      --text: var(--tg-theme-text-color, #212529);
+      --section-bg: var(--tg-theme-section-bg-color, white);
+      --hint: var(--tg-theme-hint-color, #6c757d);
+      --border: var(--tg-theme-section-separator-color, rgba(0,0,0,0.08));
+      --radius-lg: 20px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --shadow: 0 6px 20px rgba(40,167,69,0.18);
+      --shadow-lg: 0 12px 32px rgba(40,167,69,0.22);
+      --transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
     }
 
-    .results-title {
-      font-size: 1.45rem;
-      font-weight: 800;
-      margin-bottom: 24px;
-      text-align: center;
-      color: var(--primary);
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Segoe UI Emoji', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.55;
+      font-size: 16px;
+      overflow-x: hidden;
+    }
+
+    .container { max-width:460px; margin:0 auto; padding:16px; padding-bottom:100px; }
+
+    #loader {
+      position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column;
+      align-items:center; justify-content:center; z-index:9999; transition:opacity 0.4s;
+    }
+
+    .loader-progress { width:200px; height:4px; background:rgba(40,167,69,0.1); border-radius:2px; margin:20px 0; overflow:hidden; }
+    .loader-progress-bar { height:100%; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:2px; animation:progress 1.5s ease-in-out infinite; }
+    @keyframes progress { 0%{width:0%;transform:translateX(0)} 50%{width:100%} 100%{width:0%;transform:translateX(200px)} }
+
+    /* Hero с улучшениями */
+    .hero { 
+      text-align:center; padding:32px 20px 48px; background:var(--section-bg); border-radius:var(--radius-lg); margin-bottom:24px;
+      border:1px solid var(--border); box-shadow:var(--shadow); position:relative; overflow:hidden; 
+      background: linear-gradient(180deg, var(--section-bg) 0%, rgba(40,167,69,0.03) 100%);
+    }
+    .hero::before { 
+      content:''; position:absolute; top:0; left:0; right:0; height:4px; 
+      background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+      background-size: 200% 100%;
+      animation: gradient-shift 3s ease infinite;
+    }
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Аватар с кольцом статуса онлайн */
+    .avatar-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+    }
+    .avatar {
+      width:100%; height:100%; border-radius:50%; object-fit:cover; border:4px solid var(--primary);
+      box-shadow:0 8px 24px rgba(40,167,69,0.25); transition:var(--transition); position: relative;
+    }
+    .avatar:hover { transform:scale(1.05); }
+    .online-status {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 16px;
+      height: 16px;
+      background: #28a745;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px rgba(40,167,69,0.3);
+      animation: pulse-online 2s infinite;
+    }
+    @keyframes pulse-online {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+    }
+
+    h1 { 
+      font-size:2.1rem; font-weight:800; margin-bottom:8px; 
+      background:linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip:text; background-clip:text; color:transparent; 
+      position: relative;
+      display: inline-block;
+    }
+    h1::after {
+      content: '✅';
+      position: absolute;
+      right: -40px;
+      top: 0;
+      font-size: 1.5rem;
+      animation: bounce 2s infinite;
+    }
+
+    .subtitle { 
+      font-size:1.05rem; color:var(--hint); margin-bottom:20px; 
+      position: relative;
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(40,167,69,0.08);
+      border-radius: 20px;
+    }
+
+    .stats { 
+      display:flex; justify-content:center; gap:24px; margin:28px 0; flex-wrap:wrap;
+      background: rgba(40,167,69,0.03);
+      padding: 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(40,167,69,0.1);
+    }
+    .stat { 
+      text-align:center; padding:12px; min-width:100px; 
+      transition: var(--transition);
+    }
+    .stat:hover {
+      transform: translateY(-5px);
+    }
+    .stat-value { 
+      font-size:2.1rem; font-weight:800; color:var(--primary); line-height:1; 
+      display:flex; align-items:center; justify-content:center; gap:4px;
+      text-shadow: 0 2px 4px rgba(40,167,69,0.2);
+    }
+    .stat-label { 
+      font-size:0.78rem; color:var(--hint); text-transform:uppercase; letter-spacing:0.5px; margin-top:4px;
+      font-weight: 600;
+    }
+
+    /* Улучшенный бейдж гарантии */
+    .guarantee-badge { 
+      display:inline-flex; align-items:center; gap:12px; 
+      background: linear-gradient(135deg, #fff3cd, #ffe8cc, #fff3cd);
+      background-size: 200% 100%;
+      animation: gradient-shift 3s ease infinite;
+      color:#664d03; padding:14px 20px; border-radius:30px; font-weight:700; margin:16px 0; 
+      border:2px solid #ffc107; box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+      font-size: 1.05rem;
+    }
+
+    .section { 
+      background:var(--section-bg); border-radius:var(--radius-md); padding:28px; margin-bottom:20px; 
+      border:1px solid var(--border); box-shadow:0 2px 12px rgba(0,0,0,0.04); transition:var(--transition); 
       position: relative;
     }
-
-    .results-title::after {
+    .section:hover { box-shadow:0 8px 24px rgba(0,0,0,0.08); }
+    .section::before {
       content: '';
       position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary), var(--accent));
-      border-radius: 2px;
-    }
-
-    .results-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      margin-bottom: 32px;
-    }
-
-    .result-card {
-      background: rgba(40,167,69,0.03);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      border: 1px solid rgba(40,167,69,0.15);
-      box-shadow: 0 6px 20px rgba(40,167,69,0.12);
-      transition: all 0.35s ease;
-      opacity: 0;
-      transform: translateY(30px);
-    }
-
-    .result-card.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .result-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 16px 40px rgba(40,167,69,0.25);
-    }
-
-    .before-after-container {
-      display: flex;
-      position: relative;
-      height: 280px;
-      overflow: hidden;
-    }
-
-    .ba-image {
-      width: 50%;
+      top: 0;
+      left: 0;
+      width: 4px;
       height: 100%;
-      object-fit: cover;
-      transition: transform 0.6s ease;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .section:hover::before {
+      opacity: 1;
     }
 
-    .ba-left  { border-right: 2px solid white; }
-    .ba-right { }
-
-    .result-card:hover .ba-left,
-    .result-card:hover .ba-right {
-      transform: scale(1.08);
+    .section h2 { 
+      font-size:1.4rem; font-weight:800; margin-bottom:24px; display:flex; align-items:center; gap:12px; 
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(40,167,69,0.1);
     }
 
-    .ba-label {
+    .feature { 
+      display:flex; align-items:center; gap:16px; padding:18px; border-radius:var(--radius-sm); 
+      background:linear-gradient(90deg, rgba(40,167,69,0.05), transparent);
+      margin-bottom:12px; border-left:4px solid var(--primary); transition:var(--transition); 
+      cursor: pointer;
+    }
+    .feature:hover { 
+      background:linear-gradient(90deg, rgba(40,167,69,0.1), transparent); 
+      transform:translateX(8px) scale(1.02);
+      box-shadow: 0 4px 12px rgba(40,167,69,0.1);
+    }
+    .feature-icon { font-size:2rem; flex-shrink:0; }
+
+    .gallery-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px; }
+    .gallery-item { 
+      border-radius:var(--radius-sm); overflow:hidden; aspect-ratio:1; 
+      box-shadow:0 4px 12px rgba(0,0,0,0.08); position:relative; 
+      transition: var(--transition);
+    }
+    .gallery-item:hover { 
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .gallery-item img { width:100%; height:100%; object-fit:cover; transition:transform 0.5s; }
+    .gallery-item:hover img { transform:scale(1.1); }
+    .gallery-label { 
+      position:absolute; bottom:0; left:0; right:0; background:linear-gradient(transparent, rgba(0,0,0,0.8)); 
+      color:white; padding:10px; font-size:0.8rem; text-align:center; font-weight:600;
+    }
+
+    /* Улучшенные карточки тарифов */
+    .pricing-grid { display:grid; gap:24px; }
+    .pricing-card { 
+      background:linear-gradient(180deg, var(--section-bg) 0%, rgba(40,167,69,0.02) 100%); 
+      border:2px solid transparent; border-radius:var(--radius-md); padding:28px; box-shadow:var(--shadow);
+      transition:var(--transition); position:relative; cursor:pointer;
+    }
+    .pricing-card:hover, .pricing-card:focus-within { 
+      transform:translateY(-8px); box-shadow:var(--shadow-lg);
+      border-color: var(--primary);
+    }
+    .pricing-card.popular { 
+      border-color:var(--primary); 
+      background: linear-gradient(180deg, rgba(40,167,69,0.05), rgba(40,167,69,0.01));
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-card.popular::before {
+      content: '🔥';
       position: absolute;
-      bottom: 12px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: white;
-      padding: 6px 14px;
-      border-radius: 20px;
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(4px);
+      top: 20px;
+      left: 20px;
+      font-size: 1.5rem;
+      animation: fire 1s infinite alternate;
+    }
+    @keyframes fire {
+      from { transform: scale(1); }
+      to { transform: scale(1.2); }
+    }
+    .popular-badge { 
+      position:absolute; top:-12px; right:20px; background:linear-gradient(135deg,var(--primary),var(--accent)); color:white;
+      padding:8px 16px; border-radius:20px; font-size:0.8rem; font-weight:800; box-shadow:0 4px 12px rgba(40,167,69,0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .ba-left-label  { left: 12px; }
-    .ba-right-label { right: 12px; background: var(--primary); }
-
-    .result-info {
-      padding: 20px 16px;
-      text-align: center;
+    .price { 
+      font-size:2.8rem; font-weight:900; color:var(--primary); margin:12px 0 4px; 
+      display:flex; align-items:baseline; gap:4px;
+      text-shadow: 0 2px 4px rgba(40,167,69,0.1);
+    }
+    .price-currency { font-size:1.4rem; opacity:0.9; }
+    .period { color:var(--hint); font-size:0.95rem; margin-bottom: 16px; }
+    .savings-badge { 
+      display:inline-block; background:linear-gradient(135deg, #ff6b6b, #ff4757); color:white; 
+      padding:6px 12px; border-radius:12px; font-size:0.8rem; font-weight:800; margin-left:8px;
+      animation: pulse 1.5s infinite;
     }
 
-    .result-name {
-      font-weight: 800;
-      font-size: 1.15rem;
-      margin-bottom: 6px;
-      color: var(--primary);
+    .features-list { list-style:none; margin:20px 0; font-size:0.95rem; }
+    .features-list li { 
+      margin-bottom:12px; display:flex; align-items:center; gap:12px; padding:8px 0;
+      border-bottom: 1px dashed rgba(0,0,0,0.05);
+    }
+    .features-list li:last-child { border-bottom: none; }
+    .features-list li::before { 
+      content:'✓'; color:var(--primary); font-weight:bold; flex-shrink:0;
+      background: rgba(40,167,69,0.1);
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
     }
 
-    .result-change {
-      font-size: 1.4rem;
-      font-weight: 900;
-      color: var(--primary);
-      margin: 8px 0;
+    /* Улучшенные кнопки */
+    .btn { 
+      width:100%; padding:20px; font-size:1.1rem; font-weight:800; border:none; border-radius:var(--radius-md); cursor:pointer;
+      transition:all 0.3s ease; display:flex; align-items:center; justify-content:center; gap:12px; 
+      position:relative; overflow:hidden; letter-spacing:0.5px;
     }
-
-    .result-text {
-      font-size: 0.95rem;
-      line-height: 1.5;
-      opacity: 0.9;
-      font-style: italic;
-      margin-top: 12px;
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.7s;
     }
-
-    .testimonial-grid {
-      display: grid;
-      gap: 20px;
+    .btn:hover::before { left: 100%; }
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-md);
+      padding: 2px;
+      background: linear-gradient(45deg, var(--primary), var(--accent), var(--primary));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.3s;
     }
-
-    .testimonial-card {
-      background: rgba(40,167,69,0.04);
-      border-radius: var(--radius-sm);
-      padding: 20px;
-      border-left: 5px solid var(--primary);
+    .btn:hover::after { opacity: 1; }
+    .btn-primary { 
+      background:linear-gradient(135deg, var(--primary), var(--accent)); color:white; 
+      box-shadow:0 10px 30px rgba(40,167,69,0.4);
       position: relative;
     }
+    .btn-primary:hover { 
+      transform:translateY(-4px) scale(1.02); 
+      box-shadow:0 15px 40px rgba(40,167,69,0.5);
+    }
+    .btn-primary:active { transform:translateY(-1px) scale(0.98); }
+    .btn-pay { 
+      background:linear-gradient(135deg,#ffd700,#ffaa00,#ffd700); background-size:200% 100%;
+      animation: gradient-shift 2s ease infinite;
+      color:#1a1a1a; font-weight:900; box-shadow:0 10px 30px rgba(255,215,0,0.5);
+      border: 2px solid #ffaa00;
+    }
+    .btn-pay:hover { 
+      transform:translateY(-4px) scale(1.02); 
+      box-shadow:0 15px 40px rgba(255,215,0,0.6);
+    }
+    .btn-secondary { 
+      background:transparent; color:var(--primary); border:2px solid var(--primary);
+      box-shadow:0 4px 12px rgba(40,167,69,0.1);
+    }
+    .btn-secondary:hover { 
+      background:rgba(40,167,69,0.05); transform:translateY(-2px);
+      box-shadow:0 8px 20px rgba(40,167,69,0.15);
+    }
 
-    .testimonial-card::before {
-      content: '“';
+    /* Форма с улучшениями */
+    .form-section { display:none; animation:slideIn 0.5s ease-out; }
+    @keyframes slideIn { 
+      from {opacity:0; transform:translateY(30px) scale(0.95)} 
+      to {opacity:1; transform:translateY(0) scale(1)} 
+    }
+
+    .form-group { margin-bottom:24px; position:relative; }
+    input, select, textarea { 
+      width:100%; padding:18px 20px; border:2px solid #dee2e6; border-radius:var(--radius-sm); font-size:1rem;
+      background:var(--bg); color:var(--text); transition:var(--transition); font-family:inherit;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    input:focus, select:focus, textarea:focus { 
+      border-color:var(--primary); outline:none; box-shadow:0 0 0 4px rgba(40,167,69,0.15), inset 0 2px 4px rgba(0,0,0,0.02);
+      transform: translateY(-2px);
+    }
+    .error { border-color:var(--danger)!important; }
+    .error-message { 
+      color:var(--danger); font-size:0.85rem; margin-top:8px; display:none; 
+      padding: 8px 12px;
+      background: rgba(220,53,69,0.05);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--danger);
+    }
+    .success { border-color:var(--primary)!important; }
+
+    .offer { 
+      background:linear-gradient(135deg,#fff3cd,#ffe8cc,#fff3cd); background-size:200% 100%;
+      animation: gradient-shift 3s ease infinite;
+      color:#664d03; padding:20px; border-radius:var(--radius-sm); text-align:center;
+      font-weight:800; margin-bottom:24px; border:2px solid #ffc107;
+      position: relative;
+      overflow: hidden;
+    }
+    .offer::before {
+      content: '🔥';
       position: absolute;
-      top: 8px;
-      left: 16px;
-      font-size: 4rem;
-      opacity: 0.15;
-      line-height: 1;
+      top: 10px;
+      left: 15px;
+      font-size: 1.5rem;
+    }
+    .timer { 
+      display:inline-block; background:linear-gradient(135deg, var(--danger), #ff6b6b); color:white; 
+      padding:10px 20px; border-radius:20px; font-weight:900; margin-top:12px; 
+      animation:pulse 1s infinite; font-size: 1.2rem;
+      box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+    }
+
+    /* Модальное окно с улучшениями */
+    .success-modal { 
+      position:fixed; inset:0; background:rgba(0,0,0,0.9); display:none; align-items:center; 
+      justify-content:center; z-index:10000; padding:20px; backdrop-filter: blur(5px);
+    }
+    .success-modal.active { display:flex; animation:fadeIn 0.3s; }
+    .modal-content { 
+      background:linear-gradient(180deg, var(--section-bg) 0%, rgba(40,167,69,0.05) 100%); 
+      border-radius:var(--radius-lg); padding:40px 32px; text-align:center; max-width:400px; width:100%; 
+      animation:modalSlideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 2px solid rgba(40,167,69,0.2);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    @keyframes modalSlideUp { 
+      from {transform:translateY(50px) scale(0.9); opacity:0} 
+      to {transform:translateY(0) scale(1); opacity:1} 
+    }
+    .modal-icon { 
+      font-size:5rem; margin-bottom:20px; animation:bounce 1s; 
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+
+    /* Плавающая кнопка с улучшениями */
+    .floating-cta { 
+      position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:calc(100% - 40px); 
+      max-width:440px; z-index:1000; transition:all 0.3s; animation:float 3s ease-in-out infinite;
+      filter: drop-shadow(0 10px 20px rgba(40,167,69,0.3));
+    }
+    @keyframes float { 
+      0%,100%{transform:translateX(-50%) translateY(0)} 
+      50%{transform:translateX(-50%) translateY(-8px)} 
+    }
+    .floating-cta.hidden { 
+      opacity:0; transform:translateX(-50%) translateY(20px); pointer-events:none;
+    }
+
+    /* Футер с улучшениями */
+    .footer { 
+      text-align:center; padding:40px 20px 60px; color:var(--hint); font-size:0.9rem; 
+      border-top:1px solid var(--border); margin-top:40px;
+      background: linear-gradient(180deg, transparent 0%, rgba(40,167,69,0.02) 100%);
+    }
+    .contact-links { display:flex; justify-content:center; gap:16px; margin:24px 0; flex-wrap:wrap; }
+    .contact-link { 
+      display:inline-flex; align-items:center; gap:10px; padding:12px 24px; 
+      background:linear-gradient(135deg, rgba(40,167,69,0.1), rgba(32,201,151,0.1)); 
+      color:var(--primary); text-decoration:none; border-radius:30px; font-weight:700; 
+      transition:all 0.3s; border: 1px solid rgba(40,167,69,0.2);
+    }
+    .contact-link:hover { 
+      background:linear-gradient(135deg, rgba(40,167,69,0.2), rgba(32,201,151,0.2)); 
+      transform:translateY(-3px) scale(1.05); box-shadow:0 8px 20px rgba(40,167,69,0.2);
+    }
+
+    @media (max-width:480px) { 
+      .gallery-grid { grid-template-columns:repeat(2,1fr); } 
+      .stats { gap:16px; } 
+      .stat { min-width:85px; padding:10px; } 
+      .stat-value { font-size:1.8rem; }
+      .contact-links { flex-direction: column; align-items: center; }
+      .contact-link { width: 100%; max-width: 280px; justify-content: center; }
+      h1 { font-size: 1.8rem; }
+      .hero { padding: 24px 16px 40px; }
+    }
+
+    /* Дополнительные улучшения */
+    .trust-badges {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 24px 0;
+      flex-wrap: wrap;
+    }
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(40,167,69,0.05);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      color: var(--hint);
+      border: 1px solid rgba(40,167,69,0.1);
+    }
+    .testimonial {
+      background: linear-gradient(135deg, rgba(40,167,69,0.05), transparent);
+      padding: 20px;
+      border-radius: var(--radius-md);
+      margin: 16px 0;
+      border-left: 4px solid var(--primary);
+      font-style: italic;
+      position: relative;
+    }
+    .testimonial::before {
+      content: '"';
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      font-size: 3rem;
+      color: rgba(40,167,69,0.2);
       font-family: Georgia, serif;
     }
-
-    .testimonial-text {
-      font-style: italic;
-      line-height: 1.6;
-      margin-bottom: 12px;
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(40,167,69,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 12px 0;
     }
-
-    .testimonial-author {
-      font-weight: 700;
-      color: var(--primary);
-      text-align: right;
-    }
-
-    .want-results-btn {
-      margin: 32px auto 0;
-      max-width: 320px;
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 4px;
+      transition: width 0.5s ease;
     }
   </style>
 </head>
 <body>
 
-<!-- ... (весь предыдущий HTML до секции тренировок дома остаётся без изменений) ... -->
+<div id="loader">
+  <div style="font-size:2.5rem; margin-bottom:16px;">💪</div>
+  <div style="font-size:1.1rem; margin-bottom:8px; font-weight:600;">Подготавливаем ваш персональный фитнес-план...</div>
+  <div class="loader-progress"><div class="loader-progress-bar"></div></div>
+  <div style="margin-top:16px; font-size:0.9rem; opacity:0.7;">Это займет всего несколько секунд</div>
+</div>
 
-  <!-- НОВАЯ СЕКЦИЯ: Реальные результаты клиентов -->
-  <div class="section results-section">
-    <h2 class="results-title">Реальные результаты моих клиентов</h2>
+<div class="container">
 
-    <div class="results-grid">
-      <!-- Отзыв 1 -->
-      <div class="result-card">
-        <div class="before-after-container">
-          <img class="ba-image ba-left" src="https://images.squarespace-cdn.com/content/v1/5f5b8e8e4b3e0a1f6e8b4567/1600000000000-EXAMPLE1/before.jpg?format=1500w" alt="До" loading="lazy">
-          <img class="ba-image ba-right" src="https://images.squarespace-cdn.com/content/v1/5f5b8e8e4b3e0a1f6e8b4567/1600000000000-EXAMPLE2/after.jpg?format=1500w" alt="После" loading="lazy">
-          <div class="ba-label ba-left-label">До</div>
-          <div class="ba-label ba-right-label">После • −14 кг</div>
-        </div>
-        <div class="result-info">
-          <div class="result-name">Алексей, 34 года</div>
-          <div class="result-change">−14 кг за 10 недель</div>
-          <div class="result-text">
-            "Работал в офисе по 12 часов, думал, спорт — не для меня. Vitaliy сделал программу на 30 минут в день дома. Ушло 14 кг, спина перестала болеть, появилось много энергии!"
-          </div>
-        </div>
-      </div>
+  <div class="hero">
+    <div class="avatar-container">
+      <img src="https://images.pexels.com/photos/13621289/pexels-photo-13621289.jpeg" alt="Vitaliy Couch" class="avatar" loading="eager"
+        onerror="this.src='https://via.placeholder.com/120/28a745/ffffff?text=VC'">
+      <div class="online-status"></div>
+    </div>
+    <h1>Vitaliy Couch Fitness</h1>
+    <div class="subtitle">Сертифицированный тренер • 500+ трансформаций • Phoenix, AZ</div>
 
-      <!-- Отзыв 2 -->
-      <div class="result-card">
-        <div class="before-after-container">
-          <img class="ba-image ba-left" src="https://rxfit.co/wp-content/uploads/2021/12/90-Day-weightloss-aesthetic-transformation-program-before.jpg" alt="До" loading="lazy">
-          <img class="ba-image ba-right" src="https://rxfit.co/wp-content/uploads/2021/12/90-Day-weightloss-aesthetic-transformation-program-after.jpeg" alt="После" loading="lazy">
-          <div class="ba-label ba-left-label">До</div>
-          <div class="ba-label ba-right-label">После • −18 кг</div>
-        </div>
-        <div class="result-info">
-          <div class="result-name">Марина, 29 лет</div>
-          <div class="result-change">−18 кг за 12 недель</div>
-          <div class="result-text">
-            "После родов набрала 22 кг. Vitaliy подобрал программу без зала и голодовок. Минус 18 кг, вернулась в любимые джинсы, чувствую себя на 10 лет моложе!"
-          </div>
-        </div>
-      </div>
-
-      <!-- Отзыв 3 -->
-      <div class="result-card">
-        <div class="before-after-container">
-          <img class="ba-image ba-left" src="https://revivalhealthandwellnessgroup.com/wp-content/uploads/2025/08/before-transformation.jpg" alt="До" loading="lazy">
-          <img class="ba-image ba-right" src="https://revivalhealthandwellnessgroup.com/wp-content/uploads/2025/08/after-transformation.jpg" alt="После" loading="lazy">
-          <div class="ba-label ba-left-label">До</div>
-          <div class="ba-label ba-right-label">После • +8 кг мышц</div>
-        </div>
-        <div class="result-info">
-          <div class="result-name">Дмитрий, 27 лет</div>
-          <div class="result-change">+8 кг мышц за 14 недель</div>
-          <div class="result-text">
-            "Хотел набрать массу без химии. Vitaliy дал программу и питание — результат огонь! Жим лежа +35 кг, появились кубики, уверенность выросла в разы."
-          </div>
-        </div>
-      </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-value">8–15<span style="font-size:1rem">кг</span></div><div class="stat-label">за 8 недель</div></div>
+      <div class="stat"><div class="stat-value">98<span style="font-size:1rem">%</span></div><div class="stat-label">довольных клиентов</div></div>
+      <div class="stat"><div class="stat-value">500+</div><div class="stat-label">успешных кейсов</div></div>
     </div>
 
-    <!-- Дополнительные короткие отзывы -->
-    <div class="testimonial-grid">
-      <div class="testimonial-card">
-        <div class="testimonial-text">
-          "Никогда не думала, что дома можно так преобразиться. Спасибо Vitaliy за мотивацию и систему!"
-        </div>
-        <div class="testimonial-author">— Ольга, 38 лет</div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-text">
-          "Минус 11 кг за 2 месяца без стресса. Самое крутое — индивидуальный подход и поддержка каждый день."
-        </div>
-        <div class="testimonial-author">— Сергей, 41 год</div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-text">
-          "Лучший тренер, с которым я работал. Чётко, без воды, результат виден уже через 3 недели."
-        </div>
-        <div class="testimonial-author">— Игорь, 30 лет</div>
-      </div>
+    <div class="guarantee-badge">
+      <span>🏆</span> 100% гарантия результата или возврат денег
     </div>
 
-    <button class="btn btn-primary want-results-btn" onclick="showForm()">
-      🔥 Хочу такие же результаты!
+    <div class="trust-badges">
+      <div class="trust-badge">✅ Безопасно</div>
+      <div class="trust-badge">📅 Индивидуально</div>
+      <div class="trust-badge">⚡ Быстрый результат</div>
+    </div>
+
+    <button class="btn btn-primary" onclick="showForm()" id="mainCta">
+      🎁 Получить бесплатный план на 7 дней
     </button>
+    
+    <div style="margin-top:20px; font-size:0.9rem; opacity:0.7;">
+      ⚡ <strong>3 места</strong> доступно для новых клиентов на этой неделе
+    </div>
   </div>
 
-  <!-- ... (остальной код — тарифы, форма, футер, скрипты — остаётся без изменений) ... -->
+  <div class="section">
+    <h2>🎯 Я помогу, если вы:</h2>
+    <div class="feature" onclick="selectGoal('похудеть')">
+      <span class="feature-icon">📉</span>
+      <div>
+        <strong>Хотите похудеть</strong><br>
+        <small>Без голодовок и срывов</small>
+      </div>
+    </div>
+    <div class="feature" onclick="selectGoal('набрать массу')">
+      <span class="feature-icon">💪</span>
+      <div>
+        <strong>Набрать мышцы</strong><br>
+        <small>Натурально и безопасно</small>
+      </div>
+    </div>
+    <div class="feature" onclick="selectGoal('домашние тренировки')">
+      <span class="feature-icon">🏠</span>
+      <div>
+        <strong>Тренируетесь дома</strong><br>
+        <small>Без оборудования</small>
+      </div>
+    </div>
+    <div class="feature" onclick="selectGoal('занятой график')">
+      <span class="feature-icon">⏰</span>
+      <div>
+        <strong>Заняты на работе</strong><br>
+        <small>Тренировки под ваш график</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Отзыв клиента -->
+  <div class="section">
+    <h2>💬 Отзыв клиента</h2>
+    <div class="testimonial">
+      "За 8 недель с Vitaliy я похудел на 14 кг без изнурительных диет. Тренировки дома занимали всего 30 минут в день. Рекомендую всем, кто хочет реальный результат!"
+      <div style="margin-top:16px; font-weight:700; color:var(--primary);">— Алексей, 32 года</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 85%;"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--hint);">
+      <span>До</span>
+      <span>Прогресс: 85%</span>
+      <span>После 8 недель</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🏋️‍♂️ Тренировки дома</h2>
+    <p style="margin-bottom:16px; opacity:0.8; font-size:0.95rem;">15+ упражнений в вашей программе</p>
+    <div class="gallery-grid">
+      <div class="gallery-item">
+        <img src="https://cdn.prod.website-files.com/611abd833ca7af7702667729/64753f7cc15256495593ba27_JackedMan_DoingPushups.png" alt="Отжимания" loading="lazy">
+        <div class="gallery-label">Отжимания</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://cdn.prod.website-files.com/611abd833ca7af7702667729/649c5b214fbbfd1f5ee9ee52_Woman_LeanMuscle_Small.jpg" alt="Планка" loading="lazy">
+        <div class="gallery-label">Планка</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://physicalachievementcenter.com/wp-content/uploads/2025/04/Screenshot-2025-04-14-at-13.45.43.webp" alt="Пресс" loading="lazy">
+        <div class="gallery-label">Пресс</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>💰 Программы и цены</h2>
+    <div class="pricing-grid">
+
+      <div class="pricing-card popular" onclick="selectPlan('online', 150, 'Онлайн-ведение 4 недели')">
+        <div class="popular-badge">САМЫЙ ВЫБОР</div>
+        <div style="font-size:1.4rem; font-weight:900; margin-bottom:12px; color:var(--primary);">📱 Онлайн-ведение</div>
+        <div class="price"><span class="price-currency">$</span>150</div>
+        <div class="period">4 недели • $37.5/неделя</div>
+        <ul class="features-list">
+          <li>Персональная программа тренировок</li>
+          <li>Индивидуальный план питания</li>
+          <li>Ежедневная поддержка в чате</li>
+          <li>Еженедельная коррекция</li>
+          <li>Доступ к видео-упражнениям</li>
+          <li>Чек-листы и трекеры прогресса</li>
+        </ul>
+        <button class="btn btn-pay" onclick="event.stopPropagation(); payWithStars('online', 150, 'Онлайн-ведение 4 недели')">
+          💳 Оплатить и начать сейчас
+        </button>
+        <div style="margin-top:12px; font-size:0.8rem; opacity:0.7; text-align:center;">
+          🔥 12 человек выбирают этот план
+        </div>
+      </div>
+
+      <div class="pricing-card" onclick="selectPlan('personal', 60, 'Персональные тренировки')">
+        <div style="font-size:1.4rem; font-weight:900; margin-bottom:12px; color:var(--primary);">🏋️ Персональные тренировки</div>
+        <div class="price"><span class="price-currency">$</span>60<span class="savings-badge">-20%</span></div>
+        <div class="period">1 час • Пакет 5 занятий: $240</div>
+        <ul class="features-list">
+          <li>Индивидуальная тренировка в зале</li>
+          <li>Коррекция техники выполнения</li>
+          <li>План тренировок на месяц</li>
+          <li>Рекомендации по питанию</li>
+          <li>Анализ текущей формы</li>
+        </ul>
+        <button class="btn btn-primary" onclick="event.stopPropagation(); bookService('Персональные тренировки — $60/час')">
+          📅 Записаться на пробное
+        </button>
+      </div>
+
+      <div class="pricing-card" onclick="selectPlan('nutrition', 80, 'План питания + тренировки')">
+        <div style="font-size:1.4rem; font-weight:900; margin-bottom:12px; color:var(--primary);">🍎 План питания + тренировки</div>
+        <div class="price"><span class="price-currency">$</span>80</div>
+        <div class="period">единоразово + 2 недели поддержки</div>
+        <ul class="features-list">
+          <li>Индивидуальный рацион на месяц</li>
+          <li>Программа тренировок на 8 недель</li>
+          <li>Список продуктов и рецепты</li>
+          <li>Рекомендации по добавкам</li>
+          <li>2 консультации по внедрению</li>
+        </ul>
+        <button class="btn btn-primary" onclick="event.stopPropagation(); bookService('План питания + тренировки — $80')">
+          📋 Получить план
+        </button>
+      </div>
+
+    </div>
+
+    <div style="text-align:center; margin-top:32px;">
+      <button class="btn btn-secondary" onclick="showForm()">
+        🤔 Не уверены в выборе? Получите консультацию
+      </button>
+    </div>
+  </div>
+
+  <div class="section form-section" id="formSection">
+    <h2>📩 Бесплатная консультация</h2>
+
+    <div class="offer">
+      🎁 Только сегодня: консультация + программа на 7 дней БЕСПЛАТНО!
+      <div class="timer" id="timer">15:00</div>
+      <div style="margin-top:8px; font-size:0.9rem;">Осталось 3 места для новых клиентов</div>
+    </div>
+
+    <div id="selectedPlanInfo" style="background:linear-gradient(135deg,rgba(40,167,69,0.1),rgba(32,201,151,0.1)); padding:20px; border-radius:var(--radius-sm); margin-bottom:24px; display:none;">
+      <strong style="color:var(--primary);">📌 Вы выбрали:</strong> <span id="planDisplay" style="font-weight:900; font-size:1.1rem;"></span>
+    </div>
+
+    <div class="form-group">
+      <input type="text" id="name" placeholder="👤 Ваше имя" required autocomplete="name" oninput="validateField(this)">
+      <div class="error-message" id="nameError">Пожалуйста, введите ваше имя</div>
+    </div>
+
+    <div class="form-group">
+      <input type="tel" id="phone" placeholder="📱 Телефон или Telegram" required autocomplete="tel" oninput="formatPhone(this)">
+      <div class="error-message" id="phoneError">Введите корректный номер телефона</div>
+      <button class="btn btn-secondary" style="margin-top:12px; font-size:0.95rem; padding:14px;" onclick="requestContact()">
+        📲 Поделиться контактом из Telegram
+      </button>
+    </div>
+
+    <div class="form-group">
+      <select id="goal" required onchange="validateField(this)">
+        <option value="">🎯 Выберите основную цель</option>
+        <option value="похудеть">Похудеть</option>
+        <option value="набрать массу">Набрать мышечную массу</option>
+        <option value="здоровье">Улучшить самочувствие</option>
+        <option value="рельеф">Сделать тело рельефным</option>
+        <option value="поддержание">Поддержание формы</option>
+        <option value="не знаю">Не знаю, нужна консультация</option>
+      </select>
+      <div class="error-message" id="goalError">Выберите вашу цель</div>
+    </div>
+
+    <div class="form-group">
+      <textarea id="comment" placeholder="💬 Расскажите о вашем опыте, травмах, пожеланиях (не обязательно)" rows="4"></textarea>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.03); padding:20px; border-radius:var(--radius-sm); margin:24px 0; border:1px solid var(--border);">
+      <div style="display:flex; align-items:flex-start; gap:16px;">
+        <input type="checkbox" id="consent" required style="width:24px; height:24px; flex-shrink:0; margin-top:4px;">
+        <label for="consent" style="font-size:0.95rem; line-height:1.5;">
+          <strong>Согласие на обработку данных</strong><br>
+          <span style="opacity:0.8;">Я согласен на обработку персональных данных и получение информации о программах. Отправляя заявку, я подтверждаю желание получить бесплатный план на 7 дней.</span>
+        </label>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="submitLead()" id="submitBtn">
+      🚀 Получить бесплатный план (3 места осталось)
+    </button>
+
+    <p style="text-align:center; margin-top:24px; font-size:0.95rem; opacity:0.8; line-height:1.6;">
+      ⚡ <strong>Гарантируем ответ в течение 10-15 минут</strong> в рабочее время<br>
+      📞 Мы перезваниваем на указанный номер или пишем в Telegram
+    </p>
+  </div>
+
+  <div class="footer">
+    <h3 style="margin-bottom:20px; color:var(--text); font-size:1.3rem;">📞 Контакты для связи</h3>
+    <div class="contact-links">
+      <a href="https://t.me/ваш_username" class="contact-link" target="_blank" onclick="trackEvent('contact_click', {platform: 'telegram'})">
+        <span style="font-size:1.2rem;">💬</span> Telegram
+      </a>
+      <a href="https://wa.me/вашномер" class="contact-link" target="_blank" onclick="trackEvent('contact_click', {platform: 'whatsapp'})">
+        <span style="font-size:1.2rem;">📱</span> WhatsApp
+      </a>
+      <a href="mailto:ваш@email.com" class="contact-link" onclick="trackEvent('contact_click', {platform: 'email'})">
+        <span style="font-size:1.2rem;">✉️</span> Email
+      </a>
+    </div>
+    <div style="margin:32px 0; padding:20px; background:rgba(40,167,69,0.05); border-radius:var(--radius-md); border:1px solid rgba(40,167,69,0.1);">
+      <div style="font-weight:700; margin-bottom:8px; color:var(--primary);">📍 Зона работы:</div>
+      <div style="opacity:0.8; line-height:1.6;">
+        Phoenix, Arizona (очные тренировки)<br>
+        🌍 Онлайн по всему миру через Telegram/WhatsApp
+      </div>
+    </div>
+    <p style="margin-top:24px; font-size:0.85rem; line-height:1.6; opacity:0.7;">
+      © 2025–2026 Vitaliy Couch Fitness<br>
+      Сертифицированный персональный тренер • Специалист по трансформации тела<br>
+      Результаты индивидуальны и зависят от соблюдения программы
+    </p>
+  </div>
 
 </div>
 
-<!-- ... (модалка успеха, floating CTA, скрипты) ... -->
+<div class="success-modal" id="successModal">
+  <div class="modal-content">
+    <div class="modal-icon">🎉</div>
+    <h2 style="font-size:2rem; margin-bottom:12px;">Отлично!</h2>
+    <p style="margin:20px 0; opacity:0.9; line-height:1.6; font-size:1.1rem;">
+      Заявка принята!<br>
+      Я свяжусь с вами в ближайшие <strong style="color:var(--primary);">10-15 минут</strong>.<br>
+      Проверьте Telegram и телефон.
+    </p>
+    <div style="background:linear-gradient(135deg, rgba(40,167,69,0.1), rgba(32,201,151,0.1)); padding:20px; border-radius:var(--radius-sm); margin:24px 0; border:1px solid rgba(40,167,69,0.2);">
+      <strong style="color:var(--primary); display:block; margin-bottom:8px;">📌 Ваш следующий шаг:</strong>
+      <div style="opacity:0.9; font-size:0.95rem;">
+        1. Подготовьте вопросы о тренировках и питании<br>
+        2. Будьте готовы обсудить ваш график<br>
+        3. Проверьте Telegram для быстрой связи
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="closeModal()" style="padding:20px 40px; font-size:1.2rem;">
+      👍 Понятно, жду звонка!
+    </button>
+    <div style="margin-top:20px; font-size:0.9rem; opacity:0.7;">
+      Если не получили ответ в течение 30 минут,<br>напишите напрямую в Telegram
+    </div>
+  </div>
+</div>
+
+<div class="floating-cta" id="floatCta">
+  <button class="btn btn-primary" onclick="showForm()">
+    🎁 Получить бесплатный план (3 места)
+  </button>
+</div>
 
 <script>
-// ... (весь предыдущий скрипт остаётся)
+const tg = window.Telegram.WebApp;
+let selectedPlan = null;
+let timerInterval = null;
+let selectedGoal = null;
+let spotsLeft = 3;
 
-// Добавляем анимацию появления карточек при скролле
-document.addEventListener('DOMContentLoaded', () => {
-  const cards = document.querySelectorAll('.result-card');
+// Инициализация
+function initApp() {
+  tg.expand();
+  tg.ready();
+  tg.enableClosingConfirmation();
   
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.15 });
+  // Установка BackButton
+  tg.BackButton.onClick(() => {
+    const form = document.getElementById('formSection');
+    if (form.style.display === 'block') {
+      form.style.display = 'none';
+      document.getElementById('floatCta').classList.remove('hidden');
+      tg.BackButton.hide();
+      tg.HapticFeedback.impactOccurred('light');
+    }
+  });
+  
+  // Автоопределение языка
+  const userLang = tg.initDataUnsafe.user?.language_code || 'ru';
+  if (userLang !== 'ru') {
+    document.documentElement.lang = userLang;
+  }
+  
+  applyTheme();
+  tg.onEvent('themeChanged', applyTheme);
+}
 
-  cards.forEach(card => observer.observe(card));
+// Улучшенная тема с поддержкой dark mode
+function applyTheme() {
+  const t = tg.themeParams;
+  const isDark = tg.colorScheme === 'dark';
+  
+  document.documentElement.style.setProperty('--bg', t.bg_color || (isDark ? '#121212' : '#f8f9fa'));
+  document.documentElement.style.setProperty('--text', t.text_color || (isDark ? '#ffffff' : '#212529'));
+  document.documentElement.style.setProperty('--section-bg', t.section_bg_color || (isDark ? '#1e1e1e' : 'white'));
+  document.documentElement.style.setProperty('--hint', t.hint_color || (isDark ? '#a0a0a0' : '#6c757d'));
+  document.documentElement.style.setProperty('--border', t.section_separator_color || (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'));
+  
+  // Добавляем класс для темной темы
+  if (isDark) {
+    document.body.classList.add('dark-theme');
+  } else {
+    document.body.classList.remove('dark-theme');
+  }
+}
+
+// Загрузка страницы с улучшениями
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const loader = document.getElementById('loader');
+    loader.style.opacity = '0';
+    setTimeout(() => {
+      loader.style.display = 'none';
+      initApp();
+      
+      // Автозаполнение данных пользователя
+      if (tg.initDataUnsafe.user) {
+        const user = tg.initDataUnsafe.user;
+        const nameField = document.getElementById('name');
+        if (user.first_name && !nameField.value) {
+          nameField.value = user.first_name;
+          validateField(nameField);
+        }
+        
+        // Добавляем аватар из Telegram если есть фото
+        if (user.photo_url) {
+          const avatar = document.querySelector('.avatar');
+          avatar.src = user.photo_url;
+        }
+      }
+      
+      // Запуск таймера с сохранением состояния
+      const savedTime = localStorage.getItem('timer_end');
+      if (savedTime) {
+        const timeLeft = Math.max(0, Math.floor((parseInt(savedTime) - Date.now()) / 1000));
+        startTimer(timeLeft > 0 ? timeLeft : 15 * 60);
+      } else {
+        startTimer(15 * 60);
+      }
+      
+      // Инициализация счетчика мест
+      const savedSpots = localStorage.getItem('spots_left');
+      if (savedSpots) {
+        spotsLeft = parseInt(savedSpots);
+        updateSpotsCounter();
+      }
+      
+      trackEvent('page_view', {
+        platform: tg.platform,
+        theme: tg.colorScheme,
+        version: tg.version
+      });
+      
+    }, 400);
+  }, 1000);
 });
+
+// Улучшенный таймер с сохранением состояния
+function startTimer(seconds) {
+  const timerEl = document.getElementById('timer');
+  const endTime = Date.now() + seconds * 1000;
+  localStorage.setItem('timer_end', endTime.toString());
+  
+  updateTimer();
+  timerInterval = setInterval(updateTimer, 1000);
+  
+  function updateTimer() {
+    const now = Date.now();
+    const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+    
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timerEl.textContent = '00:00';
+      timerEl.style.background = '#6c757d';
+      timerEl.style.animation = 'none';
+      localStorage.removeItem('timer_end');
+      return;
+    }
+    
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    timerEl.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    
+    // Меняем цвет при малом времени
+    if (timeLeft <= 300) { // 5 минут
+      timerEl.style.background = 'linear-gradient(135deg, #ff6b6b, #ff4757)';
+      timerEl.style.animation = 'pulse 0.5s infinite';
+    }
+  }
+}
+
+// Улучшенная валидация
+function validateField(field) {
+  const errId = field.id + 'Error';
+  const errEl = document.getElementById(errId);
+  
+  if (field.type === 'tel') {
+    const phoneRegex = /^[\d\s\(\)\-+]+$/;
+    const value = field.value.replace(/\D/g, '');
+    const isValid = value.length >= 10 && phoneRegex.test(field.value);
+    
+    if (!isValid && field.value.trim() !== '') {
+      field.classList.add('error');
+      field.classList.remove('success');
+      if (errEl) {
+        errEl.textContent = 'Введите корректный номер телефона (минимум 10 цифр)';
+        errEl.style.display = 'block';
+      }
+      return false;
+    } else if (field.value.trim() === '') {
+      field.classList.add('error');
+      field.classList.remove('success');
+      if (errEl) {
+        errEl.textContent = 'Это поле обязательно для заполнения';
+        errEl.style.display = 'block';
+      }
+      return false;
+    } else {
+      field.classList.remove('error');
+      field.classList.add('success');
+      if (errEl) errEl.style.display = 'none';
+      return true;
+    }
+  }
+  
+  if (field.value.trim() === '') {
+    field.classList.add('error');
+    field.classList.remove('success');
+    if (errEl) {
+      errEl.textContent = field.placeholder.includes('цель') ? 'Пожалуйста, выберите цель' : 'Это поле обязательно для заполнения';
+      errEl.style.display = 'block';
+    }
+    return false;
+  } else {
+    field.classList.remove('error');
+    field.classList.add('success');
+    if (errEl) errEl.style.display = 'none';
+    return true;
+  }
+}
+
+// Улучшенное форматирование телефона
+function formatPhone(input) {
+  let value = input.value.replace(/\D/g, '');
+  
+  if (value.length > 0) {
+    if (value.length <= 3) {
+      value = value;
+    } else if (value.length <= 6) {
+      value = `(${value.slice(0,3)}) ${value.slice(3)}`;
+    } else if (value.length <= 10) {
+      value = `(${value.slice(0,3)}) ${value.slice(3,6)}-${value.slice(6)}`;
+    } else {
+      value = `(${value.slice(0,3)}) ${value.slice(3,6)}-${value.slice(6,10)}`;
+    }
+  }
+  
+  input.value = value;
+  validateField(input);
+}
+
+// Выбор цели
+function selectGoal(goal) {
+  selectedGoal = goal;
+  const goalSelect = document.getElementById('goal');
+  goalSelect.value = goal;
+  validateField(goalSelect);
+  tg.HapticFeedback.selectionChanged();
+  trackEvent('goal_select', { goal });
+}
+
+// Показать форму с улучшениями
+function showForm() {
+  const form = document.getElementById('formSection');
+  const floatCta = document.getElementById('floatCta');
+  
+  form.style.display = 'block';
+  floatCta.classList.add('hidden');
+  
+  // Плавная прокрутка с отступом
+  setTimeout(() => {
+    form.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start',
+      inline: 'nearest'
+    });
+  }, 100);
+  
+  tg.BackButton.show();
+  tg.MainButton.hide();
+  tg.HapticFeedback.impactOccurred('medium');
+  
+  trackEvent('form_open', { source: 'button' });
+}
+
+// Выбор плана
+function selectPlan(type, amount, name) {
+  selectedPlan = {type, price:amount, name};
+  
+  const planDisplay = document.getElementById('planDisplay');
+  const planInfo = document.getElementById('selectedPlanInfo');
+  
+  planDisplay.textContent = name;
+  planInfo.style.display = 'block';
+  
+  // Анимация появления
+  planInfo.style.animation = 'fadeIn 0.5s';
+  
+  showForm();
+  trackEvent('plan_select', { type, amount, name });
+}
+
+// Оплата через Stars
+function payWithStars(type, amount, name) {
+  if (spotsLeft <= 0) {
+    tg.showAlert('❌ К сожалению, все места на этой неделе заняты. Пожалуйста, оставьте заявку для записи на следующую неделю.');
+    return;
+  }
+  
+  selectedPlan = {type, price:amount, name};
+  document.getElementById('planDisplay').textContent = name;
+  document.getElementById('selectedPlanInfo').style.display = 'block';
+  
+  showForm();
+  
+  tg.openInvoice({
+    title: `${name} • Vitaliy Couch Fitness`,
+    description: 'Персональный план тренировок + питание + поддержка 4 недели\n🔥 Гарантия результата или возврат денег',
+    payload: JSON.stringify({
+      type, 
+      userId: tg.initDataUnsafe.user?.id || 'anon', 
+      username: tg.initDataUnsafe.user?.username || '',
+      timestamp: Date.now()
+    }),
+    provider_token: '',
+    currency: 'XTR',
+    prices: [{label: name, amount: amount * 100}]
+  }, (status) => {
+    if (status === 'paid') {
+      tg.showAlert('✅ Оплата прошла успешно! Программа активирована. Добро пожаловать в команду! 🎉');
+      tg.HapticFeedback.notificationOccurred('success');
+      
+      // Уменьшаем количество мест
+      spotsLeft--;
+      updateSpotsCounter();
+      localStorage.setItem('spots_left', spotsLeft.toString());
+      
+      tg.sendData(JSON.stringify({
+        action: 'paid', 
+        plan: type, 
+        amount,
+        userId: tg.initDataUnsafe.user?.id,
+        timestamp: new Date().toISOString()
+      }));
+      
+      // Показываем успех и закрываем
+      setTimeout(() => {
+        document.getElementById('successModal').classList.add('active');
+      }, 500);
+      
+      trackEvent('payment_success', { type, amount });
+      
+    } else if (status === 'cancelled') {
+      tg.showAlert('Оплата отменена. Если передумаете — всегда можете вернуться!');
+      trackEvent('payment_cancelled', { type, amount });
+    } else if (status === 'failed') {
+      tg.showAlert('❌ Ошибка оплаты. Пожалуйста, попробуйте позже или выберите другой способ оплаты.');
+      trackEvent('payment_failed', { type, amount });
+    }
+  });
+}
+
+// Забронировать услугу
+function bookService(service) {
+  if (spotsLeft <= 0) {
+    tg.showAlert('❌ К сожалению, все места на этой неделе заняты. Пожалуйста, оставьте заявку для записи на следующую неделю.');
+    return;
+  }
+  
+  tg.sendData(JSON.stringify({
+    action:'book', 
+    service,
+    userId: tg.initDataUnsafe.user?.id,
+    timestamp: new Date().toISOString()
+  }));
+  tg.showAlert(`✅ Запрос на «${service}» отправлен! Свяжусь с вами в ближайшее время.`);
+  tg.HapticFeedback.notificationOccurred('success');
+  trackEvent('service_book', { service });
+}
+
+// Запрос контакта через Telegram
+function requestContact() {
+  tg.requestContact((success, response) => {
+    if (success && response?.phone_number) {
+      const phoneField = document.getElementById('phone');
+      phoneField.value = formatPhoneNumber(response.phone_number);
+      validateField(phoneField);
+      tg.showAlert('✅ Контакт получен! Телефон добавлен в форму.');
+      tg.HapticFeedback.notificationOccurred('success');
+      trackEvent('contact_shared');
+    } else {
+      tg.showAlert('❌ Не удалось получить контакт. Пожалуйста, введите номер вручную.');
+      tg.HapticFeedback.notificationOccurred('error');
+    }
+  });
+}
+
+function formatPhoneNumber(phone) {
+  const cleaned = phone.replace(/\D/g, '');
+  const match = cleaned.match(/^(\d{1,3})(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    return `+${match[1]} (${match[2]}) ${match[3]}-${match[4]}`;
+  }
+  return phone;
+}
+
+// Отправка лида
+function submitLead() {
+  if (spotsLeft <= 0) {
+    tg.showAlert('❌ К сожалению, все места на этой неделе заняты. Пожалуйста, оставьте заявку для записи на следующую неделю.');
+    return;
+  }
+  
+  const name = document.getElementById('name');
+  const phone = document.getElementById('phone');
+  const goal = document.getElementById('goal');
+  const consent = document.getElementById('consent');
+  const comment = document.getElementById('comment');
+
+  // Валидация всех полей
+  const isValid = validateField(name) && validateField(phone) && validateField(goal);
+  
+  if (!isValid) {
+    tg.showAlert('⚠️ Пожалуйста, заполните все обязательные поля корректно');
+    tg.HapticFeedback.notificationOccurred('error');
+    return;
+  }
+
+  if (!consent.checked) {
+    tg.showAlert('📋 Подтвердите согласие на обработку данных');
+    tg.HapticFeedback.notificationOccurred('error');
+    return;
+  }
+
+  const data = {
+    action: 'lead',
+    name: name.value.trim(),
+    phone: phone.value.trim(),
+    goal: goal.value,
+    comment: comment.value.trim(),
+    plan: selectedPlan || {type:'consultation', price:0, name:'Бесплатная консультация'},
+    user: tg.initDataUnsafe.user || {},
+    timestamp: new Date().toISOString(),
+    platform: tg.platform,
+    version: tg.version,
+    spots_left: spotsLeft
+  };
+
+  const btn = document.getElementById('submitBtn');
+  const originalText = btn.innerHTML;
+  const originalWidth = btn.offsetWidth;
+  
+  btn.style.width = originalWidth + 'px';
+  btn.innerHTML = '<span class="btn-spinner">⏳</span> Отправляем...';
+  btn.disabled = true;
+
+  // Имитация отправки с анимацией
+  setTimeout(() => {
+    // Уменьшаем количество мест
+    spotsLeft--;
+    updateSpotsCounter();
+    localStorage.setItem('spots_left', spotsLeft.toString());
+    
+    // Отправка данных
+    tg.sendData(JSON.stringify(data));
+    
+    // Показ успеха
+    document.getElementById('successModal').classList.add('active');
+    
+    // Тактильная отдача
+    tg.HapticFeedback.notificationOccurred('success');
+    
+    // Аналитика
+    trackEvent('lead_submitted', {
+      goal: data.goal,
+      has_plan: !!selectedPlan,
+      spots_left: spotsLeft
+    });
+
+    // Восстановление кнопки
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      btn.style.width = '';
+      
+      // Сброс формы
+      document.getElementById('formSection').reset();
+      document.getElementById('selectedPlanInfo').style.display = 'none';
+      selectedPlan = null;
+      selectedGoal = null;
+      
+      // Обновление счетчика в плавающей кнопке
+      const floatBtn = document.querySelector('#floatCta button');
+      floatBtn.innerHTML = `🎁 Получить бесплатный план (${spotsLeft} места)`;
+      
+    }, 2000);
+    
+  }, 1500);
+}
+
+// Обновление счетчика мест
+function updateSpotsCounter() {
+  const spotsText = spotsLeft > 0 ? `(${spotsLeft} места)` : '(мест нет)';
+  document.querySelectorAll('#mainCta, #floatCta button, #submitBtn').forEach(btn => {
+    if (btn.id !== 'submitBtn') {
+      btn.innerHTML = btn.innerHTML.replace(/\(\d+ места\)|\(мест нет\)/, spotsText);
+    }
+  });
+  
+  if (spotsLeft <= 0) {
+    document.querySelectorAll('.offer, #timer').forEach(el => {
+      el.style.opacity = '0.5';
+    });
+  }
+}
+
+// Закрыть модалку
+function closeModal() {
+  document.getElementById('successModal').classList.remove('active');
+  setTimeout(() => {
+    document.getElementById('floatCta').classList.remove('hidden');
+  }, 300);
+  
+  // Возврат к началу страницы
+  setTimeout(() => {
+    document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' });
+  }, 500);
+}
+
+// Трекинг событий
+function trackEvent(eventName, properties = {}) {
+  const eventData = {
+    event: eventName,
+    ...properties,
+    timestamp: new Date().toISOString(),
+    user_id: tg.initDataUnsafe.user?.id || 'anonymous',
+    platform: tg.platform,
+    theme: tg.colorScheme
+  };
+  
+  console.log('📊 Event:', eventData);
+  
+  // Можно интегрировать с Google Analytics, Amplitude и т.д.
+  if (typeof gtag !== 'undefined') {
+    gtag('event', eventName, properties);
+  }
+}
+
+// MainButton Telegram с улучшениями
+tg.MainButton
+  .setText(`🎁 Бесплатный план (${spotsLeft} места)`)
+  .setParams({
+    color: '#28a745',
+    text_color: '#ffffff'
+  })
+  .show()
+  .onClick(() => {
+    showForm();
+    trackEvent('main_button_click');
+  });
+
+// Обработка видимости страницы
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    trackEvent('page_visible');
+  }
+});
+
+// Сохранение лидов в localStorage как fallback
+function saveLeadLocally(data) {
+  try {
+    const leads = JSON.parse(localStorage.getItem('fitness_leads') || '[]');
+    leads.push({ ...data, saved_at: new Date().toISOString() });
+    localStorage.setItem('fitness_leads', JSON.stringify(leads.slice(-50)));
+  } catch (e) {
+    console.error('Не удалось сохранить лид:', e);
+  }
+}
+
+// Синхронизация лидов при интернете
+function syncLeads() {
+  try {
+    const leads = JSON.parse(localStorage.getItem('fitness_leads') || '[]');
+    if (leads.length > 0 && navigator.onLine) {
+      leads.forEach(lead => {
+        tg.sendData(JSON.stringify({
+          ...lead,
+          action: 'lead_sync',
+          sync_time: new Date().toISOString()
+        }));
+      });
+      localStorage.removeItem('fitness_leads');
+    }
+  } catch (e) {
+    console.error('Ошибка синхронизации:', e);
+  }
+}
+
+// Проверяем интернет соединение
+window.addEventListener('online', syncLeads);
+
+// Инициализация при загрузке
+initApp();
 </script>
 </body>
-</html>
+  </html>
