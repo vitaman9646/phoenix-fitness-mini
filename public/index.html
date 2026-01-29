@@ -1,1399 +1,1942 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#28a745">
-  <meta name="description" content="Персональный онлайн-тренер Виталий Карпинский. -8–15 кг за 8 недель. 500+ трансформаций. Абакан, Россия + онлайн по всему миру.">
-  <title>Виталий Карпинский | Персональный тренер</title>
-
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
+  <meta charset="UTF-8" />
+  <title>Vitaliy Couch Fitness — персональные тренировки</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      --primary: #28a745;
-      --primary-dark: #218838;
-      --accent: #20c997;
-      --danger: #dc3545;
-      --warning: #ffc107;
-      --bg: var(--tg-theme-bg-color, #f8f9fa);
-      --text: var(--tg-theme-text-color, #212529);
-      --section-bg: var(--tg-theme-section-bg-color, #ffffff);
-      --hint: var(--tg-theme-hint-color, #6c757d);
-      --border: var(--tg-theme-section-separator-color, rgba(0,0,0,0.08));
-      --radius-lg: 20px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
-      --shadow: 0 6px 20px rgba(40,167,69,0.18);
-      --shadow-lg: 0 12px 32px rgba(40,167,69,0.22);
-      --gradient-primary: linear-gradient(90deg, var(--primary), var(--accent));
-      --gradient-soft: linear-gradient(180deg, var(--section-bg) 0%, rgba(40,167,69,0.03) 100%);
-      --transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --bg: #05060a;
+      --bg-alt: #0b0d14;
+      --card: #101320;
+      --primary: #35d48b;
+      --primary-soft: rgba(53, 212, 139, 0.12);
+      --accent: #ff6b6b;
+      --text: #f5f5f7;
+      --muted: #9ca3af;
+      --border-soft: rgba(255, 255, 255, 0.06);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.55);
+      --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.45);
+      --transition-fast: 0.2s ease;
+      --transition-med: 0.3s ease;
     }
 
     * {
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
+      box-sizing: border-box;
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Segoe UI Emoji', sans-serif;
-      background: var(--bg);
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      background: radial-gradient(circle at top, #15192b 0, #05060a 55%);
       color: var(--text);
-      min-height: 100vh;
-      line-height: 1.55;
-      font-size: 16px;
-      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    body.loading {
-      overflow: hidden;
-    }
-
-    .container {
-      max-width:460px;
-      margin:0 auto;
-      padding:16px;
-      padding-bottom:100px;
-    }
-
-    #loader {
-      position:fixed;
-      inset:0;
-      background:var(--bg);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-      transition:opacity 0.4s ease;
-    }
-
-    #loader.hidden {
-      opacity:0;
-      pointer-events:none;
-    }
-
-    .loader-progress {
-      width:200px;
-      height:4px;
-      background:rgba(40,167,69,0.1);
-      border-radius:2px;
-      margin:20px 0;
-      overflow:hidden;
-    }
-
-    .loader-progress-bar {
-      height:100%;
-      background:var(--gradient-primary);
-      border-radius:2px;
-      animation:loader-progress 1.5s ease-in-out infinite;
-    }
-
-    @keyframes loader-progress {
-      0% { transform:translateX(-100%); }
-      100% { transform:translateX(100%); }
+    .app {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px 16px 120px;
     }
 
     .hero {
-      text-align:center;
-      padding:32px 20px 48px;
-      background:var(--gradient-soft);
-      border-radius:var(--radius-lg);
-      margin-bottom:24px;
-      border:1px solid var(--border);
-      box-shadow:var(--shadow);
-      position:relative;
-      overflow:hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 24px;
     }
 
-    .hero::before {
-      content:'';
-      position:absolute;
-      top:0;
-      left:0;
-      right:0;
-      height:4px;
-      background: var(--gradient-primary);
-      background-size: 200% 100%;
-      animation:gradient-shift 3s ease infinite;
+    @media (max-width: 768px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
     }
 
-    @keyframes gradient-shift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .avatar-container {
-      position: relative;
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 20px;
-    }
-
-    .avatar {
-      width:100%;
-      height:100%;
-      border-radius:50%;
-      object-fit:cover;
-      border:4px solid var(--primary);
-      box-shadow:0 8px 24px rgba(40,167,69,0.25);
-      transition:var(--transition);
-      position: relative;
-    }
-
-    .avatar:hover {
-      transform:scale(1.05);
-      will-change: transform;
-    }
-
-    .online-status {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      width: 16px;
-      height: 16px;
-      background: #28a745;
-      border-radius: 50%;
-      border: 3px solid white;
-      box-shadow: 0 0 0 2px rgba(40,167,69,0.3);
-      animation: pulse-online 2s infinite;
-    }
-
-    @keyframes pulse-online {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.8; }
-    }
-
-    h1 {
-      font-size:2.1rem;
-      font-weight:800;
-      margin-bottom:8px;
-      background:var(--gradient-primary);
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-      position: relative;
-      display: inline-block;
-    }
-
-    h1::after {
-      content: '✅';
-      position: absolute;
-      right: -40px;
-      top: 0;
-      font-size: 1.5rem;
-      animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
-    }
-
-    .subtitle {
-      font-size:1.05rem;
-      color:var(--hint);
-      margin-bottom:20px;
-      position: relative;
-      display: inline-block;
-      padding: 4px 12px;
-      background: rgba(40,167,69,0.08);
-      border-radius: 20px;
-    }
-
-    .stats {
-      display:flex;
-      justify-content:center;
-      gap:24px;
-      margin:28px 0;
-      flex-wrap:wrap;
-      background: rgba(40,167,69,0.03);
-      padding: 20px;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(40,167,69,0.1);
-    }
-
-    .stat {
-      text-align:center;
-      padding:12px;
-      min-width:100px;
-      transition: var(--transition);
-    }
-
-    .stat:hover {
-      transform: translateY(-5px);
-      will-change: transform;
-    }
-
-    .stat-value {
-      font-size:2.1rem;
-      font-weight:800;
-      color:var(--primary);
-      line-height:1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:4px;
-      text-shadow: 0 2px 4px rgba(40,167,69,0.2);
-    }
-
-    .stat-label {
-      font-size:0.78rem;
-      color:var(--hint);
-      text-transform:uppercase;
-      letter-spacing:0.5px;
-      margin-top:4px;
-      font-weight: 600;
-    }
-
-    .guarantee-badge {
-      display:inline-flex;
-      align-items:center;
-      gap:12px;
-      background: linear-gradient(135deg, #fff3cd, #ffe8cc, #fff3cd);
-      background-size: 200% 100%;
-      animation: gradient-shift 3s ease infinite;
-      color:#664d03;
-      padding:14px 20px;
-      border-radius:30px;
-      font-weight:700;
-      margin:16px 0;
-      border:2px solid #ffc107;
-      box-shadow: 0 4px 12px rgba(255,193,7,0.3);
-      font-size: 1.05rem;
-    }
-
-    .section {
-      background:var(--section-bg);
-      border-radius:var(--radius-md);
-      padding:28px;
-      margin-bottom:20px;
-      border:1px solid var(--border);
-      box-shadow:0 2px 12px rgba(0,0,0,0.04);
-      transition:var(--transition);
-      position: relative;
-    }
-
-    .section:hover {
-      box-shadow:0 8px 24px rgba(0,0,0,0.08);
-    }
-
-    .section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 4px;
-      height: 100%;
-      background: var(--gradient-primary);
-      border-radius: var(--radius-md) 0 0 var(--radius-md);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .section:hover::before {
-      opacity: 1;
-    }
-
-    .section-title {
-      font-size:1.4rem;
-      font-weight:800;
-      margin-bottom:24px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid rgba(40,167,69,0.1);
-    }
-
-    .feature {
-      display:flex;
-      align-items:center;
-      gap:16px;
-      padding:18px;
-      border-radius:var(--radius-sm);
-      background:linear-gradient(90deg, rgba(40,167,69,0.05), transparent);
-      margin-bottom:12px;
-      border-left:4px solid var(--primary);
-      transition:var(--transition);
-      cursor: pointer;
-    }
-
-    .feature:hover {
-      background:linear-gradient(90deg, rgba(40,167,69,0.1), transparent);
-      transform:translateX(8px) scale(1.02);
-      box-shadow: 0 4px 12px rgba(40,167,69,0.1);
-      will-change: transform;
-    }
-
-    .feature.active {
-      background:rgba(40,167,69,0.12);
-      border-left-color: var(--accent);
-    }
-
-    .feature-icon {
-      font-size:2rem;
-      flex-shrink:0;
-    }
-
-    .gallery-grid {
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-      margin-top:16px;
-    }
-
-    .gallery-item {
-      border-radius:var(--radius-sm);
-      overflow:hidden;
-      aspect-ratio:1;
-      box-shadow:0 4px 12px rgba(0,0,0,0.08);
-      position:relative;
-      transition: var(--transition);
-    }
-
-    .gallery-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      will-change: transform;
-    }
-
-    .gallery-item img {
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      transition:transform 0.5s;
-    }
-
-    .gallery-item:hover img {
-      transform:scale(1.1);
-    }
-
-    .gallery-label {
-      position:absolute;
-      bottom:0;
-      left:0;
-      right:0;
-      background:linear-gradient(transparent, rgba(0,0,0,0.8));
-      color:white;
-      padding:10px;
-      font-size:0.8rem;
-      text-align:center;
-      font-weight:600;
-    }
-
-    .pricing-grid {
-      display:grid;
-      gap:24px;
-    }
-
-    .pricing-card {
-      background:linear-gradient(180deg, var(--section-bg) 0%, rgba(40,167,69,0.02) 100%);
-      border:2px solid transparent;
-      border-radius:var(--radius-md);
-      padding:28px;
-      box-shadow:var(--shadow);
-      transition:var(--transition);
-      position:relative;
-      cursor:pointer;
-    }
-
-    .pricing-card:hover,
-    .pricing-card:focus-within {
-      transform:translateY(-8px);
-      box-shadow:var(--shadow-lg);
-      border-color: var(--primary);
-      will-change: transform;
-    }
-
-    .pricing-card.popular {
-      border-color:var(--primary);
-      background: linear-gradient(180deg, rgba(40,167,69,0.05), rgba(40,167,69,0.01));
+    .hero-left {
+      padding: 18px 18px 20px;
+      border-radius: 24px;
+      background: radial-gradient(circle at top left, rgba(53, 212, 139, 0.18), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(255, 107, 107, 0.18), transparent 55%),
+                  linear-gradient(135deg, #05060a, #0b0d14);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       position: relative;
       overflow: hidden;
     }
 
-    .pricing-card.popular::before {
-      content: '🔥';
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      font-size: 1.5rem;
-      animation: fire 1s infinite alternate;
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(5, 6, 10, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 10px;
     }
 
-    @keyframes fire {
-      from { transform: scale(1); }
-      to { transform: scale(1.2); }
+    .hero-badge span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(53, 212, 139, 0.15);
+      color: var(--primary);
+      font-size: 11px;
     }
 
-    .popular-badge {
-      position:absolute;
-      top:-12px;
-      right:20px;
-      background:linear-gradient(135deg,var(--primary),var(--accent));
-      color:white;
-      padding:8px 16px;
-      border-radius:20px;
-      font-size:0.8rem;
-      font-weight:800;
-      box-shadow:0 4px 12px rgba(40,167,69,0.3);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .hero-title {
+      font-size: 26px;
+      line-height: 1.2;
+      font-weight: 800;
+      margin-bottom: 10px;
     }
 
-    .pricing-title {
-      font-size:1.4rem;
-      font-weight:900;
-      margin-bottom:12px;
-      color:var(--primary);
+    .hero-title span {
+      background: linear-gradient(120deg, #35d48b, #7cf5ff);
+      -webkit-background-clip: text;
+      color: transparent;
     }
 
-    .price {
-      font-size:2.8rem;
-      font-weight:900;
-      color:var(--primary);
-      margin:12px 0 4px;
-      display:flex;
-      align-items:baseline;
-      gap:4px;
-      text-shadow: 0 2px 4px rgba(40,167,69,0.1);
+    .hero-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 14px;
     }
 
-    .price-currency {
-      font-size:1.4rem;
-      opacity:0.9;
+    .hero-subtitle strong {
+      color: var(--text);
+      font-weight: 600;
     }
 
-    .period {
-      color:var(--hint);
-      font-size:0.95rem;
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
       margin-bottom: 16px;
     }
 
-    .savings-badge {
-      display:inline-block;
-      background:linear-gradient(135deg, #ff6b6b, #ff4757);
-      color:white;
-      padding:6px 12px;
-      border-radius:12px;
-      font-size:0.8rem;
-      font-weight:800;
-      margin-left:8px;
-      animation: pulse 1.5s infinite;
+    .hero-stat {
+      flex: 1 1 110px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(5, 6, 10, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 12px;
     }
 
-    @keyframes pulse {
-      0%,100% { transform:scale(1); }
-      50% { transform:scale(1.05); }
+    .hero-stat-label {
+      color: var(--muted);
+      margin-bottom: 4px;
     }
 
-    .features-list {
-      list-style:none;
-      margin:20px 0;
-      font-size:0.95rem;
+    .hero-stat-value {
+      font-weight: 700;
+      font-size: 14px;
     }
 
-    .features-list li {
-      margin-bottom:12px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding:8px 0;
-      border-bottom: 1px dashed rgba(0,0,0,0.05);
-    }
-
-    .features-list li:last-child {
-      border-bottom: none;
-    }
-
-    .features-list li::before {
-      content:'✓';
-      color:var(--primary);
-      font-weight:bold;
-      flex-shrink:0;
-      background: rgba(40,167,69,0.1);
-      width: 24px;
-      height: 24px;
+    .hero-cta-row {
       display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
       align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-    }
-
-    .btn {
-      width:100%;
-      padding:20px;
-      font-size:1.1rem;
-      font-weight:800;
-      border:none;
-      border-radius:var(--radius-md);
-      cursor:pointer;
-      transition:all 0.3s ease;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      position:relative;
-      overflow:hidden;
-      letter-spacing:0.5px;
-      background:transparent;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-      transition: left 0.7s;
-    }
-
-    .btn:hover::before {
-      left: 100%;
+      margin-top: 4px;
     }
 
     .btn-primary {
-      background:linear-gradient(135deg, var(--primary), var(--accent));
-      color:white;
-      box-shadow:0 10px 30px rgba(40,167,69,0.4);
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #35d48b, #1fb874);
+      color: #05060a;
+      font-weight: 700;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 12px 30px rgba(53, 212, 139, 0.35);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
+      white-space: nowrap;
     }
 
     .btn-primary:hover {
-      transform:translateY(-4px) scale(1.02);
-      box-shadow:0 15px 40px rgba(40,167,69,0.5);
-      will-change: transform;
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(53, 212, 139, 0.45);
     }
 
     .btn-primary:active {
-      transform:translateY(-1px) scale(0.98);
+      transform: translateY(0);
+      box-shadow: 0 8px 20px rgba(53, 212, 139, 0.3);
+      opacity: 0.9;
     }
 
-    .btn-secondary {
-      background:transparent;
-      color:var(--primary);
-      border:2px solid var(--primary);
-      box-shadow:0 4px 12px rgba(40,167,69,0.1);
+    .hero-note {
+      font-size: 12px;
+      color: var(--muted);
     }
 
-    .btn-secondary:hover {
-      background:rgba(40,167,69,0.05);
-      transform:translateY(-2px);
-      box-shadow:0 8px 20px rgba(40,167,69,0.15);
+    .hero-note span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .hero-right {
+      padding: 16px;
+      border-radius: 24px;
+      background: radial-gradient(circle at top, rgba(53, 212, 139, 0.2), transparent 60%),
+                  linear-gradient(145deg, #05060a, #0b0d14);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .coach-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+    }
+
+    .coach-photo {
+      width: 120px;
+      height: 120px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top, #35d48b, #05060a);
+      padding: 3px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+      position: relative;
+    }
+
+    .coach-photo-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background-image: url("https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg");
+      background-size: cover;
+      background-position: center;
+      filter: saturate(1.1);
+    }
+
+    .coach-name {
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .coach-location {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .coach-location span {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .coach-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .coach-tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(5, 6, 10, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+    }
+
+    .timer-card {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: radial-gradient(circle at left, rgba(255, 107, 107, 0.2), transparent 60%),
+                  rgba(5, 6, 10, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .timer-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .timer-value {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff6b6b, #ffb86c);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .spots-pill {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(5, 6, 10, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+    }
+
+    .section {
+      margin-top: 24px;
+      padding: 16px 14px;
+      border-radius: var(--radius-lg);
+      background: rgba(5, 6, 10, 0.9);
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-card);
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title span {
+      font-size: 18px;
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .trust-item {
+      padding: 10px 10px;
+      border-radius: var(--radius-md);
+      background: rgba(10, 12, 20, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 13px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .trust-item::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(53, 212, 139, 0.18), transparent 60%);
+      opacity: 0;
+      transition: opacity var(--transition-med);
+      pointer-events: none;
+    }
+
+    .trust-item:hover::before {
+      opacity: 1;
+    }
+
+    .trust-label {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .trust-text {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .mistakes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+
+    .mistake-card {
+      padding: 10px 10px;
+      border-radius: var(--radius-md);
+      background: rgba(10, 12, 20, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 13px;
+      position: relative;
+    }
+
+    .mistake-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 107, 107, 0.12);
+      color: #ffb3b3;
+      margin-bottom: 6px;
+    }
+
+    .mistake-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .mistake-text {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .mistake-conseq {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #ffb86c;
+    }
+
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .process-step {
+      padding: 10px 10px;
+      border-radius: var(--radius-md);
+      background: rgba(10, 12, 20, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 13px;
+      position: relative;
+    }
+
+    .process-step-number {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(53, 212, 139, 0.18);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .process-step-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .process-step-text {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .principles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .principle {
+      padding: 10px 10px;
+      border-radius: var(--radius-md);
+      background: rgba(10, 12, 20, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 13px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .principle-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(53, 212, 139, 0.18);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .principle-text {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .testimonials {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .testimonial {
+      padding: 12px 12px 12px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(10, 12, 20, 0.95);
+      border-left: 3px solid var(--primary);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 13px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .testimonial::after {
+      content: "“";
+      position: absolute;
+      right: 10px;
+      bottom: -10px;
+      font-size: 60px;
+      color: rgba(255, 255, 255, 0.04);
+      pointer-events: none;
+    }
+
+    .faq-item {
+      padding: 10px 10px;
+      border-radius: var(--radius-md);
+      background: rgba(10, 12, 20, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .faq-item.open {
+      background: rgba(15, 18, 30, 0.98);
+      border-color: rgba(53, 212, 139, 0.5);
+    }
+
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .faq-toggle {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(5, 6, 10, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .faq-answer {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      display: none;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    .cases-carousel {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      background: rgba(5, 6, 10, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 12px 10px 16px;
+    }
+
+    .cases-track {
+      display: flex;
+      transition: transform 0.4s ease;
       will-change: transform;
     }
 
-    .btn-pay {
-      background:linear-gradient(135deg,#ffd700,#ffaa00,#ffd700);
-      background-size:200% 100%;
-      color:#1a1a1a;
-      font-weight:900;
-      box-shadow:0 10px 30px rgba(255,215,0,0.5);
-      border: 2px solid #ffaa00;
+    .case-slide {
+      min-width: 100%;
+      padding: 4px 4px 0;
+      box-sizing: border-box;
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .btn-pay {
-        animation:none;
+    .case-inner {
+      display: grid;
+      grid-template-columns: 1.1fr 1.1fr;
+      gap: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .case-inner {
+        grid-template-columns: 1fr;
       }
     }
 
-    .btn-spinner {
-      display:inline-block;
-      animation:spin 1s linear infinite;
+    .case-photos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
     }
 
-    @keyframes spin {
-      to { transform:rotate(360deg); }
+    .case-photo {
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      background: #11131c;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .case-photo img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .case-label {
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: rgba(5, 6, 10, 0.85);
+      color: var(--muted);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .case-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .case-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .case-result {
+      font-size: 13px;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .case-text {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .case-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .case-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(5, 6, 10, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+    }
+
+    .cases-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    .cases-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .cases-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      transition: background var(--transition-fast), transform var(--transition-fast), width var(--transition-fast);
+    }
+
+    .cases-dot.active {
+      background: var(--primary);
+      transform: scale(1.1);
+      width: 14px;
+    }
+
+    .cases-arrows {
+      display: flex;
+      gap: 6px;
+    }
+
+    .cases-arrow-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 6, 10, 0.9);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .cases-arrow-btn:hover {
+      background: rgba(53, 212, 139, 0.15);
+      color: var(--primary);
+      border-color: rgba(53, 212, 139, 0.7);
+      transform: translateY(-1px);
     }
 
     .form-section {
-      opacity:0;
-      pointer-events:none;
-      transform:translateY(20px);
-      transition:0.3s ease;
+      margin-top: 24px;
+      padding: 16px 14px 18px;
+      border-radius: var(--radius-lg);
+      background: rgba(5, 6, 10, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: var(--shadow-card);
     }
 
-    .form-section.active {
-      opacity:1;
-      pointer-events:auto;
-      transform:translateY(0);
+    .form-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .form-group {
-      margin-bottom:24px;
-      position:relative;
+      margin-bottom: 10px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .form-label span {
+      color: var(--accent);
     }
 
     .input,
     .select,
     .textarea {
-      width:100%;
-      padding:18px 20px;
-      border:2px solid #dee2e6;
-      border-radius:var(--radius-sm);
-      font-size:1rem;
-      background:var(--bg);
-      color:var(--text);
-      transition:var(--transition);
-      font-family:inherit;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 6, 10, 0.9);
+      color: var(--text);
+      font-size: 13px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .textarea {
+      border-radius: 14px;
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    .input::placeholder,
+    .select::placeholder,
+    .textarea::placeholder {
+      color: rgba(156, 163, 175, 0.7);
     }
 
     .input:focus,
     .select:focus,
     .textarea:focus {
-      border-color:var(--primary);
-      outline:none;
-      box-shadow:0 0 0 4px rgba(40,167,69,0.15), inset 0 2px 4px rgba(0,0,0,0.02);
-      transform: translateY(-2px);
-      will-change: transform;
+      border-color: rgba(53, 212, 139, 0.7);
+      box-shadow: 0 0 0 1px rgba(53, 212, 139, 0.4);
+      background: rgba(5, 6, 10, 0.98);
+      transform: translateY(-1px);
     }
 
-    .input--error {
-      border-color:var(--danger);
+    .input.error,
+    .select.error,
+    .textarea.error {
+      border-color: rgba(255, 107, 107, 0.8);
+      box-shadow: 0 0 0 1px rgba(255, 107, 107, 0.4);
     }
 
-    .input--success {
-      border-color:var(--primary);
+    .input.success,
+    .select.success,
+    .textarea.success {
+      border-color: rgba(53, 212, 139, 0.8);
     }
 
     .error-message {
-      color:var(--danger);
-      font-size:0.85rem;
-      margin-top:8px;
-      display:none;
-      padding: 8px 12px;
-      background: rgba(220,53,69,0.05);
-      border-radius: var(--radius-sm);
-      border-left: 3px solid var(--danger);
+      font-size: 11px;
+      color: #ffb3b3;
+      margin-top: 3px;
+      display: none;
     }
 
-    .offer {
-      background:linear-gradient(135deg,#fff3cd,#ffe8cc,#fff3cd);
-      background-size:200% 100%;
-      color:#664d03;
-      padding:20px;
-      border-radius:var(--radius-sm);
-      text-align:center;
-      font-weight:800;
-      margin-bottom:24px;
-      border:2px solid #ffc107;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .offer::before {
-      content: '🔥';
-      position: absolute;
-      top: 10px;
-      left: 15px;
-      font-size: 1.5rem;
-    }
-
-    .timer {
-      display:inline-block;
-      background:linear-gradient(135deg, var(--danger), #ff6b6b);
-      color:white;
-      padding:10px 20px;
-      border-radius:20px;
-      font-weight:900;
-      margin-top:12px;
-      animation:pulse 1s infinite;
-      font-size: 1.2rem;
-      box-shadow: 0 4px 12px rgba(220,53,69,0.3);
-    }
-
-    .timer--inactive {
-      background:#6c757d !important;
-      animation:none !important;
-    }
-
-    .trust-badges {
+    .consent-row {
       display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin: 24px 0;
-      flex-wrap: wrap;
-    }
-
-    .trust-badge {
-      display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 8px;
-      padding: 10px 16px;
-      background: rgba(40,167,69,0.05);
-      border-radius: var(--radius-sm);
-      font-size: 0.9rem;
-      color: var(--hint);
-      border: 1px solid rgba(40,167,69,0.1);
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--muted);
     }
 
-    .testimonial {
-      background: linear-gradient(135deg, rgba(40,167,69,0.05), transparent);
-      padding: 20px;
+    .consent-row input {
+      margin-top: 2px;
+    }
+
+    .plan-box {
+      padding: 10px 10px;
       border-radius: var(--radius-md);
-      margin: 16px 0;
-      border-left: 4px solid var(--primary);
-      font-style: italic;
-      position: relative;
+      background: rgba(10, 12, 20, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 13px;
     }
 
-    .testimonial::before {
-      content: '"';
-      position: absolute;
-      top: 5px;
-      left: 15px;
-      font-size: 2.2rem;
-      color: rgba(40,167,69,0.2);
-      font-family: Georgia, serif;
+    .plan-title {
+      font-weight: 600;
+      margin-bottom: 4px;
     }
 
-    .progress-bar {
+    .plan-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .plan-list li {
+      margin-bottom: 2px;
+    }
+
+    .plan-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .plan-option {
+      padding: 8px 9px;
+      border-radius: 12px;
+      background: rgba(5, 6, 10, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .plan-option:hover {
+      border-color: rgba(53, 212, 139, 0.7);
+      background: rgba(10, 14, 20, 0.98);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .plan-option-name {
+      font-weight: 600;
+    }
+
+    .plan-option-price {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .plan-option-note {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .selected-plan-info {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      display: none;
+    }
+
+    .selected-plan-info span {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .btn-submit {
+      margin-top: 10px;
       width: 100%;
-      height: 8px;
-      background: rgba(40,167,69,0.1);
-      border-radius: 4px;
-      overflow: hidden;
-      margin: 12px 0;
+      border-radius: 999px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #35d48b, #1fb874);
+      color: #05060a;
+      font-weight: 700;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 12px 30px rgba(53, 212, 139, 0.35);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
     }
 
-    .progress-fill {
-      height: 100%;
-      background: var(--gradient-primary);
-      border-radius: 4px;
-      transition: width 0.5s ease;
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
     }
 
-    .success-modal {
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.9);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:10000;
-      padding:20px;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity 0.3s ease;
-      backdrop-filter: blur(5px);
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(53, 212, 139, 0.45);
     }
 
-    @supports not ((backdrop-filter: blur(5px))) {
-      .success-modal {
-        background:rgba(0,0,0,0.85);
+    .btn-spinner {
+      display: inline-block;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
       }
     }
 
-    .success-modal.active {
-      opacity:1;
-      pointer-events:auto;
+    .float-cta {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 12px;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 50;
     }
 
-    .modal-content {
-      background:linear-gradient(180deg, var(--section-bg) 0%, rgba(40,167,69,0.05) 100%);
-      border-radius:var(--radius-lg);
-      padding:40px 32px;
-      text-align:center;
-      max-width:400px;
-      width:100%;
-      border: 2px solid rgba(40,167,69,0.2);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      animation:modalSlideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    .float-cta-inner {
+      pointer-events: auto;
+      max-width: 960px;
+      width: 100%;
+      padding: 0 16px;
     }
 
-    @keyframes modalSlideUp {
-      from {transform:translateY(50px) scale(0.9); opacity:0;}
-      to {transform:translateY(0) scale(1); opacity:1;}
+    .float-cta button {
+      width: 100%;
+      border-radius: 999px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #35d48b, #1fb874);
+      color: #05060a;
+      font-weight: 700;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 12px 30px rgba(53, 212, 139, 0.35);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
     }
 
-    .modal-icon {
-      font-size:5rem;
-      margin-bottom:20px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      display: inline-block;
-      animation:bounce 1s;
+    .float-cta.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px);
+      transition: opacity var(--transition-med), transform var(--transition-med);
     }
 
-    .floating-cta {
-      position:fixed;
-      bottom:calc(20px + var(--safe-bottom));
-      left:50%;
-      transform:translateX(-50%);
-      width:calc(100% - 40px);
-      max-width:440px;
-      z-index:1000;
-      transition:all 0.3s;
-      filter: drop-shadow(0 10px 20px rgba(40,167,69,0.3));
+    .float-cta button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(53, 212, 139, 0.45);
     }
 
-    .floating-cta-inner {
-      animation:float 3s ease-in-out infinite;
+    .success-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-med);
     }
 
-    @keyframes float {
-      0%,100%{transform:translateY(0);}
-      50%{transform:translateY(-8px);}
+    .success-modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .floating-cta.hidden {
-      opacity:0;
-      transform:translateX(-50%) translateY(20px);
-      pointer-events:none;
+    .success-modal {
+      width: 100%;
+      max-width: 360px;
+      padding: 18px 16px 16px;
+      border-radius: 20px;
+      background: radial-gradient(circle at top, rgba(53, 212, 139, 0.2), transparent 60%),
+                  rgba(5, 6, 10, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      transform: translateY(20px) scale(0.96);
+      opacity: 0;
+      transition: transform var(--transition-med), opacity var(--transition-med);
+      text-align: center;
     }
 
-    .footer {
-      text-align:center;
-      padding:40px 20px calc(60px + var(--safe-bottom));
-      color:var(--hint);
-      font-size:0.9rem;
-      border-top:1px solid var(--border);
-      margin-top:40px;
-      background: linear-gradient(180deg, transparent 0%, rgba(40,167,69,0.02) 100%);
+    .success-modal-backdrop.active .success-modal {
+      transform: translateY(0) scale(1);
+      opacity: 1;
     }
 
-    .contact-links {
-      display:flex;
-      justify-content:center;
-      gap:16px;
-      margin:24px 0;
-      flex-wrap:wrap;
+    .success-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      background: rgba(53, 212, 139, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      font-size: 26px;
     }
 
-    .contact-link {
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:12px 24px;
-      background:linear-gradient(135deg, rgba(40,167,69,0.1), rgba(32,201,151,0.1));
-      color:var(--primary);
-      text-decoration:none;
-      border-radius:30px;
-      font-weight:700;
-      transition:all 0.3s;
-      border: 1px solid rgba(40,167,69,0.2);
-      min-width: 140px;
-      justify-content:center;
+    .success-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
     }
 
-    .contact-link:hover {
-      background:linear-gradient(135deg, rgba(40,167,69,0.2), rgba(32,201,151,0.2));
-      transform:translateY(-3px) scale(1.05);
-      box-shadow:0 8px 20px rgba(40,167,69,0.2);
-      will-change: transform;
+    .success-text {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
     }
 
-    @media (max-width:480px) {
-      .gallery-grid { grid-template-columns:repeat(2,1fr); }
-      .stats { gap:16px; }
-      .stat { min-width:85px; padding:10px; }
-      .stat-value { font-size:1.8rem; }
-      .contact-links { flex-direction: column; align-items: center; }
-      .contact-link { width: 100%; max-width: 280px; }
-      h1 { font-size: 1.8rem; }
-      .hero { padding: 24px 16px 40px; }
+    .success-btn {
+      border-radius: 999px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 9px 16px;
+      background: rgba(5, 6, 10, 0.9);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      width: 100%;
+      transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
     }
 
-    .dark-theme {
-      --bg:#121212;
-      --text:#ffffff;
-      --section-bg:#1e1e1e;
-      --hint:#a0a0a0;
-      --border:rgba(255,255,255,0.1);
+    .success-btn:hover {
+      background: rgba(10, 12, 20, 0.98);
+      border-color: rgba(53, 212, 139, 0.7);
+      transform: translateY(-1px);
     }
   </style>
 </head>
-<body class="loading">
-
-<div id="loader">
-  <div style="font-size:2.5rem; margin-bottom:16px;">💪</div>
-  <div style="font-size:1.1rem; margin-bottom:8px; font-weight:600;">Подготавливаем ваш персональный план...</div>
-  <div class="loader-progress"><div class="loader-progress-bar"></div></div>
-  <div style="margin-top:16px; font-size:0.9rem; opacity:0.7;">Это займет всего несколько секунд</div>
-</div>
-
-<div class="container">
-
-  <div class="hero">
-    <div class="avatar-container">
-      <img src="https://images.pexels.com/photos/13621289/pexels-photo-13621289.jpeg"
-           alt="Виталий Карпинский"
-           class="avatar"
-           loading="eager"
-           onerror="this.src='https://via.placeholder.com/120/28a745/ffffff?text=VK'">
-      <div class="online-status"></div>
-    </div>
-    <h1>Виталий Карпинский</h1>
-    <div class="subtitle">Персональный тренер • Абакан, Россия • Онлайн по всему миру</div>
-
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-value">8–15<span style="font-size:1rem">кг</span></div>
-        <div class="stat-label">за 8 недель</div>
+<body>
+<div class="app">
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span>🔥</span>
+        <div>Персональный онлайн‑тренер • Vitaliy Couch Fitness</div>
       </div>
-      <div class="stat">
-        <div class="stat-value">98<span style="font-size:1rem">%</span></div>
-        <div class="stat-label">довольных клиентов</div>
+      <h1 class="hero-title">
+        Создам <span>тело вашей мечты</span><br />за 4–8 недель без жёстких диет
+      </h1>
+      <div class="hero-subtitle">
+        <strong>Виталий Карпинский</strong> — персональный тренер из г. Абакан, Россия.  
+        Провожу тренировки <strong>офлайн в Абакане</strong> и <strong>онлайн по всему миру</strong>.
       </div>
-      <div class="stat">
-        <div class="stat-value">500+</div>
-        <div class="stat-label">трансформаций</div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-label">Клиентов довёл до результата</div>
+          <div class="hero-stat-value">100+ человек</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-label">Средний результат за 8 недель</div>
+          <div class="hero-stat-value">–8–14 кг</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-label">Формат</div>
+          <div class="hero-stat-value">Дом / зал / онлайн</div>
+        </div>
       </div>
-    </div>
-
-    <div class="guarantee-badge">
-      <span>🏆</span> 100% гарантия: либо результат, либо деньги обратно
-    </div>
-
-    <div class="trust-badges">
-      <div class="trust-badge">✅ Безопасно для здоровья</div>
-      <div class="trust-badge">📅 Под ваш график</div>
-      <div class="trust-badge">🌍 Онлайн по всему миру</div>
-    </div>
-
-    <button class="btn btn-primary" id="mainCta" data-base-text="🎁 Получить бесплатный план на 7 дней">
-      🎁 Получить бесплатный план на 7 дней (3 места)
-    </button>
-
-    <div style="margin-top:20px; font-size:0.9rem; opacity:0.7;">
-      ⚡ <strong id="spotsInfoText">3 места</strong> доступно для новых клиентов на этой неделе
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">🎯 Я помогу, если вы:</div>
-    <div class="feature" data-goal="похудеть">
-      <span class="feature-icon">📉</span>
-      <div>
-        <strong>Хотите похудеть</strong><br>
-        <small>Без голодовок, срывов и жёстких запретов</small>
-      </div>
-    </div>
-    <div class="feature" data-goal="набрать массу">
-      <span class="feature-icon">💪</span>
-      <div>
-        <strong>Набрать мышцы</strong><br>
-        <small>Натурально, безопасно и с контролем техники</small>
-      </div>
-    </div>
-    <div class="feature" data-goal="домашние тренировки">
-      <span class="feature-icon">🏠</span>
-      <div>
-        <strong>Тренируетесь дома</strong><br>
-        <small>Без оборудования или с минимальным инвентарём</small>
-      </div>
-    </div>
-    <div class="feature" data-goal="занятой график">
-      <span class="feature-icon">⏰</span>
-      <div>
-        <strong>Мало времени</strong><br>
-        <small>Тренировки под ваш плотный график</small>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">💬 Отзыв клиента</div>
-    <div class="testimonial">
-      «За 8 недель с Виталием я похудел на 14 кг без изнурительных диет. Тренировки дома занимали всего 30 минут в день. Самое главное — не было чувства, что я “страдаю”, всё шло естественно. Рекомендую всем, кто хочет реальный результат, а не очередную “чудо-диету”.»
-      <div style="margin-top:16px; font-weight:700; color:var(--primary);">— Алексей, 32 года, офисная работа</div>
-    </div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="testimonialProgress" style="width: 0%;"></div>
-    </div>
-    <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--hint);">
-      <span>До</span>
-      <span id="testimonialProgressText">Прогресс: 0%</span>
-      <span>После 8 недель</span>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">🏋️‍♂️ Тренировки дома</div>
-    <p style="margin-bottom:16px; opacity:0.8; font-size:0.95rem;">15+ упражнений в вашей персональной программе</p>
-    <div class="gallery-grid">
-      <div class="gallery-item">
-        <img src="https://cdn.prod.website-files.com/611abd833ca7af7702667729/64753f7cc15256495593ba27_JackedMan_DoingPushups.png" alt="Отжимания" loading="lazy">
-        <div class="gallery-label">Отжимания</div>
-      </div>
-      <div class="gallery-item">
-        <img src="https://cdn.prod.website-files.com/611abd833ca7af7702667729/649c5b214fbbfd1f5ee9ee52_Woman_LeanMuscle_Small.jpg" alt="Планка" loading="lazy">
-        <div class="gallery-label">Планка</div>
-      </div>
-      <div class="gallery-item">
-        <img src="https://physicalachievementcenter.com/wp-content/uploads/2025/04/Screenshot-2025-04-14-at-13.45.43.webp" alt="Пресс" loading="lazy">
-        <div class="gallery-label">Пресс</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">💰 Программы и цены</div>
-    <div class="pricing-grid">
-
-      <div class="pricing-card popular" data-plan-type="online" data-plan-amount="150" data-plan-name="Онлайн-ведение 4 недели">
-        <div class="popular-badge">Самый популярный</div>
-        <div class="pricing-title">📱 Онлайн-ведение</div>
-        <div class="price"><span class="price-currency">$</span>150</div>
-        <div class="period">4 недели • ~$37.5/неделя</div>
-        <ul class="features-list">
-          <li>Персональная программа тренировок под ваш уровень</li>
-          <li>Индивидуальный план питания с привычными продуктами</li>
-          <li>Ежедневная поддержка в Telegram</li>
-          <li>Еженедельная корректировка программы</li>
-          <li>Видео-разбор техники упражнений</li>
-          <li>Трекеры прогресса и чек-листы</li>
-        </ul>
-        <button class="btn btn-pay js-pay-stars">
-          💳 Оплатить и начать сейчас
+      <div class="hero-cta-row">
+        <button id="mainCta" class="btn-primary">
+          🎁 Получить бесплатный план (3 места)
         </button>
-        <div style="margin-top:12px; font-size:0.8rem; opacity:0.7; text-align:center;">
-          🔥 <span id="onlinePlanCounter">12</span> человек выбирают этот план
+        <div class="hero-note">
+          <span>Осталось несколько мест</span> на этой неделе — забронируйте сейчас.
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="coach-card">
+        <div class="coach-photo">
+          <div class="coach-photo-inner"></div>
+        </div>
+        <div class="coach-name">Виталий Карпинский</div>
+        <div class="coach-location">
+          г. Абакан, Россия • <span>онлайн по всему миру</span>
+        </div>
+        <div class="coach-tags">
+          <div class="coach-tag">Персональные планы тренировок</div>
+          <div class="coach-tag">Питание без жёстких диет</div>
+          <div class="coach-tag">Поддержка и контроль</div>
+        </div>
+      </div>
+      <div class="timer-card" id="timer">
+        <div>
+          <div class="timer-label">Бесплатный разбор и план до конца таймера</div>
+          <div class="timer-value" id="countdown">14:59</div>
+        </div>
+        <div class="spots-pill" id="spotsPill">Осталось: 3 места</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span>✅</span>Почему мне доверяют</div>
+    <div class="section-subtitle">
+      Я не просто даю тренировки — я беру ответственность за ваш результат и здоровье.
+    </div>
+    <div class="trust-grid">
+      <div class="trust-item">
+        <div class="trust-label">Работаю с любым уровнем подготовки</div>
+        <div class="trust-text">
+          От «никогда не тренировался» до продвинутых. Программу адаптирую под ваш текущий уровень и ограничения.
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-label">Безопасные тренировки без перегрузок</div>
+        <div class="trust-text">
+          Контролирую технику, нагрузку и прогресс. Никаких «убийственных» тренировок ради красивых цифр.
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-label">Под ваш график и образ жизни</div>
+        <div class="trust-text">
+          Тренировки 25–40 минут, которые реально вписать в рабочий день, семью и дела.
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-label">Реальные результаты без жёстких диет</div>
+        <div class="trust-text">
+          Без голодовок и запретов. Учим есть вкусно, достаточно и при этом худеть и подтягиваться.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span>⚠️</span>Частые ошибки новичков</div>
+    <div class="section-subtitle">
+      Если вы узнаёте себя в этих ошибках — значит, вам особенно нужен грамотный план.
+    </div>
+    <div class="mistakes-grid">
+      <div class="mistake-card">
+        <div class="mistake-tag">Ошибка</div>
+        <div class="mistake-title">Слишком много кардио</div>
+        <div class="mistake-text">
+          Бесконечная беговая дорожка и часами кардио без силовых — метаболизм замедляется, мышцы не растут.
+        </div>
+        <div class="mistake-conseq">→ Результат: плато, усталость, вес стоит.</div>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-tag">Ошибка</div>
+        <div class="mistake-title">Слишком мало еды</div>
+        <div class="mistake-text">
+          Жёсткие диеты, голодовки, «ем 800 ккал» — организм защищается, включаются срывы и откаты.
+        </div>
+        <div class="mistake-conseq">→ Результат: срывы, набор веса обратно.</div>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-tag">Ошибка</div>
+        <div class="mistake-title">Неправильная техника и хаос в тренировках</div>
+        <div class="mistake-text">
+          Случайные упражнения из интернета без системы и контроля техники.
+        </div>
+        <div class="mistake-conseq">→ Результат: травмы, боли, нет прогресса.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span>📸</span>Кейсы: до и после</div>
+    <div class="section-subtitle">
+      Реальные трансформации моих клиентов. Карусель листается свайпом или стрелками.
+    </div>
+
+    <div class="cases-carousel" id="casesCarousel">
+      <div class="cases-track" id="casesTrack">
+        <!-- Слайд 1 -->
+        <div class="case-slide">
+          <div class="case-inner">
+            <div class="case-photos">
+              <div class="case-photo">
+                <!-- Замените src на путь к вашему фото ДО -->
+                <img src="images/case1_before.jpg" alt="До">
+                <div class="case-label">до</div>
+              </div>
+              <div class="case-photo">
+                <!-- Замените src на путь к вашему фото ПОСЛЕ -->
+                <img src="images/case1_after.jpg" alt="После">
+                <div class="case-label">после</div>
+              </div>
+            </div>
+            <div>
+              <div class="case-title">Алексей, 32 года</div>
+              <div class="case-result">–14 кг за 8 недель • минус живот, плюс энергия</div>
+              <div class="case-text">
+                Пришёл с лишним весом и болями в спине. Сделали упор на технику, базовые упражнения и питание без жёстких ограничений.
+                Тренировки дома по 30 минут, 4 раза в неделю.
+              </div>
+              <div class="case-tags">
+                <div class="case-tag">Домашние тренировки</div>
+                <div class="case-tag">–14 кг</div>
+                <div class="case-tag">8 недель</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Слайд 2 -->
+        <div class="case-slide">
+          <div class="case-inner">
+            <div class="case-photos">
+              <div class="case-photo">
+                <img src="images/case2_before.jpg" alt="До">
+                <div class="case-label">до</div>
+              </div>
+              <div class="case-photo">
+                <img src="images/case2_after.jpg" alt="После">
+                <div class="case-label">после</div>
+              </div>
+            </div>
+            <div>
+              <div class="case-title">Марина, 27 лет</div>
+              <div class="case-result">–9 кг за 6 недель • послеродовое восстановление</div>
+              <div class="case-text">
+                Молодая мама, мало времени и сил. Составили короткие тренировки дома, без прыжков и перегрузок.
+                Питание — гибкое, без запрета любимых продуктов.
+              </div>
+              <div class="case-tags">
+                <div class="case-tag">После родов</div>
+                <div class="case-tag">–9 кг</div>
+                <div class="case-tag">6 недель</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Слайд 3 -->
+        <div class="case-slide">
+          <div class="case-inner">
+            <div class="case-photos">
+              <div class="case-photo">
+                <img src="images/case3_before.jpg" alt="До">
+                <div class="case-label">до</div>
+              </div>
+              <div class="case-photo">
+                <img src="images/case3_after.jpg" alt="После">
+                <div class="case-label">после</div>
+              </div>
+            </div>
+            <div>
+              <div class="case-title">Сергей, 41 год</div>
+              <div class="case-result">–11 кг за 8 недель • больше выносливости</div>
+              <div class="case-text">
+                Предприниматель с сидячей работой и хронической усталостью. Тренировки по 25–30 минут, акцент на здоровье спины и выносливость.
+                Питание — без фанатизма, но с контролем.
+              </div>
+              <div class="case-tags">
+                <div class="case-tag">Сидячая работа</div>
+                <div class="case-tag">–11 кг</div>
+                <div class="case-tag">8 недель</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Слайд 4 -->
+        <div class="case-slide">
+          <div class="case-inner">
+            <div class="case-photos">
+              <div class="case-photo">
+                <img src="images/case4_before.jpg" alt="До">
+                <div class="case-label">до</div>
+              </div>
+              <div class="case-photo">
+                <img src="images/case4_after.jpg" alt="После">
+                <div class="case-label">после</div>
+              </div>
+            </div>
+            <div>
+              <div class="case-title">Анна, 30 лет</div>
+              <div class="case-result">–7 кг и подтянутое тело за 6 недель</div>
+              <div class="case-text">
+                Хотела «не просто похудеть, а выглядеть спортивно». Добавили силовые, работу с собственным весом и акцент на ягодицы и пресс.
+              </div>
+              <div class="case-tags">
+                <div class="case-tag">Фигура</div>
+                <div class="case-tag">–7 кг</div>
+                <div class="case-tag">6 недель</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Слайд 5 -->
+        <div class="case-slide">
+          <div class="case-inner">
+            <div class="case-photos">
+              <div class="case-photo">
+                <img src="images/case5_before.jpg" alt="До">
+                <div class="case-label">до</div>
+              </div>
+              <div class="case-photo">
+                <img src="images/case5_after.jpg" alt="После">
+                <div class="case-label">после</div>
+              </div>
+            </div>
+            <div>
+              <div class="case-title">Игорь, 35 лет</div>
+              <div class="case-result">+мышцы, –жир • рельеф за 10 недель</div>
+              <div class="case-text">
+                Цель — набрать мышечную массу и убрать лишний жир. Составили программу в зале, отработали технику, добавили контроль питания и сна.
+              </div>
+              <div class="case-tags">
+                <div class="case-tag">Набор мышц</div>
+                <div class="case-tag">Рельеф</div>
+                <div class="case-tag">10 недель</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="pricing-card" data-plan-type="personal" data-plan-amount="60" data-plan-name="Персональные тренировки">
-        <div class="pricing-title">🏋️ Персональные тренировки</div>
-        <div class="price">
-          <span class="price-currency">$</span>60
-          <span class="savings-badge">-20%</span>
+      <div class="cases-nav">
+        <div class="cases-dots" id="casesDots"></div>
+        <div class="cases-arrows">
+          <button class="cases-arrow-btn" id="casesPrev" aria-label="Предыдущий кейс">‹</button>
+          <button class="cases-arrow-btn" id="casesNext" aria-label="Следующий кейс">›</button>
         </div>
-        <div class="period">1 час • Пакет 5 занятий: $240</div>
-        <ul class="features-list">
-          <li>Очные тренировки в зале в Абакане</li>
-          <li>Коррекция техники и контроль нагрузки</li>
-          <li>План тренировок на месяц</li>
-          <li>Рекомендации по питанию</li>
-          <li>Анализ текущей формы и целей</li>
-        </ul>
-        <button class="btn btn-primary js-book-service">
-          📅 Записаться на пробное
-        </button>
-      </div>
-
-      <div class="pricing-card" data-plan-type="nutrition" data-plan-amount="80" data-plan-name="План питания + тренировки">
-        <div class="pricing-title">🍎 План питания + тренировки</div>
-        <div class="price"><span class="price-currency">$</span>80</div>
-        <div class="period">единоразово + 2 недели поддержки</div>
-        <ul class="features-list">
-          <li>Индивидуальный рацион на месяц</li>
-          <li>Программа тренировок на 8 недель</li>
-          <li>Список продуктов и простые рецепты</li>
-          <li>Рекомендации по добавкам</li>
-          <li>2 консультации по внедрению</li>
-        </ul>
-        <button class="btn btn-primary js-book-service">
-          📋 Получить план
-        </button>
-      </div>
-
-    </div>
-
-    <div style="text-align:center; margin-top:32px;">
-      <button class="btn btn-secondary" id="consultationBtn">
-        🤔 Не уверены в выборе? Получите консультацию
-      </button>
-    </div>
-  </div>
-
-  <div class="section form-section" id="formSection">
-    <div class="section-title">📩 Бесплатная консультация</div>
-
-    <div class="offer" id="offerBlock">
-      🎁 Только сегодня: консультация + персональный план на 7 дней БЕСПЛАТНО!
-      <div class="timer" id="timer">15:00</div>
-      <div style="margin-top:8px; font-size:0.9rem;">Осталось <span id="spotsInline">3 места</span> для новых клиентов</div>
-    </div>
-
-    <div id="selectedPlanInfo" style="background:linear-gradient(135deg,rgba(40,167,69,0.1),rgba(32,201,151,0.1)); padding:20px; border-radius:var(--radius-sm); margin-bottom:24px; display:none;">
-      <strong style="color:var(--primary);">📌 Вы выбрали:</strong>
-      <span id="planDisplay" style="font-weight:900; font-size:1.1rem;"></span>
-    </div>
-
-    <div class="form-group">
-      <input type="text" id="name" class="input" placeholder="👤 Ваше имя" autocomplete="name">
-      <div class="error-message" id="nameError">Пожалуйста, введите ваше имя</div>
-    </div>
-
-    <div class="form-group">
-      <input type="tel" id="phone" class="input" placeholder="📱 Телефон или Telegram" autocomplete="tel">
-      <div class="error-message" id="phoneError">Введите контакт для связи (телефон или @username)</div>
-      <button class="btn btn-secondary" id="shareContactBtn" style="margin-top:12px; font-size:0.95rem; padding:14px;">
-        📲 Поделиться контактом из Telegram
-      </button>
-    </div>
-
-    <div class="form-group">
-      <select id="goal" class="select">
-        <option value="">🎯 Выберите основную цель</option>
-        <option value="похудеть">Похудеть</option>
-        <option value="набрать массу">Набрать мышечную массу</option>
-        <option value="здоровье">Улучшить самочувствие</option>
-        <option value="рельеф">Сделать тело рельефным</option>
-        <option value="поддержание">Поддержание формы</option>
-        <option value="не знаю">Не знаю, нужна консультация</option>
-      </select>
-      <div class="error-message" id="goalError">Выберите вашу цель</div>
-    </div>
-
-    <div class="form-group">
-      <textarea id="comment" class="textarea" placeholder="💬 Расскажите о вашем опыте, травмах, пожеланиях (не обязательно)" rows="4"></textarea>
-    </div>
-
-    <div style="background:rgba(0,0,0,0.03); padding:20px; border-radius:var(--radius-sm); margin:24px 0; border:1px solid var(--border);">
-      <div style="display:flex; align-items:flex-start; gap:16px;">
-        <input type="checkbox" id="consent" style="width:20px; height:20px; flex-shrink:0; margin-top:4px;">
-        <label for="consent" style="font-size:0.95rem; line-height:1.5;">
-          <strong>Согласие на обработку данных</strong><br>
-          <span style="opacity:0.8;">Я согласен на обработку персональных данных и получение информации о программах. Отправляя заявку, я подтверждаю желание получить бесплатный план на 7 дней.</span>
-        </label>
       </div>
     </div>
+  </section>
 
-    <button class="btn btn-primary" id="submitBtn">
-      🚀 Получить бесплатный план (3 места осталось)
-    </button>
-
-    <p style="text-align:center; margin-top:24px; font-size:0.95rem; opacity:0.8; line-height:1.6;">
-      ⚡ <strong>Гарантируем ответ в течение 10–15 минут</strong> в рабочее время<br>
-      📞 Свяжусь с вами по телефону или в Telegram
-    </p>
-  </div>
-
-  <div class="footer">
-    <h3 style="margin-bottom:20px; color:var(--text); font-size:1.3rem;">📞 Контакты для связи</h3>
-    <div class="contact-links">
-      <a href="https://t.me/your_username_here" class="contact-link" target="_blank">
-        <span style="font-size:1.2rem;">💬</span> Telegram
-      </a>
-      <a href="https://wa.me/your_phone_here" class="contact-link" target="_blank">
-        <span style="font-size:1.2rem;">📱</span> WhatsApp
-      </a>
-      <a href="mailto:your_email_here@example.com" class="contact-link">
-        <span style="font-size:1.2rem;">✉️</span> Email
-      </a>
+  <section class="section">
+    <div class="section-title"><span>💬</span>Отзывы клиентов</div>
+    <div class="section-subtitle">
+      Люди приходят за формой, а остаются за отношением, поддержкой и результатом.
     </div>
-    <div style="margin:32px 0; padding:20px; background:rgba(40,167,69,0.05); border-radius:var(--radius-md); border:1px solid rgba(40,167,69,0.1);">
-      <div style="font-weight:700; margin-bottom:8px; color:var(--primary);">📍 Зона работы:</div>
-      <div style="opacity:0.8; line-height:1.6;">
-        Абакан, Россия — очные тренировки<br>
-        🌍 Онлайн по всему миру через Telegram / WhatsApp
+    <div class="testimonials">
+      <div class="testimonial" style="position: relative; padding-left: 80px;">
+        <img src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg"
+             alt="Фото клиента"
+             style="width:60px; height:60px; border-radius:50%; object-fit:cover; position:absolute; left:10px; top:20px; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+        <div style="font-style:italic;">
+          «За 8 недель с Виталием я похудел на 14 кг без изнурительных диет.
+          Тренировки дома занимали всего 30 минут в день.
+          Рекомендую всем, кто хочет реальный результат!»
+        </div>
+        <div style="margin-top:16px; font-weight:700; color:var(--primary);">— Алексей, 32 года</div>
+      </div>
+
+      <div class="testimonial" style="position: relative; padding-left: 80px;">
+        <img src="https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg"
+             alt="Фото клиента"
+             style="width:60px; height:60px; border-radius:50%; object-fit:cover; position:absolute; left:10px; top:20px; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+        <div style="font-style:italic;">
+          «Я думала, что после родов уже не вернусь в форму.
+          Но программа Виталия оказалась настолько удобной, что я занималась дома между делами.
+          За 6 недель — минус 9 кг и снова чувствую себя собой!»
+        </div>
+        <div style="margin-top:16px; font-weight:700; color:var(--primary);">— Марина, 27 лет</div>
+      </div>
+
+      <div class="testimonial" style="position: relative; padding-left: 80px;">
+        <img src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg"
+             alt="Фото клиента"
+             style="width:60px; height:60px; border-radius:50%; object-fit:cover; position:absolute; left:10px; top:20px; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+        <div style="font-style:italic;">
+          «У меня хронически не было времени.
+          Но короткие тренировки по 25–30 минут — это спасение.
+          За 2 месяца ушёл живот, появилась энергия.
+          Виталий — тренер, который реально понимает клиентов.»
+        </div>
+        <div style="margin-top:16px; font-weight:700; color:var(--primary);">— Сергей, 41 год</div>
       </div>
     </div>
-    <p style="margin-top:24px; font-size:0.85rem; line-height:1.6; opacity:0.7;">
-      © 2025–2026 Виталий Карпинский<br>
-      Персональный тренер • Специалист по трансформации тела<br>
-      Результаты индивидуальны и зависят от соблюдения программы
-    </p>
-  </div>
+  </section>
 
+  <section class="section">
+    <div class="section-title"><span>❓</span>Часто задаваемые вопросы</div>
+    <div class="faq-item">
+      <div class="faq-question">
+        <div>Смогу ли я тренироваться дома, если нет оборудования?</div>
+        <div class="faq-toggle">+</div>
+      </div>
+      <div class="faq-answer">
+        Да. Я составляю программы под ваши условия: дом, зал, минимум или максимум оборудования.
+        Можно начать вообще без инвентаря, а потом постепенно добавлять.
+      </div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">
+        <div>Что если у меня мало времени?</div>
+        <div class="faq-toggle">+</div>
+      </div>
+      <div class="faq-answer">
+        Мы строим тренировки так, чтобы они занимали 25–40 минут и вписывались в ваш график.
+        Лучше 3–4 короткие тренировки в неделю, чем «идеальный план», который вы не сможете выполнять.
+      </div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">
+        <div>Подходит ли программа новичкам?</div>
+        <div class="faq-toggle">+</div>
+      </div>
+      <div class="faq-answer">
+        Да. Я подробно объясняю технику, даю видео, корректирую ошибки и подбираю нагрузку так, чтобы вы не перегорели и не травмировались.
+      </div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">
+        <div>Что если у меня есть травмы или ограничения?</div>
+        <div class="faq-toggle">+</div>
+      </div>
+      <div class="faq-answer">
+        Мы учитываем ваши особенности: спина, колени, давление и т.д.
+        Я не врач, но могу адаптировать тренировки и убрать опасные упражнения.
+        При серьёзных проблемах — работаем в связке с врачом.
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span>🧭</span>Как проходит работа со мной</div>
+    <div class="section-subtitle">
+      Прозрачный процесс от первой заявки до стабильного результата.
+    </div>
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="process-step-number">1</div>
+        <div class="process-step-title">Диагностика и цели</div>
+        <div class="process-step-text">
+          Вы заполняете анкету, мы обсуждаем цели, ограничения, образ жизни и сроки.
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="process-step-number">2</div>
+        <div class="process-step-title">Составление плана</div>
+        <div class="process-step-text">
+          Я подбираю тренировки и питание под ваш уровень, график и возможности.
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="process-step-number">3</div>
+        <div class="process-step-title">Контроль техники</div>
+        <div class="process-step-text">
+          Вы присылаете видео, я корректирую технику, чтобы тренировки были безопасными и эффективными.
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="process-step-number">4</div>
+        <div class="process-step-title">Поддержка и мотивация</div>
+        <div class="process-step-text">
+          Регулярная связь, ответы на вопросы, корректировки по самочувствию и прогрессу.
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="process-step-number">5</div>
+        <div class="process-step-title">Коррекция и закрепление результата</div>
+        <div class="process-step-text">
+          По мере прогресса усложняем план, учим вас удерживать форму без жёстких рамок.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span>🧠</span>Мои принципы работы</div>
+    <div class="section-subtitle">
+      Я за здоровый, адекватный подход без крайностей и насилия над собой.
+    </div>
+    <div class="principles-grid">
+      <div class="principle">
+        <div class="principle-icon">✓</div>
+        <div class="principle-text">
+          Без голодовок и «сушки» для новичков. Мы не ломаем организм ради быстрых цифр.
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-icon">✓</div>
+        <div class="principle-text">
+          Без запрещённых продуктов. Учимся есть так, чтобы можно было жить, а не выживать.
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-icon">✓</div>
+        <div class="principle-text">
+          Без стыда и давления. Вы не «плохой», если что‑то не получилось — мы просто корректируем план.
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-icon">✓</div>
+        <div class="principle-text">
+          Только здоровый, долгосрочный подход. Цель — не просто «похудеть к лету», а изменить привычки.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-section" id="formSection">
+    <div class="section-title"><span>📋</span>Оставьте заявку и получите бесплатный план</div>
+    <div class="section-subtitle">
+      Заполните форму — я свяжусь с вами, уточню детали и предложу формат, который подойдёт именно вам.
+    </div>
+
+    <form id="leadForm">
+      <div class="form-grid">
+        <div>
+          <div class="form-group">
+            <div class="form-label">Имя <span>*</span></div>
+            <input id="name" class="input" type="text" placeholder="Как к вам обращаться?" />
+            <div class="error-message" data-for="name"></div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">
+              Телефон <span>*</span>
+              <button type="button" id="requestContactBtn" style="margin-left:6px; font-size:11px; background:none; border:none; color:var(--primary); cursor:pointer; padding:0;">
+                Получить из Telegram
+              </button>
+            </div>
+            <input id="phone" class="input" type="tel" placeholder="+7 (___) ___-__-__" />
+            <div class="error-message" data-for="phone"></div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Ваша цель <span>*</span></div>
+            <select id="goal" class="select">
+              <option value="">Выберите цель</option>
+              <option value="weight_loss">Похудение и снижение веса</option>
+              <option value="tone">Подтянуть тело и рельеф</option>
+              <option value="mass">Набор мышечной массы</option>
+              <option value="health">Здоровье спины, суставов, самочувствие</option>
+              <option value="other">Другое</option>
+            </select>
+            <div class="error-message" data-for="goal"></div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Комментарий (по желанию)</div>
+            <textarea id="comment" class="textarea" placeholder="Напишите, что для вас важно: опыт, травмы, сроки, формат (дом/зал/онлайн)"></textarea>
+          </div>
+
+          <div class="consent-row">
+            <input type="checkbox" id="consent" />
+            <label for="consent">
+              Я согласен(на) на обработку персональных данных и получение сообщений от тренера.
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <div class="plan-box">
+            <div class="plan-title">Выберите формат работы</div>
+            <ul class="plan-list">
+              <li>Бесплатный разбор и план — чтобы понять, подойдём ли мы друг другу.</li>
+              <li>Персональное ведение 4 недели — тренировки + питание + поддержка.</li>
+              <li>Онлайн‑формат — можно из любой точки мира.</li>
+            </ul>
+
+            <div class="plan-options">
+              <div class="plan-option" onclick="selectPlan('free', 0, 'Бесплатный разбор и план')">
+                <div class="plan-option-name">Бесплатный разбор</div>
+                <div class="plan-option-price">0 ₽</div>
+                <div class="plan-option-note">Разбор цели + базовый план действий.</div>
+              </div>
+              <div class="plan-option" onclick="selectPlan('standard', 4990, 'Персональный план 4 недели')">
+                <div class="plan-option-name">Персональный план 4 недели</div>
+                <div class="plan-option-price">4 990 ₽</div>
+                <div class="plan-option-note">Тренировки + питание + поддержка.</div>
+              </div>
+              <div class="plan-option" onclick="selectPlan('premium', 7990, 'Ведение 4 недели с плотной связью')">
+                <div class="plan-option-name">Ведение 4 недели</div>
+                <div class="plan-option-price">7 990 ₽</div>
+                <div class="plan-option-note">Максимум контроля и обратной связи.</div>
+              </div>
+            </div>
+
+            <div id="selectedPlanInfo" class="selected-plan-info">
+              Вы выбрали: <span id="planDisplay">—</span>.  
+              Формат можно обсудить и изменить при созвоне.
+            </div>
+          </div>
+
+          <button type="button" id="submitBtn" class="btn-submit" onclick="submitLead()">
+            🚀 Отправить заявку
+          </button>
+        </div>
+      </div>
+    </form>
+  </section>
 </div>
 
-<div class="success-modal" id="successModal">
-  <div class="modal-content">
-    <div class="modal-icon">🎉</div>
-    <h2 style="font-size:2rem; margin-bottom:12px;">Отлично!</h2>
-    <p style="margin:20px 0; opacity:0.9; line-height:1.6; font-size:1.1rem;">
-      Заявка принята!<br>
-      Я свяжусь с вами в ближайшие <strong style="color:var(--primary);">10–15 минут</strong>.<br>
-      Проверьте Telegram и телефон.
-    </p>
-    <div style="background:linear-gradient(135deg, rgba(40,167,69,0.1), rgba(32,201,151,0.1)); padding:20px; border-radius:var(--radius-sm); margin:24px 0; border:1px solid rgba(40,167,69,0.2);">
-      <strong style="color:var(--primary); display:block; margin-bottom:8px;">📌 Ваш следующий шаг:</strong>
-      <div style="opacity:0.9; font-size:0.95rem;">
-        1. Подготовьте вопросы о тренировках и питании<br>
-        2. Подумайте, какой результат вы хотите через 8 недель<br>
-        3. Будьте на связи в Telegram
-      </div>
-    </div>
-    <button class="btn btn-primary" id="closeModalBtn" style="padding:20px 40px; font-size:1.2rem;">
-      👍 Понятно, жду связи!
-    </button>
-    <div style="margin-top:20px; font-size:0.9rem; opacity:0.7;">
-      Если не получили ответ в течение 30 минут,<br>напишите напрямую в Telegram
-    </div>
-  </div>
-</div>
-
-<div class="floating-cta" id="floatCta">
-  <div class="floating-cta-inner">
-    <button class="btn btn-primary" id="floatCtaBtn" data-base-text="🎁 Получить бесплатный план">
+<div class="float-cta" id="floatCta">
+  <div class="float-cta-inner">
+    <button type="button">
       🎁 Получить бесплатный план (3 места)
     </button>
   </div>
 </div>
 
+<div class="success-modal-backdrop" id="successModal">
+  <div class="success-modal">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Заявка отправлена</div>
+    <div class="success-text">
+      Спасибо за доверие! Я свяжусь с вами в ближайшее время, чтобы обсудить цели и формат работы.
+    </div>
+    <button class="success-btn" type="button" onclick="closeModal()">Вернуться на страницу</button>
+  </div>
+</div>
+
 <script>
-  const tg = window.Telegram.WebApp;
-  const state = {
-    selectedPlan: null,
-    selectedGoal: null,
-    spotsLeft: 3,
-    timerInterval: null,
-    timerEnd: null
+  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : {
+    initDataUnsafe: {},
+    platform: 'web',
+    version: '1.0',
+    colorScheme: 'dark',
+    MainButton: {
+      setText: () => tg.MainButton,
+      setParams: () => tg.MainButton,
+      show: () => {},
+      hide: () => {},
+      onClick: () => {}
+    },
+    BackButton: {
+      show: () => {},
+      hide: () => {}
+    },
+    HapticFeedback: {
+      impactOccurred: () => {},
+      notificationOccurred: () => {},
+      selectionChanged: () => {}
+    },
+    showAlert: (msg) => alert(msg),
+    sendData: (data) => console.log('sendData:', data),
+    openInvoice: (params, cb) => {
+      console.log('openInvoice mock:', params);
+      setTimeout(() => cb && cb('paid'), 1000);
+    },
+    requestContact: (cb) => cb(false, null)
   };
 
-  function applyTheme() {
-    const t = tg.themeParams || {};
-    const isDark = tg.colorScheme === 'dark';
+  let spotsLeft = parseInt(localStorage.getItem('spots_left') || '3', 10);
+  if (isNaN(spotsLeft) || spotsLeft < 0) spotsLeft = 3;
 
-    document.documentElement.style.setProperty('--bg', t.bg_color || (isDark ? '#121212' : '#f8f9fa'));
-    document.documentElement.style.setProperty('--text', t.text_color || (isDark ? '#ffffff' : '#212529'));
-    document.documentElement.style.setProperty('--section-bg', t.section_bg_color || (isDark ? '#1e1e1e' : '#ffffff'));
-    document.documentElement.style.setProperty('--hint', t.hint_color || (isDark ? '#a0a0a0' : '#6c757d'));
-    document.documentElement.style.setProperty('--border', t.section_separator_color || (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'));
+  let selectedPlan = null;
+  let selectedGoal = null;
 
-    if (isDark) {
-      document.body.classList.add('dark-theme');
+  function initApp() {
+    updateSpotsCounter();
+    initCountdown();
+    initFaq();
+    initCarousel();
+    initFormListeners();
+    syncLeads();
+
+    const floatBtn = document.querySelector('#floatCta button');
+    floatBtn.addEventListener('click', () => {
+      showForm();
+      trackEvent('float_button_click');
+    });
+
+    const mainCta = document.getElementById('mainCta');
+    mainCta.addEventListener('click', () => {
+      showForm();
+      trackEvent('hero_button_click');
+    });
+
+    const requestContactBtn = document.getElementById('requestContactBtn');
+    requestContactBtn.addEventListener('click', requestContact);
+
+    tg.MainButton
+      .setText(`🎁 Бесплатный план (${spotsLeft} места)`)
+      .setParams({
+        color: '#28a745',
+        text_color: '#ffffff'
+      })
+      .show()
+      .onClick(() => {
+        showForm();
+        trackEvent('main_button_click');
+      });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        trackEvent('page_visible');
+      }
+    });
+
+    window.addEventListener('online', syncLeads);
+  }
+
+  function initCountdown() {
+    const countdownEl = document.getElementById('countdown');
+    let totalSeconds = 15 * 60;
+
+    function updateTimer() {
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      countdownEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      if (totalSeconds > 0) {
+        totalSeconds--;
+      } else {
+        countdownEl.textContent = '00:00';
+      }
+    }
+
+    updateTimer();
+    setInterval(updateTimer, 1000);
+  }
+
+  function initFaq() {
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.addEventListener('click', () => {
+        item.classList.toggle('open');
+        const toggle = item.querySelector('.faq-toggle');
+        if (toggle) toggle.textContent = item.classList.contains('open') ? '−' : '+';
+      });
+    });
+  }
+
+  function initCarousel() {
+    const track = document.getElementById('casesTrack');
+    const dotsContainer = document.getElementById('casesDots');
+    const slides = Array.from(track.children);
+    const prevBtn = document.getElementById('casesPrev');
+    const nextBtn = document.getElementById('casesNext');
+
+    let currentIndex = 0;
+    const total = slides.length;
+
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'cases-dot' + (i === 0 ? ' active' : '');
+      dot.dataset.index = i;
+      dot.addEventListener('click', () => goToSlide(i));
+      dotsContainer.appendChild(dot);
+    }
+
+    function updateCarousel() {
+      const offset = -currentIndex * 100;
+      track.style.transform = `translateX(${offset}%)`;
+      dotsContainer.querySelectorAll('.cases-dot').forEach(dot => {
+        dot.classList.toggle('active', parseInt(dot.dataset.index, 10) === currentIndex);
+      });
+    }
+
+    function goToSlide(index) {
+      currentIndex = (index + total) % total;
+      updateCarousel();
+      tg.HapticFeedback.selectionChanged();
+      trackEvent('case_slide_change', { index: currentIndex + 1 });
+    }
+
+    prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+    nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+    let startX = 0;
+    let isDown = false;
+
+    track.addEventListener('touchstart', (e) => {
+      isDown = true;
+      startX = e.touches[0].clientX;
+    });
+
+    track.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      const diff = e.touches[0].clientX - startX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) {
+          goToSlide(currentIndex - 1);
+        } else {
+          goToSlide(currentIndex + 1);
+        }
+        isDown = false;
+      }
+    });
+
+    track.addEventListener('touchend', () => {
+      isDown = false;
+    });
+
+    updateCarousel();
+  }
+
+  function initFormListeners() {
+    const name = document.getElementById('name');
+    const phone = document.getElementById('phone');
+    const goal = document.getElementById('goal');
+    const comment = document.getElementById('comment');
+
+    name.addEventListener('input', () => validateField(name));
+    phone.addEventListener('input', () => {
+      formatPhone(phone);
+    });
+    goal.addEventListener('change', () => validateField(goal));
+    comment.addEventListener('input', () => validateField(comment, false));
+  }
+
+  function validateField(field, required = true) {
+    const errEl = document.querySelector(`.error-message[data-for="${field.id}"]`);
+
+    if (!required) {
+      if (field.value.trim() === '') {
+        field.classList.remove('error');
+        field.classList.remove('success');
+        if (errEl) errEl.style.display = 'none';
+        return true;
+      } else {
+        field.classList.remove('error');
+        field.classList.add('success');
+        if (errEl) errEl.style.display = 'none';
+        return true;
+      }
+    }
+
+    if (field.value.trim() === '') {
+      field.classList.add('error');
+      field.classList.remove('success');
+      if (errEl) {
+        errEl.textContent = field.placeholder && field.placeholder.includes('цель')
+          ? 'Пожалуйста, выберите цель'
+          : 'Это поле обязательно для заполнения';
+        errEl.style.display = 'block';
+      }
+      return false;
     } else {
-      document.body.classList.remove('dark-theme');
+      field.classList.remove('error');
+      field.classList.add('success');
+      if (errEl) errEl.style.display = 'none';
+      return true;
     }
   }
 
-  function setFieldError(field, errEl, message) {
-    field.classList.remove('input--success');
-    field.classList.add('input--error');
-    if (errEl) {
-      errEl.textContent = message;
-      errEl.style.display = 'block';
+  function formatPhone(input) {
+    let value = input.value.replace(/\D/g, '');
+
+    if (value.startsWith('8')) {
+      value = '7' + value.slice(1);
     }
-    return false;
-  }
 
-  function setFieldSuccess(field, errEl) {
-    field.classList.remove('input--error');
-    field.classList.add('input--success');
-    if (errEl) {
-      errEl.style.display = 'none';
+    if (value.length > 0 && !value.startsWith('7')) {
+      value = '7' + value;
     }
-    return true;
-  }
 
-  function validateField(field) {
-    const errId = field.id + 'Error';
-    const errEl = document.getElementById(errId);
-
-    const value = field.value.trim();
-
-    if (field.id === 'phone') {
-      const digits = value.replace(/\D/g, '');
-      if (!value) {
-        return setFieldError(field, errEl, 'Это поле обязательно для заполнения');
+    if (value.length > 0) {
+      if (value.length <= 1) {
+        value = '+' + value;
+      } else if (value.length <= 4) {
+        value = `+${value[0]} (${value.slice(1)}`;
+      } else if (value.length <= 7) {
+        value = `+${value[0]} (${value.slice(1, 4)}) ${value.slice(4)}`;
+      } else if (value.length <= 9) {
+        value = `+${value[0]} (${value.slice(1, 4)}) ${value.slice(4, 7)}-${value.slice(7)}`;
+      } else {
+        value = `+${value[0]} (${value.slice(1, 4)}) ${value.slice(4, 7)}-${value.slice(7, 9)}-${value.slice(9, 11)}`;
       }
-      if (digits.length < 7 && !value.startsWith('@')) {
-        return setFieldError(field, errEl, 'Введите телефон или @username для связи');
-      }
-      return setFieldSuccess(field, errEl);
     }
 
-    if (field.id === 'name') {
-      if (!value) {
-        return setFieldError(field, errEl, 'Пожалуйста, введите ваше имя');
-      }
-      if (value.length < 2) {
-        return setFieldError(field, errEl, 'Имя должно быть не короче 2 символов');
-      }
-      return setFieldSuccess(field, errEl);
-    }
-
-    if (field.id === 'goal') {
-      if (!value) {
-        return setFieldError(field, errEl, 'Пожалуйста, выберите цель');
-      }
-      return setFieldSuccess(field, errEl);
-    }
-
-    if (!value) {
-      return setFieldError(field, errEl, 'Это поле обязательно для заполнения');
-    }
-
-    return setFieldSuccess(field, errEl);
-  }
-
-  function formatPhoneInput(input) {
-    const raw = input.value;
-    const digits = raw.replace(/\D/g, '');
-    if (!digits) {
-      input.value = '';
-      return;
-    }
-    // Лёгкое форматирование: +7 XXX XXX-XX-XX или просто как есть
-    if (digits.length >= 11 && digits.startsWith('7')) {
-      const p = digits;
-      input.value = `+7 (${p.slice(1,4)}) ${p.slice(4,7)}-${p.slice(7,9)}-${p.slice(9,11)}`;
-    } else {
-      input.value = raw; // не навязываем формат, чтобы не мешать
-    }
-  }
-
-  function formatPhoneNumber(phone) {
-    const cleaned = phone.replace(/\D/g, '');
-    if (cleaned.length >= 11) {
-      const p = cleaned;
-      return `+${p[0]} (${p.slice(1,4)}) ${p.slice(4,7)}-${p.slice(7,9)}-${p.slice(9,11)}`;
-    }
-    return phone;
+    input.value = value;
+    validateField(input);
   }
 
   function selectGoal(goal) {
-    state.selectedGoal = goal;
+    selectedGoal = goal;
     const goalSelect = document.getElementById('goal');
     goalSelect.value = goal;
     validateField(goalSelect);
-
-    document.querySelectorAll('.feature').forEach(el => {
-      el.classList.toggle('active', el.dataset.goal === goal);
-    });
-
     tg.HapticFeedback.selectionChanged();
     trackEvent('goal_select', { goal });
   }
 
-  function showForm(source = 'button') {
+  function showForm() {
     const form = document.getElementById('formSection');
     const floatCta = document.getElementById('floatCta');
 
-    form.classList.add('active');
-    floatCta.classList.add('hidden');
+    form.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+      inline: 'nearest'
+    });
 
-    setTimeout(() => {
-      form.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-        inline: 'nearest'
-      });
-    }, 50);
+    floatCta.classList.add('hidden');
 
     tg.BackButton.show();
     tg.MainButton.hide();
     tg.HapticFeedback.impactOccurred('medium');
 
-    trackEvent('form_open', { source });
-  }
-
-  function closeForm() {
-    const form = document.getElementById('formSection');
-    const floatCta = document.getElementById('floatCta');
-
-    form.classList.remove('active');
-    floatCta.classList.remove('hidden');
-    tg.BackButton.hide();
-    tg.HapticFeedback.impactOccurred('light');
+    trackEvent('form_open', { source: 'button' });
   }
 
   function selectPlan(type, amount, name) {
-    state.selectedPlan = { type, price: amount, name };
+    selectedPlan = { type, price: amount, name };
 
     const planDisplay = document.getElementById('planDisplay');
     const planInfo = document.getElementById('selectedPlanInfo');
@@ -1402,86 +1945,8 @@
     planInfo.style.display = 'block';
     planInfo.style.animation = 'fadeIn 0.5s';
 
-    showForm('plan');
+    showForm();
     trackEvent('plan_select', { type, amount, name });
-  }
-
-  function payWithStars(type, amount, name) {
-    if (state.spotsLeft <= 0) {
-      tg.showAlert('❌ К сожалению, все места на этой неделе заняты. Оставьте заявку, чтобы попасть в список ожидания.');
-      return;
-    }
-
-    state.selectedPlan = { type, price: amount, name };
-    document.getElementById('planDisplay').textContent = name;
-    document.getElementById('selectedPlanInfo').style.display = 'block';
-
-    showForm('stars');
-
-    // Здесь должен быть реальный provider_token
-    tg.openInvoice({
-      title: `${name} • Виталий Карпинский`,
-      description: 'Персональный план тренировок + питание + поддержка 4 недели\n🔥 Гарантия результата или возврат денег',
-      payload: JSON.stringify({
-        type,
-        userId: tg.initDataUnsafe.user?.id || 'anon',
-        username: tg.initDataUnsafe.user?.username || '',
-        timestamp: Date.now()
-      }),
-      provider_token: '',
-      currency: 'XTR',
-      prices: [{ label: name, amount: amount * 100 }]
-    }, (status) => {
-      try {
-        if (status === 'paid') {
-          tg.showAlert('✅ Оплата прошла успешно! Программа активирована. Добро пожаловать в команду! 🎉');
-          tg.HapticFeedback.notificationOccurred('success');
-
-          state.spotsLeft--;
-          updateSpotsCounter();
-          localStorage.setItem('spots_left', String(state.spotsLeft));
-
-          tg.sendData(JSON.stringify({
-            action: 'paid',
-            plan: type,
-            amount,
-            userId: tg.initDataUnsafe.user?.id,
-            timestamp: new Date().toISOString()
-          }));
-
-          setTimeout(() => {
-            openSuccessModal();
-          }, 500);
-
-          trackEvent('payment_success', { type, amount });
-        } else if (status === 'cancelled') {
-          tg.showAlert('Оплата отменена. Если передумаете — всегда можете вернуться!');
-          trackEvent('payment_cancelled', { type, amount });
-        } else if (status === 'failed') {
-          tg.showAlert('❌ Ошибка оплаты. Пожалуйста, попробуйте позже или выберите другой способ связи.');
-          trackEvent('payment_failed', { type, amount });
-        }
-      } catch (e) {
-        console.error('Invoice callback error:', e);
-      }
-    });
-  }
-
-  function bookService(service) {
-    if (state.spotsLeft <= 0) {
-      tg.showAlert('❌ К сожалению, все места на этой неделе заняты. Оставьте заявку, чтобы попасть в список ожидания.');
-      return;
-    }
-
-    tg.sendData(JSON.stringify({
-      action: 'book',
-      service,
-      userId: tg.initDataUnsafe.user?.id,
-      timestamp: new Date().toISOString()
-    }));
-    tg.showAlert(`✅ Запрос на «${service}» отправлен! Свяжусь с вами в ближайшее время.`);
-    tg.HapticFeedback.notificationOccurred('success');
-    trackEvent('service_book', { service });
   }
 
   function requestContact() {
@@ -1494,33 +1959,24 @@
         tg.HapticFeedback.notificationOccurred('success');
         trackEvent('contact_shared');
       } else {
-        tg.showAlert('❌ Не удалось получить контакт. Пожалуйста, введите номер или @username вручную.');
+        tg.showAlert('❌ Не удалось получить контакт. Пожалуйста, введите номер вручную.');
         tg.HapticFeedback.notificationOccurred('error');
       }
     });
   }
 
-  function openSuccessModal() {
-    const modal = document.getElementById('successModal');
-    modal.classList.add('active');
-  }
-
-  function closeModal() {
-    const modal = document.getElementById('successModal');
-    modal.classList.remove('active');
-
-    setTimeout(() => {
-      document.getElementById('floatCta').classList.remove('hidden');
-    }, 300);
-
-    setTimeout(() => {
-      document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' });
-    }, 500);
+  function formatPhoneNumber(phone) {
+    const cleaned = phone.replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{1,3})(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      return `+${match[1]} (${match[2]}) ${match[3]}-${match[4]}`;
+    }
+    return phone;
   }
 
   function submitLead() {
-    if (state.spotsLeft <= 0) {
-      tg.showAlert('❌ К сожалению, все места на этой неделе заняты. Оставьте заявку, чтобы попасть в список ожидания.');
+    if (spotsLeft <= 0) {
+      tg.showAlert('❌ К сожалению, все места на этой неделе заняты. Пожалуйста, оставьте заявку для записи на следующую неделю.');
       return;
     }
 
@@ -1530,12 +1986,9 @@
     const consent = document.getElementById('consent');
     const comment = document.getElementById('comment');
 
-    const valid =
-      validateField(name) &
-      validateField(phone) &
-      validateField(goal);
+    const isValid = validateField(name) && validateField(phone) && validateField(goal);
 
-    if (!valid) {
+    if (!isValid) {
       tg.showAlert('⚠️ Пожалуйста, заполните все обязательные поля корректно');
       tg.HapticFeedback.notificationOccurred('error');
       return;
@@ -1553,12 +2006,12 @@
       phone: phone.value.trim(),
       goal: goal.value,
       comment: comment.value.trim(),
-      plan: state.selectedPlan || { type: 'consultation', price: 0, name: 'Бесплатная консультация' },
+      plan: selectedPlan || { type: 'consultation', price: 0, name: 'Бесплатная консультация' },
       user: tg.initDataUnsafe.user || {},
       timestamp: new Date().toISOString(),
       platform: tg.platform,
       version: tg.version,
-      spots_left: state.spotsLeft
+      spots_left: spotsLeft
     };
 
     const btn = document.getElementById('submitBtn');
@@ -1570,74 +2023,68 @@
     btn.disabled = true;
 
     setTimeout(() => {
+      spotsLeft--;
+      updateSpotsCounter();
+      localStorage.setItem('spots_left', spotsLeft.toString());
+
       try {
-        state.spotsLeft--;
-        updateSpotsCounter();
-        localStorage.setItem('spots_left', String(state.spotsLeft));
-
         tg.sendData(JSON.stringify(data));
+      } catch (e) {
         saveLeadLocally(data);
-
-        openSuccessModal();
-        tg.HapticFeedback.notificationOccurred('success');
-
-        trackEvent('lead_submitted', {
-          goal: data.goal,
-          has_plan: !!state.selectedPlan,
-          spots_left: state.spotsLeft
-        });
-      } finally {
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.disabled = false;
-          btn.style.width = '';
-
-          const form = document.getElementById('formSection');
-          form.reset();
-          document.getElementById('selectedPlanInfo').style.display = 'none';
-          state.selectedPlan = null;
-          state.selectedGoal = null;
-
-          document.querySelectorAll('.input, .select, .textarea').forEach(el => {
-            el.classList.remove('input--error', 'input--success');
-          });
-
-          const floatBtn = document.getElementById('floatCtaBtn');
-          floatBtn.innerHTML = `${floatBtn.dataset.baseText} (${state.spotsLeft > 0 ? state.spotsLeft + ' места' : 'мест нет'})`;
-        }, 2000);
       }
+
+      document.getElementById('successModal').classList.add('active');
+      tg.HapticFeedback.notificationOccurred('success');
+
+      trackEvent('lead_submitted', {
+        goal: data.goal,
+        has_plan: !!selectedPlan,
+        spots_left: spotsLeft
+      });
+
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        btn.style.width = '';
+
+        document.getElementById('leadForm').reset();
+        document.getElementById('selectedPlanInfo').style.display = 'none';
+        selectedPlan = null;
+        selectedGoal = null;
+
+        const floatBtn = document.querySelector('#floatCta button');
+        floatBtn.innerHTML = `🎁 Получить бесплатный план (${spotsLeft} места)`;
+      }, 2000);
     }, 1500);
   }
 
   function updateSpotsCounter() {
-    const spotsText = state.spotsLeft > 0 ? `${state.spotsLeft} места` : 'мест нет';
-    const mainCta = document.getElementById('mainCta');
-    const floatBtn = document.getElementById('floatCtaBtn');
-    const submitBtn = document.getElementById('submitBtn');
-    const spotsInfoText = document.getElementById('spotsInfoText');
-    const spotsInline = document.getElementById('spotsInline');
-
-    if (mainCta) {
-      mainCta.innerHTML = `${mainCta.dataset.baseText} (${spotsText})`;
-    }
-    if (floatBtn) {
-      floatBtn.innerHTML = `${floatBtn.dataset.baseText} (${spotsText})`;
-    }
-    if (submitBtn) {
-      submitBtn.innerHTML = `🚀 Получить бесплатный план (${spotsText} осталось)`;
-    }
-    if (spotsInfoText) {
-      spotsInfoText.textContent = spotsText;
-    }
-    if (spotsInline) {
-      spotsInline.textContent = spotsText;
+    const spotsText = spotsLeft > 0 ? `(${spotsLeft} места)` : '(мест нет)';
+    const pill = document.getElementById('spotsPill');
+    if (pill) {
+      pill.textContent = spotsLeft > 0 ? `Осталось: ${spotsLeft} места` : 'Мест нет';
     }
 
-    if (state.spotsLeft <= 0) {
+    document.querySelectorAll('#mainCta, #floatCta button').forEach(btn => {
+      btn.innerHTML = btn.innerHTML.replace(/\(\d+ места\)|\(мест нет\)/, spotsText);
+    });
+
+    if (spotsLeft <= 0) {
       document.querySelectorAll('.offer, #timer').forEach(el => {
-        el.style.opacity = '0.5';
+        if (el) el.style.opacity = '0.5';
       });
     }
+  }
+
+  function closeModal() {
+    document.getElementById('successModal').classList.remove('active');
+    setTimeout(() => {
+      document.getElementById('floatCta').classList.remove('hidden');
+    }, 300);
+
+    setTimeout(() => {
+      document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' });
+    }, 500);
   }
 
   function trackEvent(eventName, properties = {}) {
@@ -1645,7 +2092,7 @@
       event: eventName,
       ...properties,
       timestamp: new Date().toISOString(),
-      user_id: tg.initDataUnsafe.user?.id || 'anonymous',
+      user_id: tg.initDataUnsafe.user && tg.initDataUnsafe.user.id ? tg.initDataUnsafe.user.id : 'anonymous',
       platform: tg.platform,
       theme: tg.colorScheme
     };
@@ -1654,9 +2101,6 @@
 
     if (typeof gtag !== 'undefined') {
       gtag('event', eventName, properties);
-    }
-    if (typeof amplitude !== 'undefined') {
-      amplitude.getInstance().logEvent(eventName, properties);
     }
   }
 
@@ -1688,223 +2132,7 @@
     }
   }
 
-  function startTimer(seconds) {
-    const timerEl = document.getElementById('timer');
-    if (!timerEl) return;
-
-    if (state.timerInterval) {
-      clearInterval(state.timerInterval);
-    }
-
-    const endTime = Date.now() + seconds * 1000;
-    state.timerEnd = endTime;
-    localStorage.setItem('timer_end', String(endTime));
-
-    function updateTimer() {
-      const now = Date.now();
-      const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
-
-      if (timeLeft <= 0) {
-        clearInterval(state.timerInterval);
-        timerEl.textContent = '00:00';
-        timerEl.classList.add('timer--inactive');
-        localStorage.removeItem('timer_end');
-        return;
-      }
-
-      const m = Math.floor(timeLeft / 60);
-      const s = timeLeft % 60;
-      timerEl.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-
-      if (timeLeft <= 300) {
-        timerEl.style.animation = 'pulse 0.5s infinite';
-      }
-    }
-
-    updateTimer();
-    state.timerInterval = setInterval(updateTimer, 1000);
-  }
-
-  function animateTestimonialProgress(target = 85) {
-    const bar = document.getElementById('testimonialProgress');
-    const text = document.getElementById('testimonialProgressText');
-    if (!bar || !text) return;
-
-    let current = 0;
-    const step = () => {
-      current += 3;
-      if (current > target) current = target;
-      bar.style.width = current + '%';
-      text.textContent = `Прогресс: ${current}%`;
-      if (current < target) {
-        requestAnimationFrame(step);
-      }
-    };
-    requestAnimationFrame(step);
-  }
-
-  function initEvents() {
-    document.querySelectorAll('.feature').forEach(el => {
-      el.addEventListener('click', () => selectGoal(el.dataset.goal));
-    });
-
-    document.querySelectorAll('.pricing-card').forEach(card => {
-      card.addEventListener('click', (e) => {
-        const type = card.dataset.planType;
-        const amount = Number(card.dataset.planAmount);
-        const name = card.dataset.planName;
-        if (!type) return;
-        if (e.target.closest('.js-pay-stars') || e.target.closest('.js-book-service')) return;
-        selectPlan(type, amount, name);
-      });
-    });
-
-    document.querySelectorAll('.js-pay-stars').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const card = btn.closest('.pricing-card');
-        const type = card.dataset.planType;
-        const amount = Number(card.dataset.planAmount);
-        const name = card.dataset.planName;
-        payWithStars(type, amount, name);
-      });
-    });
-
-    document.querySelectorAll('.js-book-service').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const card = btn.closest('.pricing-card');
-        const name = card.dataset.planName;
-        bookService(name);
-      });
-    });
-
-    document.getElementById('consultationBtn').addEventListener('click', () => showForm('consultation'));
-    document.getElementById('mainCta').addEventListener('click', () => showForm('hero'));
-    document.getElementById('floatCtaBtn').addEventListener('click', () => showForm('floating'));
-    document.getElementById('submitBtn').addEventListener('click', submitLead);
-    document.getElementById('shareContactBtn').addEventListener('click', requestContact);
-    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-
-    const successModal = document.getElementById('successModal');
-    successModal.addEventListener('click', (e) => {
-      if (e.target === successModal) {
-        closeModal();
-      }
-    });
-
-    const phoneInput = document.getElementById('phone');
-    phoneInput.addEventListener('input', () => {
-      formatPhoneInput(phoneInput);
-      validateField(phoneInput);
-    });
-
-    document.getElementById('name').addEventListener('input', (e) => validateField(e.target));
-    document.getElementById('goal').addEventListener('change', (e) => validateField(e.target));
-
-    tg.BackButton.onClick(() => {
-      const form = document.getElementById('formSection');
-      if (form.classList.contains('active')) {
-        closeForm();
-      }
-    });
-
-    let lastScroll = 0;
-    window.addEventListener('scroll', () => {
-      const current = window.scrollY;
-      const floatCta = document.getElementById('floatCta');
-      if (current > lastScroll + 10) {
-        floatCta.classList.add('hidden');
-      } else if (current < lastScroll - 10) {
-        floatCta.classList.remove('hidden');
-      }
-      lastScroll = current;
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        trackEvent('page_visible');
-        syncLeads();
-      }
-    });
-
-    window.addEventListener('online', () => {
-      syncLeads();
-    });
-  }
-
-  function initApp() {
-    tg.ready();
-    tg.expand();
-    tg.enableClosingConfirmation();
-
-    const userLang = tg.initDataUnsafe.user?.language_code || 'ru';
-    document.documentElement.lang = userLang;
-
-    applyTheme();
-    tg.onEvent('themeChanged', applyTheme);
-
-    if (tg.initDataUnsafe.user) {
-      const user = tg.initDataUnsafe.user;
-      const nameField = document.getElementById('name');
-      if (user.first_name && !nameField.value) {
-        nameField.value = user.first_name;
-        validateField(nameField);
-      }
-      if (user.photo_url) {
-        const avatar = document.querySelector('.avatar');
-        avatar.src = user.photo_url;
-      }
-    }
-
-    const savedTime = localStorage.getItem('timer_end');
-    if (savedTime) {
-      const timeLeft = Math.max(0, Math.floor((parseInt(savedTime, 10) - Date.now()) / 1000));
-      startTimer(timeLeft > 0 ? timeLeft : 15 * 60);
-    } else {
-      startTimer(15 * 60);
-    }
-
-    const savedSpots = localStorage.getItem('spots_left');
-    if (savedSpots) {
-      state.spotsLeft = parseInt(savedSpots, 10);
-    }
-    updateSpotsCounter();
-
-    tg.MainButton
-      .setText(`🎁 Бесплатный план (${state.spotsLeft} места)`)
-      .setParams({
-        color: '#28a745',
-        text_color: '#ffffff'
-      })
-      .show()
-      .onClick(() => {
-        showForm('main_button');
-        trackEvent('main_button_click');
-      });
-
-    animateTestimonialProgress(85);
-
-    trackEvent('page_view', {
-      platform: tg.platform,
-      theme: tg.colorScheme,
-      version: tg.version
-    });
-  }
-
-  window.addEventListener('load', () => {
-    const loader = document.getElementById('loader');
-    setTimeout(() => {
-      loader.classList.add('hidden');
-      document.body.classList.remove('loading');
-      loader.addEventListener('transitionend', () => {
-        loader.style.display = 'none';
-      }, { once: true });
-      initEvents();
-      initApp();
-      syncLeads();
-    }, 800);
-  });
+  document.addEventListener('DOMContentLoaded', initApp);
 </script>
 </body>
-  </html>
+</html>
