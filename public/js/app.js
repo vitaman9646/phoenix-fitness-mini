@@ -268,3 +268,30 @@ document.querySelectorAll("[data-scroll-target]").forEach(btn => {
     });
   });
 })();
+
+// Scroll reveal
+(function () {
+  const elements = document.querySelectorAll(".reveal");
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+      }
+    });
+  }, { threshold: 0.2 });
+
+  elements.forEach(el => observer.observe(el));
+})();
+
+// Parallax for hero background
+(function () {
+  const bg = document.querySelector(".hero-bg");
+  if (!bg) return;
+
+  document.addEventListener("mousemove", (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 10;
+    const y = (e.clientY / window.innerHeight - 0.5) * 10;
+    bg.style.transform = `translate(${x}px, ${y}px)`;
+  });
+})();
