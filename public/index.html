@@ -1765,69 +1765,113 @@
   }
 
   function initCarousel() {
-    const track = document.getElementById('casesTrack');
-    const dotsContainer = document.getElementById('casesDots');
-    const slides = Array.from(track.children);
-    const prevBtn = document.getElementById('casesPrev');
-    const nextBtn = document.getElementById('casesNext');
+  const track = document.getElementById('casesTrack');
+  const dotsContainer = document.getElementById('casesDots');
+  const slides = Array.from(track.children);
+  const prevBtn = document.getElementById('casesPrev');
+  const nextBtn = document.getElementById('casesNext');
+  const progress = document.getElementById('casesProgress');
 
-    let currentIndex = 0;
-    const total = slides.length;
+  let currentIndex = 0;
+  const total = slides.length;
+  let autoplayInterval = null;
+  let autoplayDelay = 6000;
+  let isInteracting = false;
 
-    dotsContainer.innerHTML = '';
-    for (let i = 0; i < total; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'cases-dot' + (i === 0 ? ' active' : '');
-      dot.dataset.index = i;
-      dot.addEventListener('click', () => goToSlide(i));
-      dotsContainer.appendChild(dot);
-    }
-
-    function updateCarousel() {
-      const offset = -currentIndex * 100;
-      track.style.transform = `translateX(${offset}%)`;
-      dotsContainer.querySelectorAll('.cases-dot').forEach(dot => {
-        dot.classList.toggle('active', parseInt(dot.dataset.index, 10) === currentIndex);
-      });
-    }
-
-    function goToSlide(index) {
-      currentIndex = (index + total) % total;
-      updateCarousel();
-      tg.HapticFeedback.selectionChanged();
-      trackEvent('case_slide_change', { index: currentIndex + 1 });
-    }
-
-    prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
-    nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
-
-    let startX = 0;
-    let isDown = false;
-
-    track.addEventListener('touchstart', (e) => {
-      isDown = true;
-      startX = e.touches[0].clientX;
+  dotsContainer.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'cases-dot' + (i === 0 ? ' active' : '');
+    dot.dataset.index = i;
+    dot.addEventListener('click', () => {
+      goToSlide(i);
+      resetAutoplay();
     });
-
-    track.addEventListener('touchmove', (e) => {
-      if (!isDown) return;
-      const diff = e.touches[0].clientX - startX;
-      if (Math.abs(diff) > 50) {
-        if (diff > 0) {
-          goToSlide(currentIndex - 1);
-        } else {
-          goToSlide(currentIndex + 1);
-        }
-        isDown = false;
-      }
-    });
-
-    track.addEventListener('touchend', () => {
-      isDown = false;
-    });
-
-    updateCarousel();
+    dotsContainer.appendChild(dot);
   }
+
+  function updateActiveSlide() {
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  function updateCarousel() {
+    const offset = -currentIndex * 100;
+    track.style.transform = `translateX(${offset}%)`;
+
+    dotsContainer.querySelectorAll('.cases-dot').forEach(dot => {
+      dot.classList.toggle('active', parseInt(dot.dataset.index, 10) === currentIndex);
+    });
+
+    updateActiveSlide();
+    updateProgress();
+  }
+
+  function updateProgress() {
+    progress.style.width = '0%';
+    setTimeout(() => {
+      progress.style.transition = `width ${autoplayDelay}ms linear`;
+      progress.style.width = '100%';
+    }, 50);
+  }
+
+  function goToSlide(index) {
+    currentIndex = (index + total) % total;
+    updateCarousel();
+    tg.HapticFeedback.selectionChanged();
+  }
+
+  prevBtn.addEventListener('click', () => {
+    goToSlide(currentIndex - 1);
+    resetAutoplay();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    goToSlide(currentIndex + 1);
+    resetAutoplay();
+  });
+
+  let startX = 0;
+  let isDown = false;
+
+  track.addEventListener('touchstart', (e) => {
+    isDown = true;
+    startX = e.touches[0].clientX;
+    isInteracting = true;
+  });
+
+  track.addEventListener('touchmove', (e) => {
+    if (!isDown) return;
+    const diff = e.touches[0].clientX - startX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) goToSlide(currentIndex - 1);
+      else goToSlide(currentIndex + 1);
+      isDown = false;
+      resetAutoplay();
+    }
+  });
+
+  track.addEventListener('touchend', () => {
+    isDown = false;
+    isInteracting = false;
+  });
+
+  function startAutoplay() {
+    autoplayInterval = setInterval(() => {
+      if (!isInteracting) goToSlide(currentIndex + 1);
+    }, autoplayDelay);
+    updateProgress();
+  }
+
+  function resetAutoplay() {
+    clearInterval(autoplayInterval);
+    startAutoplay();
+  }
+
+  updateCarousel();
+  startAutoplay();
+}
 
   function initFormListeners() {
     const name = document.getElementById('name');
