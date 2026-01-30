@@ -1,2362 +1,583 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>Vitaliy Couch Fitness — персональные тренировки</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --bg: #05060a;
-      --bg-alt: #0b0d14;
-      --card: #101320;
-      --primary: #35d48b;
-      --primary-soft: rgba(53, 212, 139, 0.12);
-      --accent: #ff6b6b;
-      --text: #f5f5f7;
-      --muted: #9ca3af;
-      --border-soft: rgba(255, 255, 255, 0.06);
-      --radius-lg: 18px;
-      --radius-md: 12px;
-      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.55);
-      --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.45);
-      --transition-fast: 0.2s ease;
-      --transition-med: 0.3s ease;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      background: radial-gradient(circle at top, #15192b 0, #05060a 55%);
-      color: var(--text);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .app {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 16px 16px 120px;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.1fr);
-      gap: 18px;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-
-    @media (max-width: 768px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .hero-left {
-      padding: 18px 18px 20px;
-      border-radius: 24px;
-      background: radial-gradient(circle at top left, rgba(53, 212, 139, 0.18), transparent 55%),
-                  radial-gradient(circle at bottom right, rgba(255, 107, 107, 0.18), transparent 55%),
-                  linear-gradient(135deg, #05060a, #0b0d14);
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(5, 6, 10, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-
-    .hero-badge span {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      background: rgba(53, 212, 139, 0.15);
-      color: var(--primary);
-      font-size: 11px;
-    }
-
-    .hero-title {
-      font-size: 26px;
-      line-height: 1.2;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
-
-    .hero-title span {
-      background: linear-gradient(120deg, #35d48b, #7cf5ff);
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .hero-subtitle {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
-
-    .hero-subtitle strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .hero-stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .hero-stat {
-      flex: 1 1 110px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(5, 6, 10, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 12px;
-    }
-
-    .hero-stat-label {
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .hero-stat-value {
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    .hero-cta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-top: 4px;
-    }
-
-    .btn-primary {
-      border: none;
-      outline: none;
-      cursor: pointer;
-      padding: 10px 16px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #35d48b, #1fb874);
-      color: #05060a;
-      font-weight: 700;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 12px 30px rgba(53, 212, 139, 0.35);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
-      white-space: nowrap;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 16px 40px rgba(53, 212, 139, 0.45);
-    }
-
-    .btn-primary:active {
-      transform: translateY(0);
-      box-shadow: 0 8px 20px rgba(53, 212, 139, 0.3);
-      opacity: 0.9;
-    }
-
-    .hero-note {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .hero-note span {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .hero-right {
-      padding: 16px;
-      border-radius: 24px;
-      background: radial-gradient(circle at top, rgba(53, 212, 139, 0.2), transparent 60%),
-                  linear-gradient(145deg, #05060a, #0b0d14);
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .coach-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 10px;
-    }
-
-    .coach-photo {
-      width: 120px;
-      height: 120px;
-      border-radius: 999px;
-      background: radial-gradient(circle at top, #35d48b, #05060a);
-      padding: 3px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
-      position: relative;
-    }
-
-    .coach-photo-inner {
-      width: 100%;
-      height: 100%;
-      border-radius: inherit;
-      background-image: url("https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg");
-      background-size: cover;
-      background-position: center;
-      filter: saturate(1.1);
-    }
-
-    .coach-name {
-      font-weight: 700;
-      font-size: 16px;
-    }
-
-    .coach-location {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .coach-location span {
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    .coach-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: center;
-      margin-top: 4px;
-    }
-
-    .coach-tag {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(5, 6, 10, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--muted);
-    }
-
-    .timer-card {
-      margin-top: 12px;
-      padding: 10px 12px;
-      border-radius: 16px;
-      background: radial-gradient(circle at left, rgba(255, 107, 107, 0.2), transparent 60%),
-                  rgba(5, 6, 10, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .timer-label {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .timer-value {
-      font-size: 20px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #ff6b6b, #ffb86c);
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .spots-pill {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(5, 6, 10, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--muted);
-    }
-
-    .section {
-      margin-top: 24px;
-      padding: 16px 14px;
-      border-radius: var(--radius-lg);
-      background: rgba(5, 6, 10, 0.9);
-      border: 1px solid var(--border-soft);
-      box-shadow: var(--shadow-card);
-    }
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .section-title span {
-      font-size: 18px;
-    }
-
-    .section-subtitle {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-
-    .trust-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-    }
-
-    .trust-item {
-      padding: 10px 10px;
-      border-radius: var(--radius-md);
-      background: rgba(10, 12, 20, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 13px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .trust-item::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top left, rgba(53, 212, 139, 0.18), transparent 60%);
-      opacity: 0;
-      transition: opacity var(--transition-med);
-      pointer-events: none;
-    }
-
-    .trust-item:hover::before {
-      opacity: 1;
-    }
-
-    .trust-label {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .trust-text {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .mistakes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 10px;
-    }
-
-    .mistake-card {
-      padding: 10px 10px;
-      border-radius: var(--radius-md);
-      background: rgba(10, 12, 20, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 13px;
-      position: relative;
-    }
-
-    .mistake-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(255, 107, 107, 0.12);
-      color: #ffb3b3;
-      margin-bottom: 6px;
-    }
-
-    .mistake-title {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .mistake-text {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .mistake-conseq {
-      margin-top: 6px;
-      font-size: 12px;
-      color: #ffb86c;
-    }
-
-    .process-steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
-      margin-top: 6px;
-    }
-
-    .process-step {
-      padding: 10px 10px;
-      border-radius: var(--radius-md);
-      background: rgba(10, 12, 20, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 13px;
-      position: relative;
-    }
-
-    .process-step-number {
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      background: rgba(53, 212, 139, 0.18);
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .process-step-title {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .process-step-text {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .principles-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-top: 6px;
-    }
-
-    .principle {
-      padding: 10px 10px;
-      border-radius: var(--radius-md);
-      background: rgba(10, 12, 20, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 13px;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .principle-icon {
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      background: rgba(53, 212, 139, 0.18);
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .principle-text {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .testimonials {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    .testimonial {
-      padding: 12px 12px 12px 16px;
-      border-radius: var(--radius-md);
-      background: rgba(10, 12, 20, 0.95);
-      border-left: 3px solid var(--primary);
-      border-right: 1px solid rgba(255, 255, 255, 0.06);
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 13px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .testimonial::after {
-      content: "“";
-      position: absolute;
-      right: 10px;
-      bottom: -10px;
-      font-size: 60px;
-      color: rgba(255, 255, 255, 0.04);
-      pointer-events: none;
-    }
-
-    .faq-item {
-      padding: 10px 10px;
-      border-radius: var(--radius-md);
-      background: rgba(10, 12, 20, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: background var(--transition-fast), border-color var(--transition-fast);
-    }
-
-    .faq-item.open {
-      background: rgba(15, 18, 30, 0.98);
-      border-color: rgba(53, 212, 139, 0.5);
-    }
-
-    .faq-question {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 13px;
-    }
-
-    .faq-toggle {
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      background: rgba(5, 6, 10, 0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: var(--muted);
-      flex-shrink: 0;
-    }
-
-    .faq-answer {
-      margin-top: 6px;
-      font-size: 12px;
-      color: var(--muted);
-      display: none;
-    }
-
-    .faq-item.open .faq-answer {
-      display: block;
-    }
-
-    .cases-carousel {
-      position: relative;
-      overflow: hidden;
-      border-radius: var(--radius-lg);
-      background: rgba(5, 6, 10, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 12px 10px 16px;
-    }
-
-    .cases-track {
-      display: flex;
-      transition: transform 0.4s ease;
-      will-change: transform;
-    }
-
-    .case-slide {
-      min-width: 100%;
-      padding: 4px 4px 0;
-      box-sizing: border-box;
-    }
-
-    .case-inner {
-      display: grid;
-      grid-template-columns: 1.1fr 1.1fr;
-      gap: 8px;
-    }
-
-    @media (max-width: 640px) {
-      .case-inner {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .case-photos {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-
-    .case-photo {
-      border-radius: 14px;
-      overflow: hidden;
-      position: relative;
-      background: #11131c;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .case-photo img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-    }
-
-    .case-label {
-      position: absolute;
-      left: 8px;
-      top: 8px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      background: rgba(5, 6, 10, 0.85);
-      color: var(--muted);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    .case-meta {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .case-title {
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .case-result {
-      font-size: 13px;
-      color: var(--primary);
-      margin-bottom: 4px;
-    }
-
-    .case-text {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .case-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 4px;
-    }
-
-    .case-tag {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(5, 6, 10, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--muted);
-    }
-
-    .cases-nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 10px;
-      gap: 10px;
-    }
-
-    .cases-dots {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .cases-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.18);
-      transition: background var(--transition-fast), transform var(--transition-fast), width var(--transition-fast);
-    }
-
-    .cases-dot.active {
-      background: var(--primary);
-      transform: scale(1.1);
-      width: 14px;
-    }
-
-    .cases-arrows {
-      display: flex;
-      gap: 6px;
-    }
-
-    .cases-arrow-btn {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(5, 6, 10, 0.9);
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
-    }
-
-    .cases-arrow-btn:hover {
-      background: rgba(53, 212, 139, 0.15);
-      color: var(--primary);
-      border-color: rgba(53, 212, 139, 0.7);
-      transform: translateY(-1px);
-    }
-
-    .form-section {
-      margin-top: 24px;
-      padding: 16px 14px 18px;
-      border-radius: var(--radius-lg);
-      background: rgba(5, 6, 10, 0.96);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: var(--shadow-card);
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
-      gap: 14px;
-    }
-
-    @media (max-width: 768px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .form-group {
-      margin-bottom: 10px;
-    }
-
-    .form-label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .form-label span {
-      color: var(--accent);
-    }
-
-    .input,
-    .select,
-    .textarea {
-      width: 100%;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(5, 6, 10, 0.9);
-      color: var(--text);
-      font-size: 13px;
-      padding: 9px 12px;
-      outline: none;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
-    }
-
-    .textarea {
-      border-radius: 14px;
-      min-height: 70px;
-      resize: vertical;
-    }
-
-    .input::placeholder,
-    .select::placeholder,
-    .textarea::placeholder {
-      color: rgba(156, 163, 175, 0.7);
-    }
-
-    .input:focus,
-    .select:focus,
-    .textarea:focus {
-      border-color: rgba(53, 212, 139, 0.7);
-      box-shadow: 0 0 0 1px rgba(53, 212, 139, 0.4);
-      background: rgba(5, 6, 10, 0.98);
-      transform: translateY(-1px);
-    }
-
-    .input.error,
-    .select.error,
-    .textarea.error {
-      border-color: rgba(255, 107, 107, 0.8);
-      box-shadow: 0 0 0 1px rgba(255, 107, 107, 0.4);
-    }
-
-    .input.success,
-    .select.success,
-    .textarea.success {
-      border-color: rgba(53, 212, 139, 0.8);
-    }
-
-    .error-message {
-      font-size: 11px;
-      color: #ffb3b3;
-      margin-top: 3px;
-      display: none;
-    }
-
-    .consent-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      margin-top: 6px;
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .consent-row input {
-      margin-top: 2px;
-    }
-
-    .plan-box {
-      padding: 10px 10px;
-      border-radius: var(--radius-md);
-      background: rgba(10, 12, 20, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 13px;
-    }
-
-    .plan-title {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .plan-list {
-      margin: 0;
-      padding-left: 18px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .plan-list li {
-      margin-bottom: 2px;
-    }
-
-    .plan-options {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .plan-option {
-      padding: 8px 9px;
-      border-radius: 12px;
-      background: rgba(5, 6, 10, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
-    }
-
-    .plan-option:hover {
-      border-color: rgba(53, 212, 139, 0.7);
-      background: rgba(10, 14, 20, 0.98);
-      transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
-    }
-
-    .plan-option-name {
-      font-weight: 600;
-    }
-
-    .plan-option-price {
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    .plan-option-note {
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .selected-plan-info {
-      margin-top: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      display: none;
-    }
-
-    .selected-plan-info span {
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    .btn-submit {
-      margin-top: 10px;
-      width: 100%;
-      border-radius: 999px;
-      border: none;
-      outline: none;
-      cursor: pointer;
-      padding: 10px 16px;
-      background: linear-gradient(135deg, #35d48b, #1fb874);
-      color: #05060a;
-      font-weight: 700;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      box-shadow: 0 12px 30px rgba(53, 212, 139, 0.35);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
-    }
-
-    .btn-submit:disabled {
-      opacity: 0.7;
-      cursor: default;
-      box-shadow: none;
-      transform: none;
-    }
-
-    .btn-submit:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 16px 40px rgba(53, 212, 139, 0.45);
-    }
-
-    .btn-spinner {
-      display: inline-block;
-      animation: spin 0.9s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .float-cta {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 12px;
-      display: flex;
-      justify-content: center;
-      pointer-events: none;
-      z-index: 50;
-    }
-
-    .float-cta-inner {
-      pointer-events: auto;
-      max-width: 960px;
-      width: 100%;
-      padding: 0 16px;
-    }
-
-    .float-cta button {
-      width: 100%;
-      border-radius: 999px;
-      border: none;
-      outline: none;
-      cursor: pointer;
-      padding: 10px 16px;
-      background: linear-gradient(135deg, #35d48b, #1fb874);
-      color: #05060a;
-      font-weight: 700;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      box-shadow: 0 12px 30px rgba(53, 212, 139, 0.35);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
-    }
-
-    .float-cta.hidden {
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(20px);
-      transition: opacity var(--transition-med), transform var(--transition-med);
-    }
-
-    .float-cta button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 16px 40px rgba(53, 212, 139, 0.45);
-    }
-
-    .success-modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 60;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity var(--transition-med);
-    }
-
-    .success-modal-backdrop.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .success-modal {
-      width: 100%;
-      max-width: 360px;
-      padding: 18px 16px 16px;
-      border-radius: 20px;
-      background: radial-gradient(circle at top, rgba(53, 212, 139, 0.2), transparent 60%),
-                  rgba(5, 6, 10, 0.98);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-      transform: translateY(20px) scale(0.96);
-      opacity: 0;
-      transition: transform var(--transition-med), opacity var(--transition-med);
-      text-align: center;
-    }
-
-    .success-modal-backdrop.active .success-modal {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
-
-    .success-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 999px;
-      background: rgba(53, 212, 139, 0.18);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 10px;
-      font-size: 26px;
-    }
-
-    .success-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .success-text {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-
-    .success-btn {
-      border-radius: 999px;
-      border: none;
-      outline: none;
-      cursor: pointer;
-      padding: 9px 16px;
-      background: rgba(5, 6, 10, 0.9);
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 600;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      width: 100%;
-      transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
-    }
-
-    .success-btn:hover {
-      background: rgba(10, 12, 20, 0.98);
-      border-color: rgba(53, 212, 139, 0.7);
-      transform: translateY(-1px);
-    }
-
-    /* Анимация появления элементов */
-.case-slide .case-title,
-.case-slide .case-result,
-.case-slide .case-text,
-.case-slide .case-tags {
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity .45s ease, transform .45s ease;
-}
-
-.case-slide.active .case-title,
-.case-slide.active .case-result,
-.case-slide.active .case-text,
-.case-slide.active .case-tags {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Анимация появления фото */
-.case-photo img {
-  opacity: 0;
-  transform: scale(0.96);
-  transition: opacity .5s ease, transform .5s ease;
-}
-
-.case-slide.active .case-photo img {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* Прогресс‑бар */
-.cases-progress {
-  height: 3px;
-  width: 100%;
-  background: rgba(255,255,255,0.1);
-  border-radius: 999px;
-  overflow: hidden;
-  margin-top: 10px;
-}
-
-.cases-progress-inner {
-  height: 100%;
-  width: 0%;
-  background: var(--primary);
-  transition: width .4s linear;
-}
-    
-  </style>
+  <meta charset="UTF-8">
+  <title>Онлайн‑коуч Виталий</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Шрифт Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div class="app">
-  <section class="hero">
-    <div class="hero-left">
-      <div class="hero-badge">
-        <span>🔥</span>
-        <div>Персональный онлайн‑тренер • Vitaliy Couch Fitness</div>
-      </div>
-      <h1 class="hero-title">
-        Создам <span>тело вашей мечты</span><br />за 4–8 недель без жёстких диет
-      </h1>
-      <div class="hero-subtitle">
-        <strong>Виталий Карпинский</strong> — персональный тренер из г. Абакан, Россия.  
-        Провожу тренировки <strong>офлайн в Абакане</strong> и <strong>онлайн по всему миру</strong>.
-      </div>
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-label">Клиентов довёл до результата</div>
-          <div class="hero-stat-value">100+ человек</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-label">Средний результат за 8 недель</div>
-          <div class="hero-stat-value">–8–14 кг</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-label">Формат</div>
-          <div class="hero-stat-value">Дом / зал / онлайн</div>
-        </div>
-      </div>
-      <div class="hero-cta-row">
-        <button id="mainCta" class="btn-primary">
-          🎁 Получить бесплатный план (3 места)
+  <div class="page">
+
+    <!-- Хедер -->
+    <header class="header">
+      <div class="container header-inner">
+        <div class="logo">Fitness_Couch_Vitaliy</div>
+        <button class="btn btn-primary header-cta" data-scroll-target="#ctaFinal">
+          Получить план
         </button>
-        <div class="hero-note">
-          <span>Осталось несколько мест</span> на этой неделе — забронируйте сейчас.
-        </div>
       </div>
-    </div>
+    </header>
 
-    <div class="hero-right">
-      <div class="coach-card">
-        <div class="coach-photo">
-          <div class="coach-photo-inner"></div>
-        </div>
-        <div class="coach-name">Виталий Карпинский</div>
-        <div class="coach-location">
-          г. Абакан, Россия • <span>онлайн по всему миру</span>
-        </div>
-        <div class="coach-tags">
-          <div class="coach-tag">Персональные планы тренировок</div>
-          <div class="coach-tag">Питание без жёстких диет</div>
-          <div class="coach-tag">Поддержка и контроль</div>
-        </div>
-      </div>
-      <div class="timer-card" id="timer">
-        <div>
-          <div class="timer-label">Бесплатный разбор и план до конца таймера</div>
-          <div class="timer-value" id="countdown">14:59</div>
-        </div>
-        <div class="spots-pill" id="spotsPill">Осталось: 3 места</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-title"><span>✅</span>Почему мне доверяют</div>
-    <div class="section-subtitle">
-      Я не просто даю тренировки — я беру ответственность за ваш результат и здоровье.
-    </div>
-    <div class="trust-grid">
-      <div class="trust-item">
-        <div class="trust-label">Работаю с любым уровнем подготовки</div>
-        <div class="trust-text">
-          От «никогда не тренировался» до продвинутых. Программу адаптирую под ваш текущий уровень и ограничения.
-        </div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-label">Безопасные тренировки без перегрузок</div>
-        <div class="trust-text">
-          Контролирую технику, нагрузку и прогресс. Никаких «убийственных» тренировок ради красивых цифр.
-        </div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-label">Под ваш график и образ жизни</div>
-        <div class="trust-text">
-          Тренировки 25–40 минут, которые реально вписать в рабочий день, семью и дела.
-        </div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-label">Реальные результаты без жёстких диет</div>
-        <div class="trust-text">
-          Без голодовок и запретов. Учим есть вкусно, достаточно и при этом худеть и подтягиваться.
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-title"><span>⚠️</span>Частые ошибки новичков</div>
-    <div class="section-subtitle">
-      Если вы узнаёте себя в этих ошибках — значит, вам особенно нужен грамотный план.
-    </div>
-    <div class="mistakes-grid">
-      <div class="mistake-card">
-        <div class="mistake-tag">Ошибка</div>
-        <div class="mistake-title">Слишком много кардио</div>
-        <div class="mistake-text">
-          Бесконечная беговая дорожка и часами кардио без силовых — метаболизм замедляется, мышцы не растут.
-        </div>
-        <div class="mistake-conseq">→ Результат: плато, усталость, вес стоит.</div>
-      </div>
-      <div class="mistake-card">
-        <div class="mistake-tag">Ошибка</div>
-        <div class="mistake-title">Слишком мало еды</div>
-        <div class="mistake-text">
-          Жёсткие диеты, голодовки, «ем 800 ккал» — организм защищается, включаются срывы и откаты.
-        </div>
-        <div class="mistake-conseq">→ Результат: срывы, набор веса обратно.</div>
-      </div>
-      <div class="mistake-card">
-        <div class="mistake-tag">Ошибка</div>
-        <div class="mistake-title">Неправильная техника и хаос в тренировках</div>
-        <div class="mistake-text">
-          Случайные упражнения из интернета без системы и контроля техники.
-        </div>
-        <div class="mistake-conseq">→ Результат: травмы, боли, нет прогресса.</div>
-      </div>
-    </div>
-  </section>
-  
-<div class="cases-carousel">
-  <div class="cases-track" id="casesTrack">
-
-    <!-- Кейс 1 -->
-    <div class="case-slide active">
-      <div class="case-photo"><img src="images/case1_before.jpg" alt="До"></div>
-      <div class="case-photo"><img src="images/case1_after.jpg" alt="После"></div>
-      <div class="case-title">Алексей, 32 года</div>
-      <div class="case-result">−14 кг за 8 недель • минус живот, плюс энергия</div>
-      <div class="case-text">
-        Пришёл с лишним весом и болями в спине. Сделали упор на технику, базовые упражнения и питание без жёстких ограничений. Тренировки дома по 30 минут, 4 раза в неделю.
-      </div>
-      <div class="case-tags">
-        <div class="case-tag">Домашние тренировки</div>
-        <div class="case-tag">−14 кг</div>
-        <div class="case-tag">8 недель</div>
-      </div>
-    </div>
-
-    <!-- Кейс 2 -->
-    <div class="case-slide">
-      <div class="case-photo"><img src="images/case2_before.jpg" alt="До"></div>
-      <div class="case-photo"><img src="images/case2_after.jpg" alt="После"></div>
-      <div class="case-title">Марина, 29 лет</div>
-      <div class="case-result">−6 кг за 6 недель • рельеф и тонус</div>
-      <div class="case-text">
-        Марина хотела подтянуть тело и убрать отёки. Мы сделали акцент на технике, умеренном дефиците и тренировках дома. Без жёстких ограничений.
-      </div>
-      <div class="case-tags">
-        <div class="case-tag">Похудение</div>
-        <div class="case-tag">Тонус</div>
-        <div class="case-tag">6 недель</div>
-      </div>
-    </div>
-
-    <!-- Кейс 3 -->
-    <div class="case-slide">
-      <div class="case-photo"><img src="images/case3_before.jpg" alt="До"></div>
-      <div class="case-photo"><img src="images/case3_after.jpg" alt="После"></div>
-      <div class="case-title">Сергей, 35 лет</div>
-      <div class="case-result">+4 кг мышц за 9 недель • спина и плечи</div>
-      <div class="case-text">
-        Сергей тренировался хаотично и не видел прогресса. Мы выстроили систему, добавили прогрессию нагрузки и питание с профицитом.
-      </div>
-      <div class="case-tags">
-        <div class="case-tag">Набор мышц</div>
-        <div class="case-tag">Спина</div>
-        <div class="case-tag">9 недель</div>
-      </div>
-    </div>
-
-    <!-- Кейс 4 -->
-    <div class="case-slide">
-      <div class="case-photo"><img src="images/case4_before.jpg" alt="До"></div>
-      <div class="case-photo"><img src="images/case4_after.jpg" alt="После"></div>
-      <div class="case-title">Анна, 26 лет</div>
-      <div class="case-result">−5 кг за 5 недель • пресс и бёдра</div>
-      <div class="case-text">
-        Анна хотела убрать живот и подтянуть бёдра. Мы сделали акцент на технике, умеренном дефиците и регулярности.
-      </div>
-      <div class="case-tags">
-        <div class="case-tag">Похудение</div>
-        <div class="case-tag">Пресс</div>
-        <div class="case-tag">5 недель</div>
-      </div>
-    </div>
-
-    <!-- Кейс 5 -->
-    <div class="case-slide">
-      <div class="case-photo"><img src="images/case5_before.jpg" alt="До"></div>
-      <div class="case-photo"><img src="images/case5_after.jpg" alt="После"></div>
-      <div class="case-title">Игорь, 31 год</div>
-      <div class="case-result">+3 кг мышц за 7 недель • грудь и руки</div>
-      <div class="case-text">
-        Игорь хотел набрать массу и улучшить пропорции. Мы добавили прогрессию нагрузки и питание с профицитом.
-      </div>
-      <div class="case-tags">
-        <div class="case-tag">Набор мышц</div>
-        <div class="case-tag">Руки</div>
-        <div class="case-tag">7 недель</div>
-      </div>
-    </div>
-
-    <!-- Кейс 6 -->
-    <div class="case-slide">
-      <div class="case-photo"><img src="images/case6_before.jpg" alt="До"></div>
-      <div class="case-photo"><img src="images/case6_after.jpg" alt="После"></div>
-      <div class="case-title">Екатерина, 27 лет</div>
-      <div class="case-result">−9 кг за 7 недель • тонус и рельеф</div>
-      <div class="case-text">
-        Екатерина пришла с усталостью и отсутствием тонуса. Мы сделали акцент на технике, умеренном дефиците и тренировках дома по 25–30 минут.
-      </div>
-      <div class="case-tags">
-        <div class="case-tag">Похудение</div>
-        <div class="case-tag">Тонус</div>
-        <div class="case-tag">7 недель</div>
-      </div>
-    </div>
-
-    <!-- Кейс 7 -->
-    <div class="case-slide">
-      <div class="case-photo"><img src="images/case7_before.jpg" alt="До"></div>
-      <div class="case-photo"><img src="images/case7_after.jpg" alt="После"></div>
-      <div class="case-title">Дмитрий, 29 лет</div>
-      <div class="case-result">+5 кг мышц за 10 недель • пропорции и сила</div>
-      <div class="case-text">
-        Дмитрий годами топтался на месте. Мы выстроили чёткую программу, добавили прогрессию нагрузки и питание с профицитом.
-      </div>
-      <div class="case-tags">
-        <div class="case-tag">Набор мышц</div>
-        <div class="case-tag">Пропорции</div>
-        <div class="case-tag">10 недель</div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="cases-nav">
-    <div class="cases-dots" id="casesDots"></div>
-    <div class="cases-arrows">
-      <button class="cases-arrow-btn" id="casesPrev"></button>
-      <button class="cases-arrow-btn" id="casesNext"></button>
-    </div>
-  </div>
-
-  <div class="cases-progress">
-    <div class="cases-progress-inner" id="casesProgress"></div>
-  </div>
-</div>
-  <section class="section">
-    <div class="section-title"><span>📸</span>Кейсы: до и после</div>
-    <div class="section-subtitle">
-      Реальные трансформации моих клиентов. Карусель листается свайпом или стрелками.
-    </div>
-
-    <div class="cases-carousel" id="casesCarousel">
-      <div class="cases-track" id="casesTrack">
-        <!-- Слайд 1 -->
-        <div class="case-slide">
-          <div class="case-inner">
-            <div class="case-photos">
-              <div class="case-photo">
-                <!-- Замените src на путь к вашему фото ДО -->
-                <img src="images/case1_before.jpg" alt="До">
-                <div class="case-label">до</div>
-              </div>
-              <div class="case-photo">
-                <!-- Замените src на путь к вашему фото ПОСЛЕ -->
-                <img src="images/case1_after.jpg" alt="После">
-                <div class="case-label">после</div>
-              </div>
-            </div>
-            <div>
-              <div class="case-title">Алексей, 32 года</div>
-              <div class="case-result">–14 кг за 8 недель • минус живот, плюс энергия</div>
-              <div class="case-text">
-                Пришёл с лишним весом и болями в спине. Сделали упор на технику, базовые упражнения и питание без жёстких ограничений.
-                Тренировки дома по 30 минут, 4 раза в неделю.
-              </div>
-              <div class="case-tags">
-                <div class="case-tag">Домашние тренировки</div>
-                <div class="case-tag">–14 кг</div>
-                <div class="case-tag">8 недель</div>
-              </div>
-            </div>
+    <!-- Hero -->
+    <section class="section hero" id="top">
+      <div class="container hero-inner">
+        <div class="hero-text">
+          <div class="hero-badge">Онлайн‑коуч по тренировкам и питанию</div>
+          <h1 class="hero-title">
+            Помогу привести тело в форму<br>без боли, хаоса и жёстких диет
+          </h1>
+          <p class="hero-subtitle">
+            Персональная программа тренировок и питания под твой график и уровень.  
+            Домашние тренировки или зал — без случайных упражнений из интернета.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-scroll-target="#quiz">
+              Пройти мини‑квиз
+            </button>
+            <button class="btn btn-ghost" data-scroll-target="#cases">
+              Посмотреть реальные кейсы
+            </button>
+          </div>
+          <div class="hero-note">
+            3 места на бесплатный план в этом месяце
           </div>
         </div>
-
-        <!-- Слайд 2 -->
-        <div class="case-slide">
-          <div class="case-inner">
-            <div class="case-photos">
-              <div class="case-photo">
-                <img src="images/case2_before.jpg" alt="До">
-                <div class="case-label">до</div>
-              </div>
-              <div class="case-photo">
-                <img src="images/case2_after.jpg" alt="После">
-                <div class="case-label">после</div>
-              </div>
-            </div>
-            <div>
-              <div class="case-title">Марина, 27 лет</div>
-              <div class="case-result">–9 кг за 6 недель • послеродовое восстановление</div>
-              <div class="case-text">
-                Молодая мама, мало времени и сил. Составили короткие тренировки дома, без прыжков и перегрузок.
-                Питание — гибкое, без запрета любимых продуктов.
-              </div>
-              <div class="case-tags">
-                <div class="case-tag">После родов</div>
-                <div class="case-tag">–9 кг</div>
-                <div class="case-tag">6 недель</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Слайд 3 -->
-        <div class="case-slide">
-          <div class="case-inner">
-            <div class="case-photos">
-              <div class="case-photo">
-                <img src="images/case3_before.jpg" alt="До">
-                <div class="case-label">до</div>
-              </div>
-              <div class="case-photo">
-                <img src="images/case3_after.jpg" alt="После">
-                <div class="case-label">после</div>
-              </div>
-            </div>
-            <div>
-              <div class="case-title">Сергей, 25 лет</div>
-              <div class="case-result">+15 кг за 15 недель • увеличение мышечной массы</div>
-              <div class="case-text">
-                Была проблема набрать вес, особенно мышечную массу. Поначалу было не легко, но со временем
-                втянулся и не знаю почему раньше не обратился к тренеру Виталию! Спасибо!
-              </div>
-              <div class="case-tags">
-                <div class="case-tag">быстрый обмен веществ</div>
-                <div class="case-tag">+15 кг</div>
-                <div class="case-tag">15 недель</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Слайд 4 -->
-        <div class="case-slide">
-          <div class="case-inner">
-            <div class="case-photos">
-              <div class="case-photo">
-                <img src="images/case4_before.jpg" alt="До">
-                <div class="case-label">до</div>
-              </div>
-              <div class="case-photo">
-                <img src="images/case4_after.jpg" alt="После">
-                <div class="case-label">после</div>
-              </div>
-            </div>
-            <div>
-              <div class="case-title">Анна, 30 лет</div>
-              <div class="case-result">–7 кг и подтянутое тело за 6 недель</div>
-              <div class="case-text">
-                Хотела «не просто похудеть, а выглядеть спортивно». Добавили силовые, работу с собственным весом и акцент на ягодицы и пресс.
-              </div>
-              <div class="case-tags">
-                <div class="case-tag">Фигура</div>
-                <div class="case-tag">–7 кг</div>
-                <div class="case-tag">6 недель</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Слайд 5 -->
-        <div class="case-slide">
-          <div class="case-inner">
-            <div class="case-photos">
-              <div class="case-photo">
-                <img src="images/case5_before.jpg" alt="До">
-                <div class="case-label">до</div>
-              </div>
-              <div class="case-photo">
-                <img src="images/case5_after.jpg" alt="После">
-                <div class="case-label">после</div>
-              </div>
-            </div>
-            <div>
-              <div class="case-title">Лера, 35 лет</div>
-              <div class="case-result">+мышцы, –жир • рельеф за 10 недель</div>
-              <div class="case-text">
-                Цель — скинуть вес, прийти в форму. Укрепили мышцы, тело подтянулось! Я довольна!
-              </div>
-              <div class="case-tags">
-                <div class="case-tag">похудение</div>
-                <div class="case-tag"тогус</div>
-                <div class="case-tag">10 недель</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="cases-nav">
-        <div class="cases-dots" id="casesDots"></div>
-        <div class="cases-arrows">
-          <button class="cases-arrow-btn" id="casesPrev" aria-label="Предыдущий кейс">‹</button>
-          <button class="cases-arrow-btn" id="casesNext" aria-label="Следующий кейс">›</button>
-        </div>
-      </div>
-      <div class="cases-progress">
-  <div class="cases-progress-inner" id="casesProgress"></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-title"><span>💬</span>Отзывы клиентов</div>
-    <div class="section-subtitle">
-      Люди приходят за формой, а остаются за отношением, поддержкой и результатом.
-    </div>
-    <div class="testimonials">
-      <div class="testimonial" style="position: relative; padding-left: 80px;">
-        <img src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg"
-             alt="Фото клиента"
-             style="width:60px; height:60px; border-radius:50%; object-fit:cover; position:absolute; left:10px; top:20px; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-        <div style="font-style:italic;">
-          «За 8 недель с Виталием я похудел на 14 кг без изнурительных диет.
-          Тренировки дома занимали всего 30 минут в день.
-          Рекомендую всем, кто хочет реальный результат!»
-        </div>
-        <div style="margin-top:16px; font-weight:700; color:var(--primary);">— Алексей, 32 года</div>
-      </div>
-
-      <div class="testimonial" style="position: relative; padding-left: 80px;">
-        <img src="https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg"
-             alt="Фото клиента"
-             style="width:60px; height:60px; border-radius:50%; object-fit:cover; position:absolute; left:10px; top:20px; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-        <div style="font-style:italic;">
-          «Я думала, что после родов уже не вернусь в форму.
-          Но программа Виталия оказалась настолько удобной, что я занималась дома между делами.
-          За 6 недель — минус 9 кг и снова чувствую себя собой!»
-        </div>
-        <div style="margin-top:16px; font-weight:700; color:var(--primary);">— Марина, 27 лет</div>
-      </div>
-
-      <div class="testimonial" style="position: relative; padding-left: 80px;">
-        <img src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg"
-             alt="Фото клиента"
-             style="width:60px; height:60px; border-radius:50%; object-fit:cover; position:absolute; left:10px; top:20px; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-        <div style="font-style:italic;">
-          «У меня хронически не было времени.
-          Но короткие тренировки по 25–30 минут — это спасение.
-          За 2 месяца ушёл живот, появилась энергия.
-          Виталий — тренер, который реально понимает клиентов.»
-        </div>
-        <div style="margin-top:16px; font-weight:700; color:var(--primary);">— Сергей, 41 год</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-title"><span>❓</span>Часто задаваемые вопросы</div>
-    <div class="faq-item">
-      <div class="faq-question">
-        <div>Смогу ли я тренироваться дома, если нет оборудования?</div>
-        <div class="faq-toggle">+</div>
-      </div>
-      <div class="faq-answer">
-        Да. Я составляю программы под ваши условия: дом, зал, минимум или максимум оборудования.
-        Можно начать вообще без инвентаря, а потом постепенно добавлять.
-      </div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-question">
-        <div>Что если у меня мало времени?</div>
-        <div class="faq-toggle">+</div>
-      </div>
-      <div class="faq-answer">
-        Мы строим тренировки так, чтобы они занимали 25–40 минут и вписывались в ваш график.
-        Лучше 3–4 короткие тренировки в неделю, чем «идеальный план», который вы не сможете выполнять.
-      </div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-question">
-        <div>Подходит ли программа новичкам?</div>
-        <div class="faq-toggle">+</div>
-      </div>
-      <div class="faq-answer">
-        Да. Я подробно объясняю технику, даю видео, корректирую ошибки и подбираю нагрузку так, чтобы вы не перегорели и не травмировались.
-      </div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-question">
-        <div>Что если у меня есть травмы или ограничения?</div>
-        <div class="faq-toggle">+</div>
-      </div>
-      <div class="faq-answer">
-        Мы учитываем ваши особенности: спина, колени, давление и т.д.
-        Я не врач, но могу адаптировать тренировки и убрать опасные упражнения.
-        При серьёзных проблемах — работаем в связке с врачом.
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-title"><span>🧭</span>Как проходит работа со мной</div>
-    <div class="section-subtitle">
-      Прозрачный процесс от первой заявки до стабильного результата.
-    </div>
-    <div class="process-steps">
-      <div class="process-step">
-        <div class="process-step-number">1</div>
-        <div class="process-step-title">Диагностика и цели</div>
-        <div class="process-step-text">
-          Вы заполняете анкету, мы обсуждаем цели, ограничения, образ жизни и сроки.
-        </div>
-      </div>
-      <div class="process-step">
-        <div class="process-step-number">2</div>
-        <div class="process-step-title">Составление плана</div>
-        <div class="process-step-text">
-          Я подбираю тренировки и питание под ваш уровень, график и возможности.
-        </div>
-      </div>
-      <div class="process-step">
-        <div class="process-step-number">3</div>
-        <div class="process-step-title">Контроль техники</div>
-        <div class="process-step-text">
-          Вы присылаете видео, я корректирую технику, чтобы тренировки были безопасными и эффективными.
-        </div>
-      </div>
-      <div class="process-step">
-        <div class="process-step-number">4</div>
-        <div class="process-step-title">Поддержка и мотивация</div>
-        <div class="process-step-text">
-          Регулярная связь, ответы на вопросы, корректировки по самочувствию и прогрессу.
-        </div>
-      </div>
-      <div class="process-step">
-        <div class="process-step-number">5</div>
-        <div class="process-step-title">Коррекция и закрепление результата</div>
-        <div class="process-step-text">
-          По мере прогресса усложняем план, учим вас удерживать форму без жёстких рамок.
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-title"><span>🧠</span>Мои принципы работы</div>
-    <div class="section-subtitle">
-      Я за здоровый, адекватный подход без крайностей и насилия над собой.
-    </div>
-    <div class="principles-grid">
-      <div class="principle">
-        <div class="principle-icon">✓</div>
-        <div class="principle-text">
-          Без голодовок и «сушки» для новичков. Мы не ломаем организм ради быстрых цифр.
-        </div>
-      </div>
-      <div class="principle">
-        <div class="principle-icon">✓</div>
-        <div class="principle-text">
-          Без запрещённых продуктов. Учимся есть так, чтобы можно было жить, а не выживать.
-        </div>
-      </div>
-      <div class="principle">
-        <div class="principle-icon">✓</div>
-        <div class="principle-text">
-          Без стыда и давления. Вы не «плохой», если что‑то не получилось — мы просто корректируем план.
-        </div>
-      </div>
-      <div class="principle">
-        <div class="principle-icon">✓</div>
-        <div class="principle-text">
-          Только здоровый, долгосрочный подход. Цель — не просто «похудеть к лету», а изменить привычки.
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="form-section" id="formSection">
-    <div class="section-title"><span>📋</span>Оставьте заявку и получите бесплатный план</div>
-    <div class="section-subtitle">
-      Заполните форму — я свяжусь с вами, уточню детали и предложу формат, который подойдёт именно вам.
-    </div>
-
-    <form id="leadForm">
-      <div class="form-grid">
-        <div>
-          <div class="form-group">
-            <div class="form-label">Имя <span>*</span></div>
-            <input id="name" class="input" type="text" placeholder="Как к вам обращаться?" />
-            <div class="error-message" data-for="name"></div>
-          </div>
-
-          <div class="form-group">
-            <div class="form-label">
-              Телефон <span>*</span>
-              <button type="button" id="requestContactBtn" style="margin-left:6px; font-size:11px; background:none; border:none; color:var(--primary); cursor:pointer; padding:0;">
-                Получить из Telegram
-              </button>
-            </div>
-            <input id="phone" class="input" type="tel" placeholder="+7 (___) ___-__-__" />
-            <div class="error-message" data-for="phone"></div>
-          </div>
-
-          <div class="form-group">
-            <div class="form-label">Ваша цель <span>*</span></div>
-            <select id="goal" class="select">
-              <option value="">Выберите цель</option>
-              <option value="weight_loss">Похудение и снижение веса</option>
-              <option value="tone">Подтянуть тело и рельеф</option>
-              <option value="mass">Набор мышечной массы</option>
-              <option value="health">Здоровье спины, суставов, самочувствие</option>
-              <option value="other">Другое</option>
-            </select>
-            <div class="error-message" data-for="goal"></div>
-          </div>
-
-          <div class="form-group">
-            <div class="form-label">Комментарий (по желанию)</div>
-            <textarea id="comment" class="textarea" placeholder="Напишите, что для вас важно: опыт, травмы, сроки, формат (дом/зал/онлайн)"></textarea>
-          </div>
-
-          <div class="consent-row">
-            <input type="checkbox" id="consent" />
-            <label for="consent">
-              Я согласен(на) на обработку персональных данных и получение сообщений от тренера.
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <div class="plan-box">
-            <div class="plan-title">Выберите формат работы</div>
-            <ul class="plan-list">
-              <li>Бесплатный разбор и план — чтобы понять, подойдём ли мы друг другу.</li>
-              <li>Персональное ведение 4 недели — тренировки + питание + поддержка.</li>
-              <li>Онлайн‑формат — можно из любой точки мира.</li>
-            </ul>
-
-            <div class="plan-options">
-              <div class="plan-option" onclick="selectPlan('free', 0, 'Бесплатный разбор и план')">
-                <div class="plan-option-name">Бесплатный разбор</div>
-                <div class="plan-option-price">0 ₽</div>
-                <div class="plan-option-note">Разбор цели + базовый план действий.</div>
-              </div>
-              <div class="plan-option" onclick="selectPlan('standard', 4990, 'Персональный план 4 недели')">
-                <div class="plan-option-name">Персональный план 4 недели</div>
-                <div class="plan-option-price">4 990 ₽</div>
-                <div class="plan-option-note">Тренировки + питание + поддержка.</div>
-              </div>
-              <div class="plan-option" onclick="selectPlan('premium', 7990, 'Ведение 4 недели с плотной связью')">
-                <div class="plan-option-name">Ведение 4 недели</div>
-                <div class="plan-option-price">7 990 ₽</div>
-                <div class="plan-option-note">Максимум контроля и обратной связи.</div>
-              </div>
-            </div>
-
-            <div id="selectedPlanInfo" class="selected-plan-info">
-              Вы выбрали: <span id="planDisplay">—</span>.  
-              Формат можно обсудить и изменить при созвоне.
-            </div>
-          </div>
-
-          <button type="button" id="submitBtn" class="btn-submit" onclick="submitLead()">
-            🚀 Отправить заявку
+        <div class="hero-card">
+          <div class="hero-card-title">Что ты получишь:</div>
+          <ul class="hero-list">
+            <li>План тренировок под твой уровень и инвентарь</li>
+            <li>Питание без жёстких запретов и «сушек»</li>
+            <li>Контроль техники и обратная связь</li>
+            <li>Реалистичные сроки и понятные шаги</li>
+          </ul>
+          <button class="btn btn-primary hero-card-btn" data-scroll-target="#ctaFinal">
+            Получить бесплатный план
           </button>
         </div>
       </div>
-    </form>
-  </section>
-</div>
+    </section>
 
-<div class="float-cta" id="floatCta">
-  <div class="float-cta-inner">
-    <button type="button">
-      🎁 Получить бесплатный план (3 места)
-    </button>
+    <!-- Блок боли / ошибок -->
+    <section class="section section-dark" id="problems">
+      <div class="container">
+        <h2 class="section-title">Почему тренировки не дают результат</h2>
+        <p class="section-subtitle">
+          90% людей застревают на одном и том же: хаос, случайные упражнения, отсутствие системы.
+        </p>
+        <div class="grid grid-3">
+          <div class="card card-outline">
+            <div class="card-label">Ошибка 1</div>
+            <h3 class="card-title">Неправильная техника и хаос в тренировках</h3>
+            <p class="card-text">
+              Случайные упражнения из интернета без системы и контроля техники.
+              В итоге — перегрузка суставов, боли и отсутствие прогресса.
+            </p>
+          </div>
+          <div class="card card-outline">
+            <div class="card-label">Ошибка 2</div>
+            <h3 class="card-title">Слишком много кардио и дефицит «на глаз»</h3>
+            <p class="card-text">
+              Бесконечное кардио и резкое урезание калорий. Организм выгорает, вес встаёт, мотивация падает.
+            </p>
+          </div>
+          <div class="card card-outline">
+            <div class="card-label">Ошибка 3</div>
+            <h3 class="card-title">Отсутствие плана и контроля</h3>
+            <p class="card-text">
+              Нет чёткой программы, прогрессии нагрузки и обратной связи.  
+              Кажется, что «я стараюсь», но тело не меняется.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Кейсы -->
+    <section class="section" id="cases">
+      <div class="container">
+        <h2 class="section-title">Реальные трансформации моих клиентов</h2>
+        <p class="section-subtitle">
+          Карусель листается свайпом или стрелками. Можно отфильтровать кейсы по цели.
+        </p>
+
+        <!-- Фильтры -->
+        <div class="cases-filters">
+          <button class="filter-btn active" data-filter="all">Все</button>
+          <button class="filter-btn" data-filter="loss">Похудение</button>
+          <button class="filter-btn" data-filter="gain">Набор мышц</button>
+          <button class="filter-btn" data-filter="home">Домашние тренировки</button>
+          <button class="filter-btn" data-filter="gym">Зал</button>
+        </div>
+
+        <!-- Карусель -->
+        <div class="cases-carousel" id="casesCarousel">
+          <div class="cases-track" id="casesTrack">
+
+            <!-- Кейс 1 -->
+            <div class="case-slide active" data-tags="loss home">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <div class="case-photo">
+                    <img src="images/case1_before.jpg" alt="До">
+                    <div class="case-label">ДО</div>
+                  </div>
+                  <div class="case-photo">
+                    <img src="images/case1_after.jpg" alt="После">
+                    <div class="case-label">после</div>
+                  </div>
+                </div>
+                <div class="case-content">
+                  <div class="case-title">Алексей, 32 года</div>
+                  <div class="case-result">−14 кг за 8 недель • спина и живот</div>
+                  <div class="case-text">
+                    Пришёл с лишним весом и болями в спине.  
+                    Тренировки дома по 30 минут, 4 раза в неделю.  
+                    Убрали хаос, выстроили прогрессию и питание без жёстких запретов.
+                  </div>
+                  <div class="case-tags">
+                    <span class="case-tag">Похудение</span>
+                    <span class="case-tag">Домашние тренировки</span>
+                    <span class="case-tag">8 недель</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Кейс 2 -->
+            <div class="case-slide" data-tags="loss home">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <div class="case-photo">
+                    <img src="images/case2_before.jpg" alt="До">
+                    <div class="case-label">ДО</div>
+                  </div>
+                  <div class="case-photo">
+                    <img src="images/case2_after.jpg" alt="После">
+                    <div class="case-label">после</div>
+                  </div>
+                </div>
+                <div class="case-content">
+                  <div class="case-title">Марина, 29 лет</div>
+                  <div class="case-result">−6 кг за 6 недель • тонус и талия</div>
+                  <div class="case-text">
+                    Хотела подтянуть тело и убрать отёки.  
+                    Умеренный дефицит, техника, тренировки дома без изнуряющих кардио‑сессий.
+                  </div>
+                  <div class="case-tags">
+                    <span class="case-tag">Похудение</span>
+                    <span class="case-tag">Тонус</span>
+                    <span class="case-tag">6 недель</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Кейс 3 -->
+            <div class="case-slide" data-tags="gain gym">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <div class="case-photo">
+                    <img src="images/case3_before.jpg" alt="До">
+                    <div class="case-label">ДО</div>
+                  </div>
+                  <div class="case-photo">
+                    <img src="images/case3_after.jpg" alt="После">
+                    <div class="case-label">после</div>
+                  </div>
+                </div>
+                <div class="case-content">
+                  <div class="case-title">Сергей, 35 лет</div>
+                  <div class="case-result">+4 кг мышц за 9 недель • спина и плечи</div>
+                  <div class="case-text">
+                    Тренировался хаотично и без прогрессии.  
+                    Выстроили систему, добавили план по нагрузке и питание с профицитом.
+                  </div>
+                  <div class="case-tags">
+                    <span class="case-tag">Набор мышц</span>
+                    <span class="case-tag">Зал</span>
+                    <span class="case-tag">9 недель</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Кейс 4 -->
+            <div class="case-slide" data-tags="loss home">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <div class="case-photo">
+                    <img src="images/case4_before.jpg" alt="До">
+                    <div class="case-label">ДО</div>
+                  </div>
+                  <div class="case-photo">
+                    <img src="images/case4_after.jpg" alt="После">
+                    <div class="case-label">после</div>
+                  </div>
+                </div>
+                <div class="case-content">
+                  <div class="case-title">Анна, 26 лет</div>
+                  <div class="case-result">−5 кг за 5 недель • живот и бёдра</div>
+                  <div class="case-text">
+                    Хотела убрать живот и подтянуть бёдра.  
+                    Акцент на технике, умеренном дефиците и регулярности, без жёстких диет.
+                  </div>
+                  <div class="case-tags">
+                    <span class="case-tag">Похудение</span>
+                    <span class="case-tag">Домашние тренировки</span>
+                    <span class="case-tag">5 недель</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Кейс 5 -->
+            <div class="case-slide" data-tags="gain gym">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <div class="case-photo">
+                    <img src="images/case5_before.jpg" alt="До">
+                    <div class="case-label">ДО</div>
+                  </div>
+                  <div class="case-photo">
+                    <img src="images/case5_after.jpg" alt="После">
+                    <div class="case-label">после</div>
+                  </div>
+                </div>
+                <div class="case-content">
+                  <div class="case-title">Игорь, 31 год</div>
+                  <div class="case-result">+3 кг мышц за 7 недель • грудь и руки</div>
+                  <div class="case-text">
+                    Хотел набрать массу и улучшить пропорции.  
+                    Добавили прогрессию нагрузки, базовые упражнения и питание с профицитом.
+                  </div>
+                  <div class="case-tags">
+                    <span class="case-tag">Набор мышц</span>
+                    <span class="case-tag">Руки</span>
+                    <span class="case-tag">7 недель</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Кейс 6 -->
+            <div class="case-slide" data-tags="loss home">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <div class="case-photo">
+                    <img src="images/case6_before.jpg" alt="До">
+                    <div class="case-label">ДО</div>
+                  </div>
+                  <div class="case-photo">
+                    <img src="images/case6_after.jpg" alt="После">
+                    <div class="case-label">после</div>
+                  </div>
+                </div>
+                <div class="case-content">
+                  <div class="case-title">Екатерина, 27 лет</div>
+                  <div class="case-result">−9 кг за 7 недель • тонус и осанка</div>
+                  <div class="case-text">
+                    Жалобы на усталость и отёки.  
+                    Умеренный дефицит, техника, тренировки дома по 25–30 минут.
+                  </div>
+                  <div class="case-tags">
+                    <span class="case-tag">Похудение</span>
+                    <span class="case-tag">Тонус</span>
+                    <span class="case-tag">7 недель</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Кейс 7 -->
+            <div class="case-slide" data-tags="gain gym">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <div class="case-photo">
+                    <img src="images/case7_before.jpg" alt="До">
+                    <div class="case-label">ДО</div>
+                  </div>
+                  <div class="case-photo">
+                    <img src="images/case7_after.jpg" alt="После">
+                    <div class="case-label">после</div>
+                  </div>
+                </div>
+                <div class="case-content">
+                  <div class="case-title">Дмитрий, 29 лет</div>
+                  <div class="case-result">+5 кг мышц за 10 недель • пропорции</div>
+                  <div class="case-text">
+                    Годами топтался на месте.  
+                    Выстроили чёткую программу, прогрессию нагрузки и питание с профицитом.
+                  </div>
+                  <div class="case-tags">
+                    <span class="case-tag">Набор мышц</span>
+                    <span class="case-tag">Пропорции</span>
+                    <span class="case-tag">10 недель</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Навигация -->
+          <div class="cases-nav">
+            <div class="cases-dots" id="casesDots"></div>
+            <div class="cases-arrows">
+              <button class="cases-arrow-btn" id="casesPrev" aria-label="Предыдущий кейс"></button>
+              <button class="cases-arrow-btn" id="casesNext" aria-label="Следующий кейс"></button>
+            </div>
+          </div>
+
+          <!-- Прогресс‑бар -->
+          <div class="cases-progress">
+            <div class="cases-progress-inner" id="casesProgress"></div>
+          </div>
+
+          <!-- Миниатюры -->
+          <div class="cases-thumbs" id="casesThumbs"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Отзывы -->
+    <section class="section section-dark" id="reviews">
+      <div class="container">
+        <h2 class="section-title">Что говорят клиенты</h2>
+        <p class="section-subtitle">
+          Коротко и по делу — реальные отзывы людей, которые уже прошли путь.
+        </p>
+        <div class="grid grid-3">
+          <div class="card card-solid">
+            <div class="review-name">Алексей, 32</div>
+            <p class="review-text">
+              «Не ожидал, что получится так быстро.  
+              Наконец‑то перестал бояться за спину и понял, как тренироваться без боли».
+            </p>
+          </div>
+          <div class="card card-solid">
+            <div class="review-name">Марина, 29</div>
+            <p class="review-text">
+              «Впервые без жёстких диет и с нормальным самочувствием.  
+              Тело меняется, а не просто вес на весах».
+            </p>
+          </div>
+          <div class="card card-solid">
+            <div class="review-name">Игорь, 31</div>
+            <p class="review-text">
+              «Наконец‑то понял, что делать в зале.  
+              Есть план, есть прогресс, есть мотивация продолжать».
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Квиз -->
+    <section class="section" id="quiz">
+      <div class="container">
+        <h2 class="section-title">Мини‑квиз: подходит ли тебе мой подход</h2>
+        <p class="section-subtitle">
+          Ответь на несколько вопросов — и я скажу, как лучше выстроить работу именно под тебя.
+        </p>
+
+        <div class="quiz" id="quizRoot">
+          <div class="quiz-step active" data-step="1">
+            <div class="quiz-question">Какая у тебя основная цель?</div>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="loss">Похудеть и подтянуть тело</button>
+              <button class="quiz-option" data-value="gain">Набрать мышечную массу</button>
+              <button class="quiz-option" data-value="tone">Стать более подтянутым и выносливым</button>
+            </div>
+          </div>
+
+          <div class="quiz-step" data-step="2">
+            <div class="quiz-question">Где ты планируешь тренироваться?</div>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="home">Дома</button>
+              <button class="quiz-option" data-value="gym">В зале</button>
+              <button class="quiz-option" data-value="both">И дома, и в зале</button>
+            </div>
+          </div>
+
+          <div class="quiz-step" data-step="3">
+            <div class="quiz-question">Сколько раз в неделю ты реально готов тренироваться?</div>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="2">2 раза</button>
+              <button class="quiz-option" data-value="3">3 раза</button>
+              <button class="quiz-option" data-value="4">4+ раза</button>
+            </div>
+          </div>
+
+          <div class="quiz-step" data-step="4">
+            <div class="quiz-question">Какой у тебя сейчас уровень?</div>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="beginner">Новичок</button>
+              <button class="quiz-option" data-value="middle">Тренировался(а), но без системы</button>
+              <button class="quiz-option" data-value="advanced">Уверенный уровень</button>
+            </div>
+          </div>
+
+          <div class="quiz-step" data-step="result">
+            <div class="quiz-result-title">Тебе подходит мой формат работы</div>
+            <p class="quiz-result-text">
+              По твоим ответам видно, что мы можем выстроить понятный план под твой уровень и цель.  
+              Я подготовлю для тебя персональный план тренировок и питания.
+            </p>
+            <button class="btn btn-primary" data-scroll-target="#ctaFinal">
+              Получить бесплатный план
+            </button>
+          </div>
+
+          <div class="quiz-progress">
+            <div class="quiz-progress-inner" id="quizProgress"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Мой подход -->
+    <section class="section section-dark" id="approach">
+      <div class="container">
+        <h2 class="section-title">Как мы будем работать</h2>
+        <p class="section-subtitle">
+          Никакой магии — только система, которая даёт результат.
+        </p>
+        <div class="approach-steps">
+          <div class="approach-step">
+            <div class="approach-number">1</div>
+            <div class="approach-content">
+              <div class="approach-title">Диагностика</div>
+              <div class="approach-text">
+                Разбираем твою цель, опыт, ограничения, график, доступный инвентарь и питание.
+              </div>
+            </div>
+          </div>
+          <div class="approach-step">
+            <div class="approach-number">2</div>
+            <div class="approach-content">
+              <div class="approach-title">План</div>
+              <div class="approach-text">
+                Составляю программу тренировок и питания под тебя. Без шаблонов и «универсальных» схем.
+              </div>
+            </div>
+          </div>
+          <div class="approach-step">
+            <div class="approach-number">3</div>
+            <div class="approach-content">
+              <div class="approach-title">Контроль техники</div>
+              <div class="approach-text">
+                Разбираем технику, корректируем ошибки, чтобы ты тренировал мышцы, а не суставы.
+              </div>
+            </div>
+          </div>
+          <div class="approach-step">
+            <div class="approach-number">4</div>
+            <div class="approach-content">
+              <div class="approach-title">Поддержка и результат</div>
+              <div class="approach-text">
+                Я веду тебя по плану, корректирую нагрузку и питание, чтобы ты дошёл до результата.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="container">
+        <h2 class="section-title">Частые вопросы</h2>
+        <div class="faq">
+          <div class="faq-item">
+            <button class="faq-question">
+              Что если у меня мало времени?
+              <span class="faq-icon"></span>
+            </button>
+            <div class="faq-answer">
+              Мы подстроим программу под твой график.  
+              Можно тренироваться по 25–30 минут, 3–4 раза в неделю — и всё равно прогрессировать.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">
+              А если у меня болит спина или колени?
+              <span class="faq-icon"></span>
+            </button>
+            <div class="faq-answer">
+              Я учитываю ограничения и подбираю упражнения, которые не перегружают проблемные зоны.  
+              Техника и контроль — приоритет.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">
+              Нужен ли мне зал и дорогой инвентарь?
+              <span class="faq-icon"></span>
+            </button>
+            <div class="faq-answer">
+              Нет. Можно начать дома с минимальным инвентарём.  
+              Если есть зал — используем его, но это не обязательное условие.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">
+              Что входит в сопровождение?
+              <span class="faq-icon"></span>
+            </button>
+            <div class="faq-answer">
+              План тренировок, рекомендации по питанию, контроль техники, корректировки по ходу и поддержка.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Финальный CTA -->
+    <section class="section section-cta" id="ctaFinal">
+      <div class="container cta-inner">
+        <div class="cta-text">
+          <h2 class="cta-title">Хочешь такой же результат?</h2>
+          <p class="cta-subtitle">
+            Оставь заявку — я свяжусь с тобой и предложу формат работы под твою цель и уровень.
+          </p>
+          <div class="cta-note">
+            Сейчас открыто 3 места на бесплатный план.  
+            Без спама и навязчивых продаж.
+          </div>
+        </div>
+        <form class="cta-form">
+          <input type="text" class="input" placeholder="Имя">
+          <input type="text" class="input" placeholder="Как с тобой связаться (Telegram, WhatsApp, Instagram)">
+          <button type="button" class="btn btn-primary">
+            Отправить заявку
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div class="footer-left">
+          <div class="logo">Fitness_Couch_Vitaliy</div>
+          <div class="footer-copy">© 2026. Онлайн‑коуч Виталий.</div>
+        </div>
+        <div class="footer-right">
+          <button class="footer-link" data-scroll-target="#top">Наверх</button>
+          <button class="footer-link" data-scroll-target="#cases">Кейсы</button>
+          <button class="footer-link" data-scroll-target="#faq">FAQ</button>
+        </div>
+      </div>
+    </footer>
+
   </div>
-</div>
 
-<div class="success-modal-backdrop" id="successModal">
-  <div class="success-modal">
-    <div class="success-icon">✅</div>
-    <div class="success-title">Заявка отправлена</div>
-    <div class="success-text">
-      Спасибо за доверие! Я свяжусь с вами в ближайшее время, чтобы обсудить цели и формат работы.
-    </div>
-    <button class="success-btn" type="button" onclick="closeModal()">Вернуться на страницу</button>
-  </div>
-</div>
-
-<script>
-  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : {
-    initDataUnsafe: {},
-    platform: 'web',
-    version: '1.0',
-    colorScheme: 'dark',
-    MainButton: {
-      setText: () => tg.MainButton,
-      setParams: () => tg.MainButton,
-      show: () => {},
-      hide: () => {},
-      onClick: () => {}
-    },
-    BackButton: {
-      show: () => {},
-      hide: () => {}
-    },
-    HapticFeedback: {
-      impactOccurred: () => {},
-      notificationOccurred: () => {},
-      selectionChanged: () => {}
-    },
-    showAlert: (msg) => alert(msg),
-    sendData: (data) => console.log('sendData:', data),
-    openInvoice: (params, cb) => {
-      console.log('openInvoice mock:', params);
-      setTimeout(() => cb && cb('paid'), 1000);
-    },
-    requestContact: (cb) => cb(false, null)
-  };
-
-  let spotsLeft = parseInt(localStorage.getItem('spots_left') || '3', 10);
-  if (isNaN(spotsLeft) || spotsLeft < 0) spotsLeft = 3;
-
-  let selectedPlan = null;
-  let selectedGoal = null;
-
-  function initApp() {
-    updateSpotsCounter();
-    initCountdown();
-    initFaq();
-    initCarousel();
-    initFormListeners();
-    syncLeads();
-
-    const floatBtn = document.querySelector('#floatCta button');
-    floatBtn.addEventListener('click', () => {
-      showForm();
-      trackEvent('float_button_click');
-    });
-
-    const mainCta = document.getElementById('mainCta');
-    mainCta.addEventListener('click', () => {
-      showForm();
-      trackEvent('hero_button_click');
-    });
-
-    const requestContactBtn = document.getElementById('requestContactBtn');
-    requestContactBtn.addEventListener('click', requestContact);
-
-    tg.MainButton
-      .setText(`🎁 Бесплатный план (${spotsLeft} места)`)
-      .setParams({
-        color: '#28a745',
-        text_color: '#ffffff'
-      })
-      .show()
-      .onClick(() => {
-        showForm();
-        trackEvent('main_button_click');
-      });
-
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        trackEvent('page_visible');
-      }
-    });
-
-    window.addEventListener('online', syncLeads);
-  }
-
-  function initCountdown() {
-    const countdownEl = document.getElementById('countdown');
-    let totalSeconds = 15 * 60;
-
-    function updateTimer() {
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      countdownEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      if (totalSeconds > 0) {
-        totalSeconds--;
-      } else {
-        countdownEl.textContent = '00:00';
-      }
-    }
-
-    updateTimer();
-    setInterval(updateTimer, 1000);
-  }
-
-  function initFaq() {
-    document.querySelectorAll('.faq-item').forEach(item => {
-      item.addEventListener('click', () => {
-        item.classList.toggle('open');
-        const toggle = item.querySelector('.faq-toggle');
-        if (toggle) toggle.textContent = item.classList.contains('open') ? '−' : '+';
-      });
-    });
-  }
-
-  function initCarousel() {
-  const track = document.getElementById('casesTrack');
-  const dotsContainer = document.getElementById('casesDots');
-  const slides = Array.from(track.children);
-  const prevBtn = document.getElementById('casesPrev');
-  const nextBtn = document.getElementById('casesNext');
-  const progress = document.getElementById('casesProgress');
-
-  let currentIndex = 0;
-  const total = slides.length;
-  let autoplayInterval = null;
-  let autoplayDelay = 6000;
-  let isInteracting = false;
-
-  dotsContainer.innerHTML = '';
-  for (let i = 0; i < total; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'cases-dot' + (i === 0 ? ' active' : '');
-    dot.dataset.index = i;
-    dot.addEventListener('click', () => {
-      goToSlide(i);
-      resetAutoplay();
-    });
-    dotsContainer.appendChild(dot);
-  }
-
-  function updateActiveSlide() {
-    slides.forEach((slide, i) => {
-      slide.classList.toggle('active', i === currentIndex);
-    });
-  }
-
-  function updateCarousel() {
-    const offset = -currentIndex * 100;
-    track.style.transform = `translateX(${offset}%)`;
-
-    dotsContainer.querySelectorAll('.cases-dot').forEach(dot => {
-      dot.classList.toggle('active', parseInt(dot.dataset.index, 10) === currentIndex);
-    });
-
-    updateActiveSlide();
-    updateProgress();
-  }
-
-  function updateProgress() {
-    progress.style.width = '0%';
-    setTimeout(() => {
-      progress.style.transition = `width ${autoplayDelay}ms linear`;
-      progress.style.width = '100%';
-    }, 50);
-  }
-
-  function goToSlide(index) {
-    currentIndex = (index + total) % total;
-    updateCarousel();
-    tg.HapticFeedback.selectionChanged();
-  }
-
-  prevBtn.addEventListener('click', () => {
-    goToSlide(currentIndex - 1);
-    resetAutoplay();
-  });
-
-  nextBtn.addEventListener('click', () => {
-    goToSlide(currentIndex + 1);
-    resetAutoplay();
-  });
-
-  let startX = 0;
-  let isDown = false;
-
-  track.addEventListener('touchstart', (e) => {
-    isDown = true;
-    startX = e.touches[0].clientX;
-    isInteracting = true;
-  });
-
-  track.addEventListener('touchmove', (e) => {
-    if (!isDown) return;
-    const diff = e.touches[0].clientX - startX;
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) goToSlide(currentIndex - 1);
-      else goToSlide(currentIndex + 1);
-      isDown = false;
-      resetAutoplay();
-    }
-  });
-
-  track.addEventListener('touchend', () => {
-    isDown = false;
-    isInteracting = false;
-  });
-
-  function startAutoplay() {
-    autoplayInterval = setInterval(() => {
-      if (!isInteracting) goToSlide(currentIndex + 1);
-    }, autoplayDelay);
-    updateProgress();
-  }
-
-  function resetAutoplay() {
-    clearInterval(autoplayInterval);
-    startAutoplay();
-  }
-
-  updateCarousel();
-  startAutoplay();
-}
-
-  function initFormListeners() {
-    const name = document.getElementById('name');
-    const phone = document.getElementById('phone');
-    const goal = document.getElementById('goal');
-    const comment = document.getElementById('comment');
-
-    name.addEventListener('input', () => validateField(name));
-    phone.addEventListener('input', () => {
-      formatPhone(phone);
-    });
-    goal.addEventListener('change', () => validateField(goal));
-    comment.addEventListener('input', () => validateField(comment, false));
-  }
-
-  function validateField(field, required = true) {
-    const errEl = document.querySelector(`.error-message[data-for="${field.id}"]`);
-
-    if (!required) {
-      if (field.value.trim() === '') {
-        field.classList.remove('error');
-        field.classList.remove('success');
-        if (errEl) errEl.style.display = 'none';
-        return true;
-      } else {
-        field.classList.remove('error');
-        field.classList.add('success');
-        if (errEl) errEl.style.display = 'none';
-        return true;
-      }
-    }
-
-    if (field.value.trim() === '') {
-      field.classList.add('error');
-      field.classList.remove('success');
-      if (errEl) {
-        errEl.textContent = field.placeholder && field.placeholder.includes('цель')
-          ? 'Пожалуйста, выберите цель'
-          : 'Это поле обязательно для заполнения';
-        errEl.style.display = 'block';
-      }
-      return false;
-    } else {
-      field.classList.remove('error');
-      field.classList.add('success');
-      if (errEl) errEl.style.display = 'none';
-      return true;
-    }
-  }
-
-  function formatPhone(input) {
-    let value = input.value.replace(/\D/g, '');
-
-    if (value.startsWith('8')) {
-      value = '7' + value.slice(1);
-    }
-
-    if (value.length > 0 && !value.startsWith('7')) {
-      value = '7' + value;
-    }
-
-    if (value.length > 0) {
-      if (value.length <= 1) {
-        value = '+' + value;
-      } else if (value.length <= 4) {
-        value = `+${value[0]} (${value.slice(1)}`;
-      } else if (value.length <= 7) {
-        value = `+${value[0]} (${value.slice(1, 4)}) ${value.slice(4)}`;
-      } else if (value.length <= 9) {
-        value = `+${value[0]} (${value.slice(1, 4)}) ${value.slice(4, 7)}-${value.slice(7)}`;
-      } else {
-        value = `+${value[0]} (${value.slice(1, 4)}) ${value.slice(4, 7)}-${value.slice(7, 9)}-${value.slice(9, 11)}`;
-      }
-    }
-
-    input.value = value;
-    validateField(input);
-  }
-
-  function selectGoal(goal) {
-    selectedGoal = goal;
-    const goalSelect = document.getElementById('goal');
-    goalSelect.value = goal;
-    validateField(goalSelect);
-    tg.HapticFeedback.selectionChanged();
-    trackEvent('goal_select', { goal });
-  }
-
-  function showForm() {
-    const form = document.getElementById('formSection');
-    const floatCta = document.getElementById('floatCta');
-
-    form.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-      inline: 'nearest'
-    });
-
-    floatCta.classList.add('hidden');
-
-    tg.BackButton.show();
-    tg.MainButton.hide();
-    tg.HapticFeedback.impactOccurred('medium');
-
-    trackEvent('form_open', { source: 'button' });
-  }
-
-  function selectPlan(type, amount, name) {
-    selectedPlan = { type, price: amount, name };
-
-    const planDisplay = document.getElementById('planDisplay');
-    const planInfo = document.getElementById('selectedPlanInfo');
-
-    planDisplay.textContent = name;
-    planInfo.style.display = 'block';
-    planInfo.style.animation = 'fadeIn 0.5s';
-
-    showForm();
-    trackEvent('plan_select', { type, amount, name });
-  }
-
-  function requestContact() {
-    tg.requestContact((success, response) => {
-      if (success && response && response.phone_number) {
-        const phoneField = document.getElementById('phone');
-        phoneField.value = formatPhoneNumber(response.phone_number);
-        validateField(phoneField);
-        tg.showAlert('✅ Контакт получен! Телефон добавлен в форму.');
-        tg.HapticFeedback.notificationOccurred('success');
-        trackEvent('contact_shared');
-      } else {
-        tg.showAlert('❌ Не удалось получить контакт. Пожалуйста, введите номер вручную.');
-        tg.HapticFeedback.notificationOccurred('error');
-      }
-    });
-  }
-
-  function formatPhoneNumber(phone) {
-    const cleaned = phone.replace(/\D/g, '');
-    const match = cleaned.match(/^(\d{1,3})(\d{3})(\d{3})(\d{4})$/);
-    if (match) {
-      return `+${match[1]} (${match[2]}) ${match[3]}-${match[4]}`;
-    }
-    return phone;
-  }
-
-  function submitLead() {
-    if (spotsLeft <= 0) {
-      tg.showAlert('❌ К сожалению, все места на этой неделе заняты. Пожалуйста, оставьте заявку для записи на следующую неделю.');
-      return;
-    }
-
-    const name = document.getElementById('name');
-    const phone = document.getElementById('phone');
-    const goal = document.getElementById('goal');
-    const consent = document.getElementById('consent');
-    const comment = document.getElementById('comment');
-
-    const isValid = validateField(name) && validateField(phone) && validateField(goal);
-
-    if (!isValid) {
-      tg.showAlert('⚠️ Пожалуйста, заполните все обязательные поля корректно');
-      tg.HapticFeedback.notificationOccurred('error');
-      return;
-    }
-
-    if (!consent.checked) {
-      tg.showAlert('📋 Подтвердите согласие на обработку данных');
-      tg.HapticFeedback.notificationOccurred('error');
-      return;
-    }
-
-    const data = {
-      action: 'lead',
-      name: name.value.trim(),
-      phone: phone.value.trim(),
-      goal: goal.value,
-      comment: comment.value.trim(),
-      plan: selectedPlan || { type: 'consultation', price: 0, name: 'Бесплатная консультация' },
-      user: tg.initDataUnsafe.user || {},
-      timestamp: new Date().toISOString(),
-      platform: tg.platform,
-      version: tg.version,
-      spots_left: spotsLeft
-    };
-
-    const btn = document.getElementById('submitBtn');
-    const originalText = btn.innerHTML;
-    const originalWidth = btn.offsetWidth;
-
-    btn.style.width = originalWidth + 'px';
-    btn.innerHTML = '<span class="btn-spinner">⏳</span> Отправляем...';
-    btn.disabled = true;
-
-    setTimeout(() => {
-      spotsLeft--;
-      updateSpotsCounter();
-      localStorage.setItem('spots_left', spotsLeft.toString());
-
-      try {
-        tg.sendData(JSON.stringify(data));
-      } catch (e) {
-        saveLeadLocally(data);
-      }
-
-      document.getElementById('successModal').classList.add('active');
-      tg.HapticFeedback.notificationOccurred('success');
-
-      trackEvent('lead_submitted', {
-        goal: data.goal,
-        has_plan: !!selectedPlan,
-        spots_left: spotsLeft
-      });
-
-      setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-        btn.style.width = '';
-
-        document.getElementById('leadForm').reset();
-        document.getElementById('selectedPlanInfo').style.display = 'none';
-        selectedPlan = null;
-        selectedGoal = null;
-
-        const floatBtn = document.querySelector('#floatCta button');
-        floatBtn.innerHTML = `🎁 Получить бесплатный план (${spotsLeft} места)`;
-      }, 2000);
-    }, 1500);
-  }
-
-  function updateSpotsCounter() {
-    const spotsText = spotsLeft > 0 ? `(${spotsLeft} места)` : '(мест нет)';
-    const pill = document.getElementById('spotsPill');
-    if (pill) {
-      pill.textContent = spotsLeft > 0 ? `Осталось: ${spotsLeft} места` : 'Мест нет';
-    }
-
-    document.querySelectorAll('#mainCta, #floatCta button').forEach(btn => {
-      btn.innerHTML = btn.innerHTML.replace(/\(\d+ места\)|\(мест нет\)/, spotsText);
-    });
-
-    if (spotsLeft <= 0) {
-      document.querySelectorAll('.offer, #timer').forEach(el => {
-        if (el) el.style.opacity = '0.5';
-      });
-    }
-  }
-
-  function closeModal() {
-    document.getElementById('successModal').classList.remove('active');
-    setTimeout(() => {
-      document.getElementById('floatCta').classList.remove('hidden');
-    }, 300);
-
-    setTimeout(() => {
-      document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' });
-    }, 500);
-  }
-
-  function trackEvent(eventName, properties = {}) {
-    const eventData = {
-      event: eventName,
-      ...properties,
-      timestamp: new Date().toISOString(),
-      user_id: tg.initDataUnsafe.user && tg.initDataUnsafe.user.id ? tg.initDataUnsafe.user.id : 'anonymous',
-      platform: tg.platform,
-      theme: tg.colorScheme
-    };
-
-    console.log('📊 Event:', eventData);
-
-    if (typeof gtag !== 'undefined') {
-      gtag('event', eventName, properties);
-    }
-  }
-
-  function saveLeadLocally(data) {
-    try {
-      const leads = JSON.parse(localStorage.getItem('fitness_leads') || '[]');
-      leads.push({ ...data, saved_at: new Date().toISOString() });
-      localStorage.setItem('fitness_leads', JSON.stringify(leads.slice(-50)));
-    } catch (e) {
-      console.error('Не удалось сохранить лид:', e);
-    }
-  }
-
-  function syncLeads() {
-    try {
-      const leads = JSON.parse(localStorage.getItem('fitness_leads') || '[]');
-      if (leads.length > 0 && navigator.onLine) {
-        leads.forEach(lead => {
-          tg.sendData(JSON.stringify({
-            ...lead,
-            action: 'lead_sync',
-            sync_time: new Date().toISOString()
-          }));
-        });
-        localStorage.removeItem('fitness_leads');
-      }
-    } catch (e) {
-      console.error('Ошибка синхронизации:', e);
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', initApp);
-</script>
+  <script src="js/app.js"></script>
 </body>
 </html>
