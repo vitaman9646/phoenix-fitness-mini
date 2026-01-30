@@ -892,3 +892,82 @@ body:has(.hero:hover) .hero-bg {
     padding-top: 40px;
   }
 }
+
+/* ====== HERO BACKGROUND EFFECTS ====== */
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Светящееся пятно */
+.hero-glow {
+  position: absolute;
+  top: -150px;
+  left: 50%;
+  width: 700px;
+  height: 700px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.35), transparent 70%);
+  filter: blur(100px);
+  animation: glowPulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse {
+  from { opacity: 0.6; transform: translateX(-50%) scale(1); }
+  to   { opacity: 1;   transform: translateX(-50%) scale(1.15); }
+}
+
+/* Анимированная сетка */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.12;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-200px); }
+}
+
+/* Частицы */
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.hero-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(0, 229, 255, 0.7);
+  border-radius: 50%;
+  filter: blur(1px);
+  animation: particleFloat 8s linear infinite;
+}
+
+@keyframes particleFloat {
+  from { transform: translateY(0) scale(1); opacity: 1; }
+  to   { transform: translateY(-200px) scale(0.4); opacity: 0; }
+}
+
+/* Анимации появления */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.7s ease-out;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
