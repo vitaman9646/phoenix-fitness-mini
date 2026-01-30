@@ -1079,6 +1079,54 @@
       border-color: rgba(53, 212, 139, 0.7);
       transform: translateY(-1px);
     }
+
+    /* Анимация появления элементов */
+.case-slide .case-title,
+.case-slide .case-result,
+.case-slide .case-text,
+.case-slide .case-tags {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .45s ease, transform .45s ease;
+}
+
+.case-slide.active .case-title,
+.case-slide.active .case-result,
+.case-slide.active .case-text,
+.case-slide.active .case-tags {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Анимация появления фото */
+.case-photo img {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity .5s ease, transform .5s ease;
+}
+
+.case-slide.active .case-photo img {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Прогресс‑бар */
+.cases-progress {
+  height: 3px;
+  width: 100%;
+  background: rgba(255,255,255,0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.cases-progress-inner {
+  height: 100%;
+  width: 0%;
+  background: var(--primary);
+  transition: width .4s linear;
+}
+    
   </style>
 </head>
 <body>
