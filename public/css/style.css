@@ -1057,3 +1057,8 @@ body:has(.hero:hover) .hero-bg {
   opacity: 1;
   transform: translateY(0);
 }
+
+.reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}
