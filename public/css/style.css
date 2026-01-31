@@ -1001,3 +1001,59 @@ body:has(.hero:hover) .hero-bg {
   50%  { box-shadow: 0 0 22px rgba(0, 229, 255, 0.7); }
   100% { box-shadow: 0 0 12px rgba(0, 229, 255, 0.4); }
 }
+
+/* ====== REVIEWS UPGRADE ====== */
+
+.reviews-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin-top: 24px;
+}
+
+.review-card {
+  background: rgba(5, 7, 11, 0.92);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 12px 30px rgba(0, 229, 255, 0.08);
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  position: relative;
+}
+
+.review-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 16px 40px rgba(0, 229, 255, 0.18);
+}
+
+.review-icon {
+  font-size: 22px;
+  margin-bottom: 10px;
+  opacity: 0.9;
+}
+
+.review-text {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-main);
+  margin-bottom: 12px;
+}
+
+.review-author {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.7s ease-out;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
