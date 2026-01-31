@@ -1045,3 +1045,41 @@ body:has(.hero:hover) .hero-bg {
   font-size: 13px;
   color: var(--text-muted);
 }
+
+/* ===== Scroll reveal ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.7s ease-out;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== Section layout ===== */
+.section {
+  padding: 60px 0;
+  position: relative;
+}
+
+.section-dark {
+  background: #0a0d12;
+  color: var(--text-main);
+}
+
+/* ===== Container ===== */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ===== Text colors ===== */
+:root {
+  --text-main: #e0e0e0;
+  --text-muted: #999;
+  --accent: #00e5ff;
+  --border-subtle: rgba(255,255,255,0.08);
+}
