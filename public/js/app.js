@@ -351,3 +351,17 @@ document.querySelectorAll("[data-scroll-target]").forEach(btn => {
   opacity: 1;
   transform: translateY(0);
 }
+
+(function () {
+  const elements = document.querySelectorAll(".reveal");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+      }
+    });
+  }, { threshold: 0.05 });
+
+  elements.forEach((el) => observer.observe(el));
+})();
