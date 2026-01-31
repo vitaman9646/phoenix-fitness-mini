@@ -1,157 +1,367 @@
-/* =========================
-   HEADER — SCROLL EFFECT
-========================= */
-const header = document.getElementById("header");
-
-window.addEventListener("scroll", () => {
-  if (window.scrollY > 40) {
-    header.classList.add("header--scrolled");
-  } else {
-    header.classList.remove("header--scrolled");
-  }
-});
-
-
-/* =========================
-   SMOOTH SCROLL
-========================= */
+// Плавный скролл по data-scroll-target
 document.querySelectorAll("[data-scroll-target]").forEach(btn => {
   btn.addEventListener("click", () => {
-    const target = document.querySelector(btn.dataset.scrollTarget);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
+    const target = btn.getAttribute("data-scroll-target");
+    const el = document.querySelector(target);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   });
 });
 
+// Карусель кейсов
+(function () {
+  const track = document.getElementById("casesTrack");
+  const slides = Array.from(track.querySelectorAll(".case-slide"));
+  const dotsContainer = document.getElementById("casesDots");
+  const thumbsContainer = document.getElementById("casesThumbs");
+  const prevBtn = document.getElementById("casesPrev");
+  const nextBtn = document.getElementById("casesNext");
+  const progress = document.getElementById("casesProgress");
+  const filters = Array.from(document.querySelectorAll(".filter-btn"));
 
-/* =========================
-   REVEAL ON SCROLL
-========================= */
-const revealElements = document.querySelectorAll(".reveal");
+  let currentIndex = 0;
+  let autoTimer = null;
+  const autoDelay = 6000;
 
-const revealObserver = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add("visible");
-      revealObserver.unobserve(entry.target);
+  if (!slides.length) return;
+
+  // Создание точек
+  function renderDots() {
+    dotsContainer.innerHTML = "";
+    slides.forEach((_, idx) => {
+      const dot = document.createElement("div");
+      dot.className = "cases-dot" + (idx === currentIndex ? " active" : "");
+      dot.dataset.index = idx;
+      dotsContainer.appendChild(dot);
+    });
+  }
+
+  // Создание миниатюр
+  function renderThumbs() {
+    thumbsContainer.innerHTML = "";
+    slides.forEach((slide, idx) => {
+      const thumb = document.createElement("button");
+      thumb.type = "button";
+      thumb.className = "cases-thumb" + (idx === currentIndex ? " active" : "");
+      thumb.dataset.index = idx;
+
+      const img = slide.querySelector(".case-photo img");
+      if (img) {
+        const thumbImg = document.createElement("img");
+        thumbImg.src = img.src;
+        thumbImg.alt = img.alt || "Кейс";
+        thumb.appendChild(thumbImg);
+      }
+
+      thumbsContainer.appendChild(thumb);
+    });
+  }
+
+  function updateActiveSlide() {
+    slides.forEach((slide, idx) => {
+      slide.classList.toggle("active", idx === currentIndex);
+    });
+
+    dotsContainer.querySelectorAll(".cases-dot").forEach(dot => {
+      dot.classList.toggle("active", Number(dot.dataset.index) === currentIndex);
+    });
+
+    thumbsContainer.querySelectorAll(".cases-thumb").forEach(thumb => {
+      thumb.classList.toggle("active", Number(thumb.dataset.index) === currentIndex);
+    });
+
+    progress.style.width = "0%";
+  }
+
+  function goTo(index) {
+    const visibleSlides = slides.filter(slide => slide.style.display !== "none");
+    if (!visibleSlides.length) return;
+
+    const realIndex = visibleSlides.indexOf(slides[index]);
+    if (realIndex === -1) {
+      currentIndex = slides.indexOf(visibleSlides[0]);
+    } else {
+      currentIndex = index;
+    }
+
+    updateActiveSlide();
+    resetAuto();
+  }
+
+  function next() {
+    const visibleSlides = slides.filter(slide => slide.style.display !== "none");
+    if (!visibleSlides.length) return;
+    const currentVisibleIndex = visibleSlides.indexOf(slides[currentIndex]);
+    const nextVisibleIndex = (currentVisibleIndex + 1) % visibleSlides.length;
+    currentIndex = slides.indexOf(visibleSlides[nextVisibleIndex]);
+    updateActiveSlide();
+    resetAuto();
+  }
+
+  function prev() {
+    const visibleSlides = slides.filter(slide => slide.style.display !== "none");
+    if (!visibleSlides.length) return;
+    const currentVisibleIndex = visibleSlides.indexOf(slides[currentIndex]);
+    const prevVisibleIndex =
+      (currentVisibleIndex - 1 + visibleSlides.length) % visibleSlides.length;
+    currentIndex = slides.indexOf(visibleSlides[prevVisibleIndex]);
+    updateActiveSlide();
+    resetAuto();
+  }
+
+  // Автопрокрутка + прогресс
+  function startAuto() {
+    let startTime = performance.now();
+    function frame(now) {
+      const elapsed = now - startTime;
+      const progressValue = Math.min(elapsed / autoDelay, 1);
+      progress.style.width = (progressValue * 100).toFixed(2) + "%";
+      if (elapsed >= autoDelay) {
+        next();
+        startTime = performance.now();
+      }
+      autoTimer = requestAnimationFrame(frame);
+    }
+    autoTimer = requestAnimationFrame(frame);
+  }
+
+  function resetAuto() {
+    if (autoTimer) cancelAnimationFrame(autoTimer);
+    progress.style.width = "0%";
+    startAuto();
+  }
+
+  // Свайп
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  track.addEventListener("touchstart", (e) => {
+    touchStartX = e.changedTouches[0].clientX;
+  });
+
+  track.addEventListener("touchend", (e) => {
+    touchEndX = e.changedTouches[0].clientX;
+    const diff = touchEndX - touchStartX;
+    if (Math.abs(diff) > 40) {
+      if (diff < 0) {
+        next();
+      } else {
+        prev();
+      }
+      if (navigator.vibrate) {
+        navigator.vibrate(20);
+      }
     }
   });
-}, { threshold: 0.2 });
 
-revealElements.forEach(el => revealObserver.observe(el));
+  // Клики по стрелкам
+  prevBtn.addEventListener("click", prev);
+  nextBtn.addEventListener("click", next);
 
+  // Клики по точкам
+  dotsContainer.addEventListener("click", (e) => {
+    const dot = e.target.closest(".cases-dot");
+    if (!dot) return;
+    const idx = Number(dot.dataset.index);
+    if (!Number.isNaN(idx)) {
+      goTo(idx);
+    }
+  });
 
-/* =========================
-   CASES — FILTERS
-========================= */
-const filterButtons = document.querySelectorAll(".cases__filter");
-const caseCards = document.querySelectorAll(".case");
+  // Клики по миниатюрам
+  thumbsContainer.addEventListener("click", (e) => {
+    const thumb = e.target.closest(".cases-thumb");
+    if (!thumb) return;
+    const idx = Number(thumb.dataset.index);
+    if (!Number.isNaN(idx)) {
+      goTo(idx);
+    }
+  });
 
-filterButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    filterButtons.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-
-    const filter = btn.dataset.filter;
-
-    caseCards.forEach(card => {
-      const tags = card.dataset.tags.split(" ");
-
-      if (filter === "all" || tags.includes(filter)) {
-        card.style.display = "block";
+  // Фильтры
+  function applyFilter(tag) {
+    slides.forEach((slide, idx) => {
+      if (tag === "all") {
+        slide.style.display = "";
       } else {
-        card.style.display = "none";
+        const tags = (slide.dataset.tags || "").split(" ");
+        slide.style.display = tags.includes(tag) ? "" : "none";
+      }
+    });
+
+    const visibleSlides = slides.filter(slide => slide.style.display !== "none");
+    if (!visibleSlides.length) return;
+
+    currentIndex = slides.indexOf(visibleSlides[0]);
+    renderDots();
+    renderThumbs();
+    updateActiveSlide();
+    resetAuto();
+  }
+
+  filters.forEach(btn => {
+    btn.addEventListener("click", () => {
+      filters.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const tag = btn.dataset.filter;
+      applyFilter(tag);
+    });
+  });
+
+  // Инициализация
+  renderDots();
+  renderThumbs();
+  updateActiveSlide();
+  startAuto();
+})();
+
+// Квиз
+(function () {
+  const root = document.getElementById("quizRoot");
+  if (!root) return;
+
+  const steps = Array.from(root.querySelectorAll(".quiz-step"));
+  const progress = document.getElementById("quizProgress");
+  const totalSteps = steps.filter(s => s.dataset.step !== "result").length;
+  let currentStepIndex = 0;
+
+  function showStep(index) {
+    steps.forEach((step, idx) => {
+      step.classList.toggle("active", idx === index);
+    });
+    const stepNumber = Math.min(index + 1, totalSteps);
+    const percent = (stepNumber / totalSteps) * 100;
+    progress.style.width = percent.toFixed(2) + "%";
+  }
+
+  steps.forEach((step, idx) => {
+    if (step.dataset.step === "result") return;
+    step.addEventListener("click", (e) => {
+      const option = e.target.closest(".quiz-option");
+      if (!option) return;
+      if (idx < totalSteps - 1) {
+        currentStepIndex = idx + 1;
+        showStep(currentStepIndex);
+      } else {
+        const resultStep = steps.find(s => s.dataset.step === "result");
+        if (!resultStep) return;
+        steps.forEach(s => s.classList.remove("active"));
+        resultStep.classList.add("active");
+        progress.style.width = "100%";
       }
     });
   });
-});
 
+  showStep(currentStepIndex);
+})();
 
-/* =========================
-   CASES — CAROUSEL
-========================= */
-const track = document.getElementById("casesTrack");
-const prevBtn = document.getElementById("casesPrev");
-const nextBtn = document.getElementById("casesNext");
-const progress = document.getElementById("casesProgress");
+// FAQ
+(function () {
+  const items = document.querySelectorAll(".faq-item");
+  items.forEach(item => {
+    const btn = item.querySelector(".faq-question");
+    btn.addEventListener("click", () => {
+      const isOpen = item.classList.contains("open");
+      items.forEach(i => i.classList.remove("open"));
+      if (!isOpen) item.classList.add("open");
+    });
+  });
+})();
 
-let position = 0;
-const cardWidth = 344; // 320 + gap
-const maxPosition = -(cardWidth * (caseCards.length - 1));
+// Scroll reveal
+(function () {
+  const elements = document.querySelectorAll(".reveal");
 
-function updateCarousel() {
-  track.style.transform = `translateX(${position}px)`;
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+      }
+    });
+  }, { threshold: 0.2 });
 
-  const progressPercent = Math.abs(position) / Math.abs(maxPosition) * 100;
-  progress.style.width = `${progressPercent}%`;
+  elements.forEach(el => observer.observe(el));
+})();
+
+// Parallax for hero background
+(function () {
+  const bg = document.querySelector(".hero-bg");
+  if (!bg) return;
+
+  document.addEventListener("mousemove", (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 10;
+    const y = (e.clientY / window.innerHeight - 0.5) * 10;
+    bg.style.transform = `translate(${x}px, ${y}px)`;
+  });
+})();
+
+/* ====== REVIEWS UPGRADE ====== */
+
+.reviews-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin-top: 24px;
 }
 
-nextBtn.addEventListener("click", () => {
-  if (position > maxPosition) {
-    position -= cardWidth;
-    updateCarousel();
-  }
-});
-
-prevBtn.addEventListener("click", () => {
-  if (position < 0) {
-    position += cardWidth;
-    updateCarousel();
-  }
-});
-
-
-/* =========================
-   QUIZ
-========================= */
-const quizRoot = document.getElementById("quizRoot");
-const quizSteps = quizRoot.querySelectorAll(".quiz__step");
-const quizProgress = document.getElementById("quizProgress");
-
-let currentStep = 0;
-
-function showStep(index) {
-  quizSteps.forEach(step => step.classList.remove("active"));
-  quizSteps[index].classList.add("active");
-
-  const percent = (index / (quizSteps.length - 1)) * 100;
-  quizProgress.style.width = `${percent}%`;
+.review-card {
+  background: rgba(5, 7, 11, 0.92);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 12px 30px rgba(0, 229, 255, 0.08);
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  position: relative;
 }
 
-quizRoot.querySelectorAll(".quiz__option").forEach(option => {
-  option.addEventListener("click", () => {
-    if (currentStep < quizSteps.length - 1) {
-      currentStep++;
-      showStep(currentStep);
-    }
-  });
-});
+.review-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 16px 40px rgba(0, 229, 255, 0.18);
+}
 
-showStep(0);
+.review-icon {
+  font-size: 22px;
+  margin-bottom: 10px;
+  opacity: 0.9;
+}
 
+.review-text {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-main);
+  margin-bottom: 12px;
+}
 
-/* =========================
-   FAQ — ACCORDION
-========================= */
-document.querySelectorAll(".faq__item").forEach(item => {
-  const question = item.querySelector(".faq__question");
+.review-author {
+  font-size: 13px;
+  color: var(--text-muted);
+}
 
-  question.addEventListener("click", () => {
-    item.classList.toggle("active");
-  });
-});
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.7s ease-out;
+}
 
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-/* =========================
-   CTA FORM — SUBMIT
-========================= */
-const ctaForm = document.getElementById("ctaForm");
+(function () {
+  const elements = document.querySelectorAll(".reveal");
 
-ctaForm.addEventListener("submit", (e) => {
-  e.preventDefault();
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+      }
+    });
+  }, { threshold: 0.05 });
 
-  alert("Спасибо! Я свяжусь с тобой в течение дня.");
-
-  ctaForm.reset();
-});
+  elements.forEach((el) => observer.observe(el));
+})();
