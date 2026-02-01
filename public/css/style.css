@@ -289,57 +289,6 @@ html, body {
   border-radius: 4px;
 }
 
-<!-- Отзывы -->
-<section class="section section-dark" id="reviews">
-  <div class="container">
-    <h2 class="section-title">Что говорят клиенты</h2>
-    <p class="section-subtitle">
-      Коротко и по делу — реальные отзывы людей, которые уже прошли путь.
-    </p>
-
-    <div class="reviews-grid">
-
-      <div class="review-card reveal">
-        <div class="review-icon">⭐</div>
-        <div class="review-text">
-          «За 2 месяца ушло 6 кг без жёстких ограничений.  
-          Тренировки короткие, но эффективные. Чувствую себя лучше, чем за последние 3 года.»
-        </div>
-        <div class="review-author">Мария, 32</div>
-      </div>
-
-      <div class="review-card reveal">
-        <div class="review-icon">🔥</div>
-        <div class="review-text">
-          «Наконец понял технику приседов.  
-          Перестала болеть спина, прогресс в силе — просто космос.»
-        </div>
-        <div class="review-author">Андрей, 28</div>
-      </div>
-
-      <div class="review-card reveal">
-        <div class="review-icon">💪</div>
-        <div class="review-text">
-          «Тренировки по 25 минут — это спасение.  
-          Успеваю даже с ребёнком и работой. Результат есть, и это мотивирует.»
-        </div>
-        <div class="review-author">Ольга, 35</div>
-      </div>
-
-      <div class="review-card reveal">
-        <div class="review-icon">⚡</div>
-        <div class="review-text">
-          «Очень крутой формат.  
-          Постоянная поддержка, корректировки, всё по делу.  
-          Чувствуется, что работаешь с профессионалом.»
-        </div>
-        <div class="review-author">Илья, 30</div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
 .quiz {
   margin-top: 32px;
   position: relative;
