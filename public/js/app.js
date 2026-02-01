@@ -1,367 +1,181 @@
-// Плавный скролл по data-scroll-target
+// ===============================
+// ПЛАВНЫЙ СКРОЛЛ
+// ===============================
 document.querySelectorAll("[data-scroll-target]").forEach(btn => {
   btn.addEventListener("click", () => {
-    const target = btn.getAttribute("data-scroll-target");
-    const el = document.querySelector(target);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    const target = document.querySelector(btn.dataset.scrollTarget);
+    if (target) {
+      window.scrollTo({
+        top: target.offsetTop - 60,
+        behavior: "smooth"
+      });
     }
   });
 });
 
-// Карусель кейсов
-(function () {
-  const track = document.getElementById("casesTrack");
-  const slides = Array.from(track.querySelectorAll(".case-slide"));
-  const dotsContainer = document.getElementById("casesDots");
-  const thumbsContainer = document.getElementById("casesThumbs");
-  const prevBtn = document.getElementById("casesPrev");
-  const nextBtn = document.getElementById("casesNext");
-  const progress = document.getElementById("casesProgress");
-  const filters = Array.from(document.querySelectorAll(".filter-btn"));
 
-  let currentIndex = 0;
-  let autoTimer = null;
-  const autoDelay = 6000;
+// ===============================
+// REVEAL-АНИМАЦИИ
+// ===============================
+const revealElements = document.querySelectorAll(".reveal");
 
-  if (!slides.length) return;
+function handleReveal() {
+  const trigger = window.innerHeight * 0.88;
 
-  // Создание точек
-  function renderDots() {
-    dotsContainer.innerHTML = "";
-    slides.forEach((_, idx) => {
-      const dot = document.createElement("div");
-      dot.className = "cases-dot" + (idx === currentIndex ? " active" : "");
-      dot.dataset.index = idx;
-      dotsContainer.appendChild(dot);
-    });
-  }
-
-  // Создание миниатюр
-  function renderThumbs() {
-    thumbsContainer.innerHTML = "";
-    slides.forEach((slide, idx) => {
-      const thumb = document.createElement("button");
-      thumb.type = "button";
-      thumb.className = "cases-thumb" + (idx === currentIndex ? " active" : "");
-      thumb.dataset.index = idx;
-
-      const img = slide.querySelector(".case-photo img");
-      if (img) {
-        const thumbImg = document.createElement("img");
-        thumbImg.src = img.src;
-        thumbImg.alt = img.alt || "Кейс";
-        thumb.appendChild(thumbImg);
-      }
-
-      thumbsContainer.appendChild(thumb);
-    });
-  }
-
-  function updateActiveSlide() {
-    slides.forEach((slide, idx) => {
-      slide.classList.toggle("active", idx === currentIndex);
-    });
-
-    dotsContainer.querySelectorAll(".cases-dot").forEach(dot => {
-      dot.classList.toggle("active", Number(dot.dataset.index) === currentIndex);
-    });
-
-    thumbsContainer.querySelectorAll(".cases-thumb").forEach(thumb => {
-      thumb.classList.toggle("active", Number(thumb.dataset.index) === currentIndex);
-    });
-
-    progress.style.width = "0%";
-  }
-
-  function goTo(index) {
-    const visibleSlides = slides.filter(slide => slide.style.display !== "none");
-    if (!visibleSlides.length) return;
-
-    const realIndex = visibleSlides.indexOf(slides[index]);
-    if (realIndex === -1) {
-      currentIndex = slides.indexOf(visibleSlides[0]);
-    } else {
-      currentIndex = index;
+  revealElements.forEach(el => {
+    const rect = el.getBoundingClientRect().top;
+    if (rect < trigger) {
+      el.classList.add("visible");
     }
-
-    updateActiveSlide();
-    resetAuto();
-  }
-
-  function next() {
-    const visibleSlides = slides.filter(slide => slide.style.display !== "none");
-    if (!visibleSlides.length) return;
-    const currentVisibleIndex = visibleSlides.indexOf(slides[currentIndex]);
-    const nextVisibleIndex = (currentVisibleIndex + 1) % visibleSlides.length;
-    currentIndex = slides.indexOf(visibleSlides[nextVisibleIndex]);
-    updateActiveSlide();
-    resetAuto();
-  }
-
-  function prev() {
-    const visibleSlides = slides.filter(slide => slide.style.display !== "none");
-    if (!visibleSlides.length) return;
-    const currentVisibleIndex = visibleSlides.indexOf(slides[currentIndex]);
-    const prevVisibleIndex =
-      (currentVisibleIndex - 1 + visibleSlides.length) % visibleSlides.length;
-    currentIndex = slides.indexOf(visibleSlides[prevVisibleIndex]);
-    updateActiveSlide();
-    resetAuto();
-  }
-
-  // Автопрокрутка + прогресс
-  function startAuto() {
-    let startTime = performance.now();
-    function frame(now) {
-      const elapsed = now - startTime;
-      const progressValue = Math.min(elapsed / autoDelay, 1);
-      progress.style.width = (progressValue * 100).toFixed(2) + "%";
-      if (elapsed >= autoDelay) {
-        next();
-        startTime = performance.now();
-      }
-      autoTimer = requestAnimationFrame(frame);
-    }
-    autoTimer = requestAnimationFrame(frame);
-  }
-
-  function resetAuto() {
-    if (autoTimer) cancelAnimationFrame(autoTimer);
-    progress.style.width = "0%";
-    startAuto();
-  }
-
-  // Свайп
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  track.addEventListener("touchstart", (e) => {
-    touchStartX = e.changedTouches[0].clientX;
   });
+}
 
-  track.addEventListener("touchend", (e) => {
-    touchEndX = e.changedTouches[0].clientX;
-    const diff = touchEndX - touchStartX;
-    if (Math.abs(diff) > 40) {
-      if (diff < 0) {
-        next();
+window.addEventListener("scroll", handleReveal);
+handleReveal();
+
+
+// ===============================
+// ФИЛЬТРЫ КЕЙСОВ
+// ===============================
+const filterButtons = document.querySelectorAll(".filter-btn");
+const caseSlides = document.querySelectorAll(".case-slide");
+
+filterButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    filterButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const filter = btn.dataset.filter;
+
+    caseSlides.forEach(slide => {
+      const tags = slide.dataset.tags.split(" ");
+
+      if (filter === "all" || tags.includes(filter)) {
+        slide.style.display = "block";
       } else {
-        prev();
-      }
-      if (navigator.vibrate) {
-        navigator.vibrate(20);
-      }
-    }
-  });
-
-  // Клики по стрелкам
-  prevBtn.addEventListener("click", prev);
-  nextBtn.addEventListener("click", next);
-
-  // Клики по точкам
-  dotsContainer.addEventListener("click", (e) => {
-    const dot = e.target.closest(".cases-dot");
-    if (!dot) return;
-    const idx = Number(dot.dataset.index);
-    if (!Number.isNaN(idx)) {
-      goTo(idx);
-    }
-  });
-
-  // Клики по миниатюрам
-  thumbsContainer.addEventListener("click", (e) => {
-    const thumb = e.target.closest(".cases-thumb");
-    if (!thumb) return;
-    const idx = Number(thumb.dataset.index);
-    if (!Number.isNaN(idx)) {
-      goTo(idx);
-    }
-  });
-
-  // Фильтры
-  function applyFilter(tag) {
-    slides.forEach((slide, idx) => {
-      if (tag === "all") {
-        slide.style.display = "";
-      } else {
-        const tags = (slide.dataset.tags || "").split(" ");
-        slide.style.display = tags.includes(tag) ? "" : "none";
-      }
-    });
-
-    const visibleSlides = slides.filter(slide => slide.style.display !== "none");
-    if (!visibleSlides.length) return;
-
-    currentIndex = slides.indexOf(visibleSlides[0]);
-    renderDots();
-    renderThumbs();
-    updateActiveSlide();
-    resetAuto();
-  }
-
-  filters.forEach(btn => {
-    btn.addEventListener("click", () => {
-      filters.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const tag = btn.dataset.filter;
-      applyFilter(tag);
-    });
-  });
-
-  // Инициализация
-  renderDots();
-  renderThumbs();
-  updateActiveSlide();
-  startAuto();
-})();
-
-// Квиз
-(function () {
-  const root = document.getElementById("quizRoot");
-  if (!root) return;
-
-  const steps = Array.from(root.querySelectorAll(".quiz-step"));
-  const progress = document.getElementById("quizProgress");
-  const totalSteps = steps.filter(s => s.dataset.step !== "result").length;
-  let currentStepIndex = 0;
-
-  function showStep(index) {
-    steps.forEach((step, idx) => {
-      step.classList.toggle("active", idx === index);
-    });
-    const stepNumber = Math.min(index + 1, totalSteps);
-    const percent = (stepNumber / totalSteps) * 100;
-    progress.style.width = percent.toFixed(2) + "%";
-  }
-
-  steps.forEach((step, idx) => {
-    if (step.dataset.step === "result") return;
-    step.addEventListener("click", (e) => {
-      const option = e.target.closest(".quiz-option");
-      if (!option) return;
-      if (idx < totalSteps - 1) {
-        currentStepIndex = idx + 1;
-        showStep(currentStepIndex);
-      } else {
-        const resultStep = steps.find(s => s.dataset.step === "result");
-        if (!resultStep) return;
-        steps.forEach(s => s.classList.remove("active"));
-        resultStep.classList.add("active");
-        progress.style.width = "100%";
+        slide.style.display = "none";
       }
     });
   });
+});
 
-  showStep(currentStepIndex);
-})();
 
+// ===============================
+// КАРУСЕЛЬ КЕЙСОВ
+// ===============================
+const track = document.getElementById("casesTrack");
+const slides = Array.from(document.querySelectorAll(".case-slide"));
+const prevBtn = document.getElementById("casesPrev");
+const nextBtn = document.getElementById("casesNext");
+const dotsContainer = document.getElementById("casesDots");
+const thumbsContainer = document.getElementById("casesThumbs");
+const progressBar = document.getElementById("casesProgress");
+
+let index = 0;
+
+// Создание точек
+slides.forEach((_, i) => {
+  const dot = document.createElement("button");
+  dot.className = "cases-dot";
+  if (i === 0) dot.classList.add("active");
+  dotsContainer.appendChild(dot);
+
+  dot.addEventListener("click", () => goToSlide(i));
+});
+
+// Создание миниатюр
+slides.forEach((slide, i) => {
+  const thumb = document.createElement("div");
+  thumb.className = "cases-thumb";
+  thumb.innerHTML = slide.querySelector("img").outerHTML;
+  if (i === 0) thumb.classList.add("active");
+  thumbsContainer.appendChild(thumb);
+
+  thumb.addEventListener("click", () => goToSlide(i));
+});
+
+function updateCarousel() {
+  track.style.transform = `translateX(-${index * 100}%)`;
+
+  // Обновление точек
+  dotsContainer.querySelectorAll(".cases-dot").forEach((dot, i) => {
+    dot.classList.toggle("active", i === index);
+  });
+
+  // Обновление миниатюр
+  thumbsContainer.querySelectorAll(".cases-thumb").forEach((thumb, i) => {
+    thumb.classList.toggle("active", i === index);
+  });
+
+  // Прогресс-бар
+  const progress = ((index + 1) / slides.length) * 100;
+  progressBar.style.width = progress + "%";
+}
+
+function goToSlide(i) {
+  index = i;
+  updateCarousel();
+}
+
+prevBtn.addEventListener("click", () => {
+  index = (index - 1 + slides.length) % slides.length;
+  updateCarousel();
+});
+
+nextBtn.addEventListener("click", () => {
+  index = (index + 1) % slides.length;
+  updateCarousel();
+});
+
+// Свайп
+let startX = 0;
+
+track.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+track.addEventListener("touchend", e => {
+  const endX = e.changedTouches[0].clientX;
+  if (endX - startX > 50) prevBtn.click();
+  if (startX - endX > 50) nextBtn.click();
+});
+
+
+// ===============================
+// КВИЗ
+// ===============================
+const quizRoot = document.getElementById("quizRoot");
+const quizSteps = quizRoot.querySelectorAll(".quiz-step");
+const quizProgress = document.getElementById("quizProgress");
+
+let quizIndex = 0;
+
+function showQuizStep(i) {
+  quizSteps.forEach(step => step.classList.remove("active"));
+  quizSteps[i].classList.add("active");
+
+  const progress = ((i + 1) / quizSteps.length) * 100;
+  quizProgress.style.width = progress + "%";
+}
+
+quizRoot.querySelectorAll(".quiz-option").forEach(btn => {
+  btn.addEventListener("click", () => {
+    quizIndex++;
+    if (quizIndex >= quizSteps.length) quizIndex = quizSteps.length - 1;
+    showQuizStep(quizIndex);
+  });
+});
+
+showQuizStep(0);
+
+
+// ===============================
 // FAQ
-(function () {
-  const items = document.querySelectorAll(".faq-item");
-  items.forEach(item => {
-    const btn = item.querySelector(".faq-question");
-    btn.addEventListener("click", () => {
-      const isOpen = item.classList.contains("open");
-      items.forEach(i => i.classList.remove("open"));
-      if (!isOpen) item.classList.add("open");
-    });
+// ===============================
+document.querySelectorAll(".faq-item").forEach(item => {
+  const question = item.querySelector(".faq-question");
+
+  question.addEventListener("click", () => {
+    item.classList.toggle("active");
   });
-})();
-
-// Scroll reveal
-(function () {
-  const elements = document.querySelectorAll(".reveal");
-
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-      }
-    });
-  }, { threshold: 0.2 });
-
-  elements.forEach(el => observer.observe(el));
-})();
-
-// Parallax for hero background
-(function () {
-  const bg = document.querySelector(".hero-bg");
-  if (!bg) return;
-
-  document.addEventListener("mousemove", (e) => {
-    const x = (e.clientX / window.innerWidth - 0.5) * 10;
-    const y = (e.clientY / window.innerHeight - 0.5) * 10;
-    bg.style.transform = `translate(${x}px, ${y}px)`;
-  });
-})();
-
-/* ====== REVIEWS UPGRADE ====== */
-
-.reviews-grid {
-  display: grid;
-  gap: 18px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  margin-top: 24px;
-}
-
-.review-card {
-  background: rgba(5, 7, 11, 0.92);
-  border: 1px solid rgba(0, 229, 255, 0.25);
-  border-radius: 16px;
-  padding: 18px 20px;
-  box-shadow: 0 12px 30px rgba(0, 229, 255, 0.08);
-  backdrop-filter: blur(10px);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  position: relative;
-}
-
-.review-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--accent);
-  box-shadow: 0 16px 40px rgba(0, 229, 255, 0.18);
-}
-
-.review-icon {
-  font-size: 22px;
-  margin-bottom: 10px;
-  opacity: 0.9;
-}
-
-.review-text {
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--text-main);
-  margin-bottom: 12px;
-}
-
-.review-author {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-/* Scroll reveal */
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: 0.7s ease-out;
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-(function () {
-  const elements = document.querySelectorAll(".reveal");
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-      }
-    });
-  }, { threshold: 0.05 });
-
-  elements.forEach((el) => observer.observe(el));
-})();
+});
