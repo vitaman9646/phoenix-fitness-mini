@@ -35,66 +35,60 @@ handleReveal();
 
 
 // ===============================
-// ФИЛЬТРЫ КЕЙСОВ
-// ===============================
-const filterButtons = document.querySelectorAll(".filter-btn");
-const caseSlides = document.querySelectorAll(".case-slide");
-
-filterButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    filterButtons.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-
-    const filter = btn.dataset.filter;
-
-    caseSlides.forEach(slide => {
-      const tags = slide.dataset.tags.split(" ");
-
-      if (filter === "all" || tags.includes(filter)) {
-        slide.style.display = "block";
-      } else {
-        slide.style.display = "none";
-      }
-    });
-  });
-});
-
-
-// ===============================
 // КАРУСЕЛЬ КЕЙСОВ
 // ===============================
 const track = document.getElementById("casesTrack");
-const slides = Array.from(document.querySelectorAll(".case-slide"));
+const allSlides = Array.from(document.querySelectorAll(".case-slide"));
 const prevBtn = document.getElementById("casesPrev");
 const nextBtn = document.getElementById("casesNext");
 const dotsContainer = document.getElementById("casesDots");
 const thumbsContainer = document.getElementById("casesThumbs");
 const progressBar = document.getElementById("casesProgress");
 
+let visibleSlides = [...allSlides];
 let index = 0;
 
 // Создание точек
-slides.forEach((_, i) => {
-  const dot = document.createElement("button");
-  dot.className = "cases-dot";
-  if (i === 0) dot.classList.add("active");
-  dotsContainer.appendChild(dot);
+function createDots() {
+  dotsContainer.innerHTML = "";
+  visibleSlides.forEach((_, i) => {
+    const dot = document.createElement("button");
+    dot.className = "cases-dot";
+    if (i === 0) dot.classList.add("active");
+    dotsContainer.appendChild(dot);
 
-  dot.addEventListener("click", () => goToSlide(i));
-});
+    dot.addEventListener("click", () => goToSlide(i));
+  });
+}
 
 // Создание миниатюр
-slides.forEach((slide, i) => {
-  const thumb = document.createElement("div");
-  thumb.className = "cases-thumb";
-  thumb.innerHTML = slide.querySelector("img").outerHTML;
-  if (i === 0) thumb.classList.add("active");
-  thumbsContainer.appendChild(thumb);
+function createThumbs() {
+  thumbsContainer.innerHTML = "";
+  visibleSlides.forEach((slide, i) => {
+    const thumb = document.createElement("div");
+    thumb.className = "cases-thumb";
+    const img = slide.querySelector("img");
+    if (img) {
+      thumb.innerHTML = img.outerHTML;
+    }
+    if (i === 0) thumb.classList.add("active");
+    thumbsContainer.appendChild(thumb);
 
-  thumb.addEventListener("click", () => goToSlide(i));
-});
+    thumb.addEventListener("click", () => goToSlide(i));
+  });
+}
 
 function updateCarousel() {
+  if (visibleSlides.length === 0) return;
+
+  // Ограничиваем индекс
+  if (index >= visibleSlides.length) {
+    index = visibleSlides.length - 1;
+  }
+  if (index < 0) {
+    index = 0;
+  }
+
   track.style.transform = `translateX(-${index * 100}%)`;
 
   // Обновление точек
@@ -108,7 +102,7 @@ function updateCarousel() {
   });
 
   // Прогресс-бар
-  const progress = ((index + 1) / slides.length) * 100;
+  const progress = ((index + 1) / visibleSlides.length) * 100;
   progressBar.style.width = progress + "%";
 }
 
@@ -118,12 +112,12 @@ function goToSlide(i) {
 }
 
 prevBtn.addEventListener("click", () => {
-  index = (index - 1 + slides.length) % slides.length;
+  index = (index - 1 + visibleSlides.length) % visibleSlides.length;
   updateCarousel();
 });
 
 nextBtn.addEventListener("click", () => {
-  index = (index + 1) % slides.length;
+  index = (index + 1) % visibleSlides.length;
   updateCarousel();
 });
 
@@ -138,6 +132,46 @@ track.addEventListener("touchend", e => {
   const endX = e.changedTouches[0].clientX;
   if (endX - startX > 50) prevBtn.click();
   if (startX - endX > 50) nextBtn.click();
+});
+
+// Инициализация
+createDots();
+createThumbs();
+updateCarousel();
+
+
+// ===============================
+// ФИЛЬТРЫ КЕЙСОВ
+// ===============================
+const filterButtons = document.querySelectorAll(".filter-btn");
+
+filterButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    filterButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const filter = btn.dataset.filter;
+
+    // Скрываем/показываем слайды
+    allSlides.forEach(slide => {
+      const tags = slide.dataset.tags.split(" ");
+
+      if (filter === "all" || tags.includes(filter)) {
+        slide.style.display = "block";
+      } else {
+        slide.style.display = "none";
+      }
+    });
+
+    // Обновляем массив видимых слайдов
+    visibleSlides = allSlides.filter(slide => slide.style.display !== "none");
+
+    // Сбрасываем индекс и пересоздаём навигацию
+    index = 0;
+    createDots();
+    createThumbs();
+    updateCarousel();
+  });
 });
 
 
@@ -176,6 +210,70 @@ document.querySelectorAll(".faq-item").forEach(item => {
   const question = item.querySelector(".faq-question");
 
   question.addEventListener("click", () => {
+    // Закрываем все остальные
+    document.querySelectorAll(".faq-item").forEach(other => {
+      if (other !== item) {
+        other.classList.remove("active");
+      }
+    });
+
+    // Переключаем текущий
     item.classList.toggle("active");
   });
 });
+
+
+// ===============================
+// ФОРМА CTA
+// ===============================
+const ctaForm = document.querySelector(".cta-form");
+const ctaButton = ctaForm.querySelector(".btn-primary");
+
+ctaButton.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const inputs = ctaForm.querySelectorAll(".input");
+  const name = inputs[0].value.trim();
+  const contact = inputs[1].value.trim();
+
+  // Простая валидация
+  if (!name || !contact) {
+    alert("Пожалуйста, заполни все поля!");
+    return;
+  }
+
+  // Имитация отправки (замени на реальный запрос к боту)
+  console.log("Отправка заявки:", { name, contact });
+
+  // Telegram Web App API (если используешь)
+  if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.sendData(JSON.stringify({ name, contact }));
+    window.Telegram.WebApp.close();
+  } else {
+    // Для тестирования вне Telegram
+    alert(`Заявка отправлена!\n\nИмя: ${name}\nКонтакт: ${contact}`);
+    inputs.forEach(input => input.value = "");
+  }
+});
+
+
+// ===============================
+// TELEGRAM WEB APP ИНТЕГРАЦИЯ
+// ===============================
+if (window.Telegram && window.Telegram.WebApp) {
+  const tg = window.Telegram.WebApp;
+
+  // Раскрываем приложение на весь экран
+  tg.expand();
+
+  // Настраиваем главную кнопку (опционально)
+  tg.MainButton.text = "Получить план";
+  tg.MainButton.show();
+  tg.MainButton.onClick(() => {
+    document.querySelector("#ctaFinal").scrollIntoView({ behavior: "smooth" });
+  });
+
+  // Применяем цветовую схему Telegram
+  document.documentElement.style.setProperty("--bg-main", tg.themeParams.bg_color || "#05070b");
+  document.documentElement.style.setProperty("--text-main", tg.themeParams.text_color || "#f5f7ff");
+}
