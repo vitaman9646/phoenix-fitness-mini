@@ -2,8 +2,8 @@
 // КОНФИГУРАЦИЯ
 // ===============================
 const CONFIG = {
-  BOT_TOKEN: 'YOUR_BOT_TOKEN', // Замени на свой токен бота
-  CHAT_ID: 'YOUR_CHAT_ID',     // Замени на свой chat_id
+  BOT_TOKEN: '8579852276:AAE23vEq3chot5Yqc-DwGux0MWA9UzZTqRk', // Замени на свой токен бота
+  CHAT_ID: '1066756284',     // Замени на свой chat_id
   ANALYTICS_ENABLED: true
 };
 
