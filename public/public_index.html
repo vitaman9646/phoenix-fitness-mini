@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Виталий — Онлайн фитнес-тренер | Персональные программы тренировок и питания</title>
+  <meta name="description" content="Онлайн-коучинг от Виталия: персональные программы тренировок и питания, контроль техники, поддержка 24/7. 150+ довольных клиентов, 95% достигают цели. Начни трансформацию сегодня!">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#00e5ff">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://fitness-coach-vitaliy.ru/">
+  <meta property="og:title" content="Виталий — Онлайн фитнес-тренер">
+  <meta property="og:description" content="Персональные программы тренировок и питания. 150+ довольных клиентов, 95% достигают цели.">
+  <meta property="og:image" content="https://fitness-coach-vitaliy.ru/images/og-image.jpg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://fitness-coach-vitaliy.ru/">
+  <meta property="twitter:title" content="Виталий — Онлайн фитнес-тренер">
+  <meta property="twitter:description" content="Персональные программы тренировок и питания. 150+ довольных клиентов, 95% достигают цели.">
+  <meta property="twitter:image" content="https://fitness-coach-vitaliy.ru/images/og-image.jpg">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Шрифт Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- ВАЖНО: Правильные пути для структуры public/ -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style-improvements.css">
+  
+  <!-- Schema.org микроразметка -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Fitness Coach Vitaliy",
+    "image": "https://fitness-coach-vitaliy.ru/images/vitaliy-photo.jpg",
+    "description": "Онлайн фитнес-тренер. Персональные программы тренировок и питания.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "RU"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "150"
+    },
+    "priceRange": "₽₽"
+  }
+  </script>
+</head>
+<body>
+  <!-- Лоадер -->
+  <div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-spinner" role="status" aria-label="Загрузка приложения"></div>
+    <div class="loader-text">Загрузка...</div>
+  </div>
+
+  <!-- Уведомления -->
+  <div class="notification-container" id="notificationContainer" role="alert" aria-live="polite"></div>
+
+  <div class="page">
+
+    <!-- Хедер -->
+    <header class="header" role="banner">
+      <div class="container header-inner">
+        <div class="logo">Fitness_Coach_Vitaliy</div>
+        <button class="btn btn-primary header-cta pulse" data-scroll-target="#ctaFinal" aria-label="Перейти к форме заявки">
+          Получить план
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero с видео-превью -->
+    <section class="hero" id="hero">
+      <div class="hero-bg" aria-hidden="true">
+        <div class="hero-glow"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-particles">
+          <div class="hero-particle" style="left:10%; top:80%; animation-delay:0s;"></div>
+          <div class="hero-particle" style="left:40%; top:90%; animation-delay:1s;"></div>
+          <div class="hero-particle" style="left:70%; top:85%; animation-delay:2s;"></div>
+          <div class="hero-particle" style="left:20%; top:95%; animation-delay:3s;"></div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="hero-inner">
+          <div class="hero-content">
+            <span class="hero-badge reveal">Персональная работа</span>
+
+            <h1 class="hero-title reveal">
+              Твой путь к лучшей форме начинается здесь
+            </h1>
+
+            <p class="hero-subtitle reveal">
+              Индивидуальная программа тренировок и питания.  
+              Контроль техники. Поддержка на каждом шаге.
+            </p>
+
+            <div class="hero-actions reveal">
+              <button class="btn btn-primary pulse" data-scroll-target="#quiz" aria-label="Перейти к квизу">Пройти квиз</button>
+              <button class="btn btn-ghost" data-scroll-target="#cases" aria-label="Перейти к кейсам клиентов">Смотреть кейсы</button>
+            </div>
+          </div>
+
+          <aside class="hero-card reveal" aria-labelledby="hero-card-title">
+            <div class="hero-card-title" id="hero-card-title">Что ты получишь:</div>
+            <ul class="hero-list">
+              <li>Программу под твои цели</li>
+              <li>Контроль техники</li>
+              <li>Корректировки по ходу</li>
+              <li>Поддержку и мотивацию</li>
+            </ul>
+            <button class="btn btn-primary hero-card-btn" data-scroll-target="#approach" aria-label="Перейти к описанию подхода">
+              Как это работает
+            </button>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Счётчики достижений -->
+    <section class="stats-section" aria-labelledby="stats-title">
+      <div class="container">
+        <h2 id="stats-title" class="sr-only">Статистика достижений</h2>
+        <div class="stats-grid">
+          <div class="stat-item reveal">
+            <div class="stat-number" data-target="150" aria-label="Более 150">0</div>
+            <div class="stat-label">Довольных клиентов</div>
+          </div>
+          <div class="stat-item reveal">
+            <div class="stat-number" data-target="2000" aria-label="Более 2000">0</div>
+            <div class="stat-label">Часов тренировок</div>
+          </div>
+          <div class="stat-item reveal">
+            <div class="stat-number" data-target="95" aria-label="95 процентов">0</div>
+            <div class="stat-label">Достигают цели %</div>
+          </div>
+          <div class="stat-item reveal">
+            <div class="stat-number" data-target="4.9" aria-label="Рейтинг 4.9 из 5">0</div>
+            <div class="stat-label">Средний рейтинг ⭐</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Обо мне (НОВЫЙ БЛОК) -->
+    <section class="section section-about" id="about">
+      <div class="container">
+        <div class="about-inner">
+          <div class="about-media reveal">
+            <div class="about-photo">
+              <img src="images/vitaliy-photo.jpg" alt="Виталий — фитнес-тренер" loading="lazy">
+              <div class="about-badge">8+ лет опыта</div>
+            </div>
+            <div class="about-video">
+              <div class="video-placeholder" data-video-id="intro">
+                <div class="video-play-btn" aria-label="Воспроизвести видео-обращение"></div>
+                <img src="images/video-thumb.jpg" alt="Превью видео-обращения" loading="lazy">
+              </div>
+            </div>
+          </div>
+          
+          <div class="about-content reveal">
+            <h2 class="section-title">Почему именно я</h2>
+            <div class="about-story">
+              <p>Привет! Я Виталий, и я знаю, каково это — начинать с нуля.</p>
+              
+              <p>8 лет назад я сам был обычным офисным работником с лишним весом и болями в спине. Пробовал всё: модные диеты, случайные тренировки из YouTube, дорогие абонементы в зал. Результат? Ноль. Разочарование и потраченные деньги.</p>
+              
+              <p>Всё изменилось, когда я понял простую вещь: <strong>нужна система, а не мотивация</strong>. Я получил образование, прошёл десятки курсов, работал с сотнями клиентов и создал свой подход, который <em>реально работает</em>.</p>
+              
+              <p>Сегодня моя миссия — помочь тебе пройти этот путь в 10 раз быстрее, без боли, демотивации и пустой траты времени.</p>
+            </div>
+            
+            <div class="about-credentials">
+              <div class="credential-item">
+                <span class="credential-icon">🎓</span>
+                <span class="credential-text">Сертифицированный тренер ISSA</span>
+              </div>
+              <div class="credential-item">
+                <span class="credential-icon">📚</span>
+                <span class="credential-text">Диплом по спортивной физиологии</span>
+              </div>
+              <div class="credential-item">
+                <span class="credential-icon">🏆</span>
+                <span class="credential-text">150+ успешных трансформаций</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Блок боли / ошибок -->
+    <section class="section section-dark" id="problems">
+      <div class="container">
+        <h2 class="section-title reveal">Почему тренировки не дают результат</h2>
+        <p class="section-subtitle reveal">
+          90% людей застревают на одном и том же: хаос, случайные упражнения, отсутствие системы.
+        </p>
+        <div class="grid grid-3">
+          <article class="card card-outline reveal">
+            <div class="card-label">Ошибка 1</div>
+            <h3 class="card-title">Неправильная техника и хаос в тренировках</h3>
+            <p class="card-text">
+              Случайные упражнения из интернета без системы и контроля техники.
+              В итоге — перегрузка суставов, боли и отсутствие прогресса.
+            </p>
+          </article>
+          <article class="card card-outline reveal">
+            <div class="card-label">Ошибка 2</div>
+            <h3 class="card-title">Слишком много кардио и дефицит «на глаз»</h3>
+            <p class="card-text">
+              Бесконечное кардио и резкое урезание калорий. Организм выгорает, вес встаёт, мотивация падает.
+            </p>
+          </article>
+          <article class="card card-outline reveal">
+            <div class="card-label">Ошибка 3</div>
+            <h3 class="card-title">Отсутствие плана и контроля</h3>
+            <p class="card-text">
+              Нет чёткой программы, прогрессии нагрузки и обратной связи.  
+              Кажется, что «я стараюсь», но тело не меняется.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Блок сравнения (НОВЫЙ БЛОК) -->
+    <section class="section section-comparison" id="comparison">
+      <div class="container">
+        <h2 class="section-title reveal">Самостоятельно vs С тренером</h2>
+        <p class="section-subtitle reveal">
+          Вот что меняется, когда ты работаешь по системе
+        </p>
+        
+        <div class="comparison-table reveal">
+          <div class="comparison-header">
+            <div class="comparison-col"></div>
+            <div class="comparison-col comparison-col-bad">
+              <div class="comparison-icon">😔</div>
+              <div class="comparison-label">Самостоятельно</div>
+            </div>
+            <div class="comparison-col comparison-col-good">
+              <div class="comparison-icon">🚀</div>
+              <div class="comparison-label">С тренером</div>
+            </div>
+          </div>
+          
+          <div class="comparison-row">
+            <div class="comparison-feature">Программа</div>
+            <div class="comparison-value">Случайные упражнения из соцсетей</div>
+            <div class="comparison-value comparison-value-good">Персональный план под цель и уровень</div>
+          </div>
+          
+          <div class="comparison-row">
+            <div class="comparison-feature">Техника</div>
+            <div class="comparison-value">Никто не проверяет</div>
+            <div class="comparison-value comparison-value-good">Контроль каждого упражнения по видео</div>
+          </div>
+          
+          <div class="comparison-row">
+            <div class="comparison-feature">Питание</div>
+            <div class="comparison-value">«На глаз» или жёсткие диеты</div>
+            <div class="comparison-value comparison-value-good">Сбалансированный план КБЖУ</div>
+          </div>
+          
+          <div class="comparison-row">
+            <div class="comparison-feature">Мотивация</div>
+            <div class="comparison-value">Пропал через 2 недели</div>
+            <div class="comparison-value comparison-value-good">Поддержка и контроль 24/7</div>
+          </div>
+          
+          <div class="comparison-row">
+            <div class="comparison-feature">Результат</div>
+            <div class="comparison-value">Нет прогресса, травмы</div>
+            <div class="comparison-value comparison-value-good">Гарантированная трансформация за 8-12 недель</div>
+          </div>
+          
+          <div class="comparison-row">
+            <div class="comparison-feature">Цена</div>
+            <div class="comparison-value">Время + здоровье + деньги на пустые абонементы</div>
+            <div class="comparison-value comparison-value-good">От 990₽/неделя — меньше чем кофе каждый день</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Кейсы (сокращено до 5, добавлены видео и чат) -->
+    <section class="section" id="cases">
+      <div class="container">
+        <h2 class="section-title reveal">Реальные трансформации моих клиентов</h2>
+        <p class="section-subtitle reveal">
+          Карусель листается свайпом или стрелками. Можно отфильтровать кейсы по цели.
+        </p>
+
+        <!-- Фильтры -->
+        <div class="cases-filters reveal" role="tablist" aria-label="Фильтры кейсов">
+          <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">Все</button>
+          <button class="filter-btn" data-filter="loss" role="tab" aria-selected="false">Похудение</button>
+          <button class="filter-btn" data-filter="gain" role="tab" aria-selected="false">Набор мышц</button>
+          <button class="filter-btn" data-filter="home" role="tab" aria-selected="false">Домашние тренировки</button>
+          <button class="filter-btn" data-filter="gym" role="tab" aria-selected="false">Зал</button>
+        </div>
+
+        <!-- Карусель -->
+        <div class="cases-carousel reveal" id="casesCarousel" role="region" aria-label="Карусель кейсов клиентов">
+          <div class="cases-track" id="casesTrack">
+
+            <!-- Кейс 1 -->
+            <article class="case-slide active" data-tags="loss home">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <figure class="case-photo">
+                    <div class="case-photo-skeleton" aria-hidden="true"></div>
+                    <img data-src="images/case1_before.jpg" alt="Алексей до тренировок — вид спереди" loading="lazy">
+                    <figcaption class="case-label">ДО</figcaption>
+                  </figure>
+                  <figure class="case-photo">
+                    <div class="case-photo-skeleton" aria-hidden="true"></div>
+                    <img data-src="images/case1_after.jpg" alt="Алексей после 8 недель тренировок — значительная потеря веса" loading="lazy">
+                    <figcaption class="case-label">ПОСЛЕ</figcaption>
+                  </figure>
+                </div>
+                <div class="case-content">
+                  <h3 class="case-title">Алексей, 32 года</h3>
+                  <div class="case-result">−14 кг за 8 недель • спина и живот</div>
+                  <p class="case-text">
+                    Пришёл с лишним весом и болями в спине.  
+                    Тренировки дома по 30 минут, 4 раза в неделю.  
+                    Убрали хаос, выстроили прогрессию и питание без жёстких запретов.
+                  </p>
+                  <div class="case-tags">
+                    <span class="case-tag">Похудение</span>
+                    <span class="case-tag">Домашние тренировки</span>
+                    <span class="case-tag">8 недель</span>
+                  </div>
+                  
+                  <!-- Видео-отзыв -->
+                  <div class="case-video">
+                    <div class="video-placeholder" data-video-id="alexey-review">
+                      <div class="video-play-btn" aria-label="Воспроизвести видео-отзыв Алексея"></div>
+                      <img src="images/case1-video-thumb.jpg" alt="Превью видео-отзыва Алексея" loading="lazy">
+                      <div class="video-duration">0:45</div>
+                    </div>
+                  </div>
+                  
+                  <!-- Скриншот переписки -->
+                  <div class="case-chat">
+                    <img src="images/case1-chat.jpg" alt="Скриншот переписки с Алексеем — благодарность за результаты" loading="lazy">
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Кейс 2 -->
+            <article class="case-slide" data-tags="gain gym">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <figure class="case-photo">
+                    <div class="case-photo-skeleton" aria-hidden="true"></div>
+                    <img data-src="images/case2_before.jpg" alt="Мария до тренировок" loading="lazy">
+                    <figcaption class="case-label">ДО</figcaption>
+                  </figure>
+                  <figure class="case-photo">
+                    <div class="case-photo-skeleton" aria-hidden="true"></div>
+                    <img data-src="images/case2_after.jpg" alt="Мария после 12 недель — набор мышечной массы" loading="lazy">
+                    <figcaption class="case-label">ПОСЛЕ</figcaption>
+                  </figure>
+                </div>
+                <div class="case-content">
+                  <h3 class="case-title">Мария, 28 лет</h3>
+                  <div class="case-result">+6 кг мышц за 12 недель • рельеф</div>
+                  <p class="case-text">
+                    Хотела набрать массу, но боялась «перекачаться».  
+                    Работали в зале 3 раза в неделю, акцент на базу и прогрессивную нагрузку.  
+                    Результат — красивое атлетичное тело без жира.
+                  </p>
+                  <div class="case-tags">
+                    <span class="case-tag">Набор массы</span>
+                    <span class="case-tag">Зал</span>
+                    <span class="case-tag">12 недель</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Кейс 3 -->
+            <article class="case-slide" data-tags="loss gym">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <figure class="case-photo">
+                    <div class="case-photo-skeleton" aria-hidden="true"></div>
+                    <img data-src="images/case3_before.jpg" alt="Дмитрий до тренировок" loading="lazy">
+                    <figcaption class="case-label">ДО</figcaption>
+                  </figure>
+                  <figure class="case-photo">
+                    <div class="case-photo-skeleton" aria-hidden="true"></div>
+                    <img data-src="images/case3_after.jpg" alt="Дмитрий после 10 недель — сушка" loading="lazy">
+                    <figcaption class="case-label">ПОСЛЕ</figcaption>
+                  </figure>
+                </div>
+                <div class="case-content">
+                  <h3 class="case-title">Дмитрий, 35 лет</h3>
+                  <div class="case-result">−18 кг за 10 недель • сушка</div>
+                  <p class="case-text">
+                    Офисный работник с «пивным животом».  
+                    Полностью перестроили питание, добавили силовые и кардио.  
+                    Сейчас — рельефный пресс и уверенность в себе.
+                  </p>
+                  <div class="case-tags">
+                    <span class="case-tag">Похудение</span>
+                    <span class="case-tag">Зал</span>
+                    <span class="case-tag">10 недель</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Кейс 4 -->
+            <article class="case-slide" data-tags="loss home">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <figure class="case-photo">
+                    <div class="case-photo-skeleton" aria-hidden="true"></div>
+                    <img data-src="images/case4_before.jpg" alt="Анна до тренировок" loading="lazy">
+                    <figcaption class="case-label">ДО</figcaption>
+                  </figure>
+                  <figure class="case-photo">
+                    <div class="case-photo-skeleton" aria-hidden="true"></div>
+                    <img data-src="images/case4_after.jpg" alt="Анна после 8 недель — похудение дома" loading="lazy">
+                    <figcaption class="case-label">ПОСЛЕ</figcaption>
+                  </figure>
+                </div>
+                <div class="case-content">
+                  <h3 class="case-title">Анна, 29 лет</h3>
+                  <div class="case-result">−11 кг за 8 недель • дома с двумя детьми</div>
+                  <p class="case-text">
+                    Молодая мама, которая не могла ходить в зал.  
+                    Тренировки по 25 минут дома, простое питание без сложных рецептов.  
+                    Вернула форму до беременности за 2 месяца.
+                  </p>
+                  <div class="case-tags">
+                    <span class="case-tag">Похудение</span>
+                    <span class="case-tag">Домашние тренировки</span>
+                    <span class="case-tag">8 недель</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Кейс 5 -->
+            <article class="case-slide" data-tags="gain gym">
+              <div class="case-inner">
+                <div class="case-photos">
+                  <figure class="case-photo">
+                    <div class="case-photo-skeleton" aria-hidden="true"></div>
+                    <img data-src="images/case5_before.jpg" alt="Игорь до тренировок" loading="lazy">
+                    <figcaption class="case-label">ДО</figcaption>
+                  </figure>
+                  <figure class="case-photo">
+                    <div class="case-photo-skeleton" aria-hidden="true"></div>
+                    <img data-src="images/case5_after.jpg" alt="Игорь после 16 недель — трансформация эктоморфа" loading="lazy">
+                    <figcaption class="case-label">ПОСЛЕ</figcaption>
+                  </figure>
+                </div>
+                <div class="case-content">
+                  <h3 class="case-title">Игорь, 24 года</h3>
+                  <div class="case-result">+12 кг за 16 недель • эктоморф</div>
+                  <p class="case-text">
+                    «Худой от природы», не мог набрать вес никак.  
+                    Расписали питание на профицит, силовые 4 раза в неделю.  
+                    Превратился из «дрища» в атлета.
+                  </p>
+                  <div class="case-tags">
+                    <span class="case-tag">Набор массы</span>
+                    <span class="case-tag">Зал</span>
+                    <span class="case-tag">16 недель</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+          </div>
+
+          <!-- Контролы -->
+          <div class="cases-controls">
+            <button class="cases-arrow cases-prev" id="casesPrev" aria-label="Предыдущий кейс">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+            </button>
+            <button class="cases-arrow cases-next" id="casesNext" aria-label="Следующий кейс">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Dots -->
+          <div class="cases-dots" id="casesDots" role="tablist" aria-label="Индикаторы слайдов"></div>
+
+          <!-- Progress -->
+          <div class="cases-progress-bar">
+            <div class="cases-progress-inner" id="casesProgress"></div>
+          </div>
+
+          <!-- Thumbnails -->
+          <div class="cases-thumbs" id="casesThumbs" aria-label="Миниатюры кейсов"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Тарифы (НОВЫЙ БЛОК) -->
+    <section class="section section-pricing" id="pricing">
+      <div class="container">
+        <h2 class="section-title reveal">Выбери свой формат работы</h2>
+        <p class="section-subtitle reveal">
+          Прозрачные цены, понятные условия. Без скрытых платежей.
+        </p>
+        
+        <div class="pricing-grid">
+          
+          <!-- Тариф 1: Старт -->
+          <article class="pricing-card reveal">
+            <div class="pricing-header">
+              <h3 class="pricing-title">Старт</h3>
+              <div class="pricing-subtitle">Попробуй мой подход</div>
+            </div>
+            <div class="pricing-price">
+              <span class="pricing-amount">990₽</span>
+              <span class="pricing-period">/ неделя</span>
+            </div>
+            <ul class="pricing-features">
+              <li class="pricing-feature pricing-feature-yes">План тренировок на неделю</li>
+              <li class="pricing-feature pricing-feature-yes">Рекомендации по питанию</li>
+              <li class="pricing-feature pricing-feature-yes">Чат-поддержка</li>
+              <li class="pricing-feature pricing-feature-no">Без контроля техники</li>
+              <li class="pricing-feature pricing-feature-no">Без корректировок</li>
+            </ul>
+            <button class="btn btn-outline pricing-btn" data-scroll-target="#ctaFinal" data-tariff="start">
+              Выбрать тариф
+            </button>
+            <div class="pricing-note">Идеально для знакомства</div>
+          </article>
+          
+          <!-- Тариф 2: Стандарт (рекомендуемый) -->
+          <article class="pricing-card pricing-card-featured reveal">
+            <div class="pricing-badge">Популярный</div>
+            <div class="pricing-header">
+              <h3 class="pricing-title">Стандарт</h3>
+              <div class="pricing-subtitle">8 недель трансформации</div>
+            </div>
+            <div class="pricing-price">
+              <span class="pricing-amount">39 990₽</span>
+              <span class="pricing-period">за 8 недель</span>
+            </div>
+            <div class="pricing-save">Экономия 1 920₽</div>
+            <ul class="pricing-features">
+              <li class="pricing-feature pricing-feature-yes">Персональная программа тренировок</li>
+              <li class="pricing-feature pricing-feature-yes">План питания с рецептами</li>
+              <li class="pricing-feature pricing-feature-yes">Контроль техники по видео</li>
+              <li class="pricing-feature pricing-feature-yes">Корректировки каждую неделю</li>
+              <li class="pricing-feature pricing-feature-yes">Поддержка 24/7 в Telegram</li>
+              <li class="pricing-feature pricing-feature-yes">Гарантия результата</li>
+            </ul>
+            <button class="btn btn-primary pricing-btn pulse" data-scroll-target="#ctaFinal" data-tariff="standard">
+              Начать трансформацию
+            </button>
+            <div class="pricing-note">95% достигают цели</div>
+          </article>
+          
+          <!-- Тариф 3: Премиум -->
+          <article class="pricing-card reveal">
+            <div class="pricing-header">
+              <h3 class="pricing-title">Премиум</h3>
+              <div class="pricing-subtitle">12 недель максимум</div>
+            </div>
+            <div class="pricing-price">
+              <span class="pricing-amount">59 990₽</span>
+              <span class="pricing-period">за 12 недель</span>
+            </div>
+            <div class="pricing-save">Экономия 4 900₽</div>
+            <ul class="pricing-features">
+              <li class="pricing-feature pricing-feature-yes">Всё из тарифа «Стандарт»</li>
+              <li class="pricing-feature pricing-feature-yes">Видео-звонки 2 раза в неделю</li>
+              <li class="pricing-feature pricing-feature-yes">Разбор техники в реальном времени</li>
+              <li class="pricing-feature pricing-feature-yes">Психологическая поддержка</li>
+              <li class="pricing-feature pricing-feature-yes">План поддержания результата</li>
+              <li class="pricing-feature pricing-feature-yes">Приоритетная поддержка</li>
+            </ul>
+            <button class="btn btn-outline pricing-btn" data-scroll-target="#ctaFinal" data-tariff="premium">
+              Выбрать премиум
+            </button>
+            <div class="pricing-note">Максимальный результат</div>
+          </article>
+          
+        </div>
+        
+        <div class="pricing-guarantee reveal">
+          <div class="guarantee-icon">✅</div>
+          <div class="guarantee-content">
+            <div class="guarantee-title">Гарантия результата</div>
+            <div class="guarantee-text">
+              Если ты полностью следуешь программе и не видишь результата через 4 недели — вернём 100% денег. Без вопросов.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Квиз -->
+    <section class="section section-dark" id="quiz">
+      <div class="container">
+        <h2 class="section-title reveal">Узнай свой идеальный план за 30 секунд</h2>
+        <p class="section-subtitle reveal">
+          Ответь на 4 вопроса и получи персональные рекомендации + бонус
+        </p>
+
+        <div class="quiz-wrapper" id="quizWrapper">
+          
+          <!-- Шаг 1 -->
+          <div class="quiz-step active" data-step="1">
+            <div class="quiz-step-counter">Вопрос 1 из 4</div>
+            <div class="quiz-question">Какая у тебя цель?</div>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="loss" data-next="2">
+                <span class="quiz-option-icon">🔥</span>
+                <span class="quiz-option-text">Похудение и рельеф</span>
+              </button>
+              <button class="quiz-option" data-value="gain" data-next="2">
+                <span class="quiz-option-icon">💪</span>
+                <span class="quiz-option-text">Набор мышечной массы</span>
+              </button>
+              <button class="quiz-option" data-value="tone" data-next="2">
+                <span class="quiz-option-icon">⚡</span>
+                <span class="quiz-option-text">Тонус и здоровье</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Шаг 2 -->
+          <div class="quiz-step" data-step="2">
+            <div class="quiz-step-counter">Вопрос 2 из 4</div>
+            <div class="quiz-question">Где ты планируешь тренироваться?</div>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="home" data-next="3">
+                <span class="quiz-option-icon">🏠</span>
+                <span class="quiz-option-text">Дома</span>
+              </button>
+              <button class="quiz-option" data-value="gym" data-next="3">
+                <span class="quiz-option-icon">🏋️</span>
+                <span class="quiz-option-text">В зале</span>
+              </button>
+              <button class="quiz-option" data-value="both" data-next="3">
+                <span class="quiz-option-icon">🔄</span>
+                <span class="quiz-option-text">Дома и в зале</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Шаг 3 -->
+          <div class="quiz-step" data-step="3">
+            <div class="quiz-step-counter">Вопрос 3 из 4</div>
+            <div class="quiz-question">Сколько раз в неделю ты готов(а) тренироваться?</div>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="3" data-next="4">
+                <span class="quiz-option-icon">3️⃣</span>
+                <span class="quiz-option-text">3 раза в неделю</span>
+              </button>
+              <button class="quiz-option" data-value="4" data-next="4">
+                <span class="quiz-option-icon">4️⃣</span>
+                <span class="quiz-option-text">4 раза в неделю</span>
+              </button>
+              <button class="quiz-option" data-value="5" data-next="4">
+                <span class="quiz-option-icon">5️⃣</span>
+                <span class="quiz-option-text">5+ раз в неделю</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Шаг 4 -->
+          <div class="quiz-step" data-step="4">
+            <div class="quiz-step-counter">Вопрос 4 из 4</div>
+            <div class="quiz-question">Какой у тебя сейчас уровень?</div>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="beginner" data-next="result">
+                <span class="quiz-option-icon">🌱</span>
+                <span class="quiz-option-text">Новичок</span>
+              </button>
+              <button class="quiz-option" data-value="middle" data-next="result">
+                <span class="quiz-option-icon">🔥</span>
+                <span class="quiz-option-text">Тренировался(а), но без системы</span>
+              </button>
+              <button class="quiz-option" data-value="advanced" data-next="result">
+                <span class="quiz-option-icon">💎</span>
+                <span class="quiz-option-text">Уверенный уровень</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Результат с персонализацией -->
+          <div class="quiz-step" data-step="result">
+            <div class="quiz-result-icon">✅</div>
+            <div class="quiz-result-title">Отлично! Вот что тебе подходит:</div>
+            <div class="quiz-result-personalized" id="quizResultText">
+              <!-- Динамически генерируется -->
+            </div>
+            
+            <!-- Бонус -->
+            <div class="quiz-bonus">
+              <div class="quiz-bonus-icon">🎁</div>
+              <div class="quiz-bonus-title">Твой бонус за прохождение квиза:</div>
+              <div class="quiz-bonus-content">
+                <ul class="quiz-bonus-list">
+                  <li><strong>PDF-план</strong> «Первая неделя под твою цель»</li>
+                  <li><strong>Чек-лист</strong> «7 главных ошибок в питании»</li>
+                  <li><strong>Калькулятор КБЖУ</strong> под твои параметры</li>
+                </ul>
+              </div>
+              <button class="btn btn-primary pulse" id="downloadBonus">
+                Скачать бонусы
+              </button>
+            </div>
+            
+            <div class="quiz-result-cta">
+              <button class="btn btn-primary pulse" data-scroll-target="#ctaFinal">
+                Получить персональный план
+              </button>
+              <button class="btn btn-ghost quiz-restart" id="quizRestart">
+                Пройти заново
+              </button>
+            </div>
+          </div>
+
+          <!-- Прогресс с кнопкой "Назад" -->
+          <div class="quiz-controls">
+            <button class="quiz-back-btn" id="quizBackBtn" style="display: none;" aria-label="Вернуться к предыдущему вопросу">
+              ← Назад
+            </button>
+            <div class="quiz-progress" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+              <div class="quiz-progress-inner" id="quizProgress"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Мой подход (улучшенная семантика) -->
+    <section class="section section-dark" id="approach">
+      <div class="container">
+        <h2 class="section-title reveal">Как мы будем работать</h2>
+        <p class="section-subtitle reveal">
+          Никакой магии — только система, которая даёт результат.
+        </p>
+        <ol class="approach-timeline" id="approachTimeline">
+          <!-- Генерируется из JS -->
+        </ol>
+      </div>
+    </section>
+
+    <!-- FAQ с семантикой details -->
+    <section class="section" id="faq" itemscope itemtype="https://schema.org/FAQPage">
+      <div class="container">
+        <h2 class="section-title reveal">Частые вопросы</h2>
+        <div class="faq">
+          
+          <details class="faq-item reveal" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="faq-question" itemprop="name">
+              Что если у меня мало времени?
+            </summary>
+            <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">
+                Мы подстроим программу под твой график. Можно тренироваться по 25–30 минут, 3–4 раза в неделю — и всё равно прогрессировать.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item reveal" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="faq-question" itemprop="name">
+              А если у меня болит спина или колени?
+            </summary>
+            <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">
+                Я учитываю ограничения и подбираю упражнения, которые не перегружают проблемные зоны. Техника и контроль — приоритет.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item reveal" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="faq-question" itemprop="name">
+              Нужен ли мне зал и дорогой инвентарь?
+            </summary>
+            <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">
+                Нет. Можно начать дома с минимальным инвентарём. Если есть зал — используем его, но это не обязательное условие.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item reveal" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="faq-question" itemprop="name">
+              Что входит в сопровождение?
+            </summary>
+            <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">
+                План тренировок, рекомендации по питанию, контроль техники, корректировки по ходу и поддержка.
+              </p>
+            </div>
+          </details>
+          
+          <details class="faq-item reveal" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="faq-question" itemprop="name">
+              Сколько стоит работа с тобой?
+            </summary>
+            <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">
+                Есть 3 тарифа: пробная неделя за 990₽, стандарт 8 недель за 39 990₽ (самый популярный), премиум 12 недель за 59 990₽. <a href="#pricing">Подробнее о тарифах</a>.
+              </p>
+            </div>
+          </details>
+          
+          <details class="faq-item reveal" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="faq-question" itemprop="name">
+              Есть ли гарантия результата?
+            </summary>
+            <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">
+                Да! Если ты полностью следуешь программе и не видишь результата через 4 недели — вернём 100% денег. Без вопросов.
+              </p>
+            </div>
+          </details>
+          
+          <details class="faq-item reveal" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="faq-question" itemprop="name">
+              Как проходит работа онлайн?
+            </summary>
+            <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">
+                Всё в Telegram: получаешь программу, снимаешь видео упражнений, я проверяю технику и корректирую. Плюс ежедневная поддержка и ответы на вопросы.
+              </p>
+            </div>
+          </details>
+          
+          <details class="faq-item reveal" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="faq-question" itemprop="name">
+              Можно ли оплатить частями?
+            </summary>
+            <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">
+                Да, для тарифа «Стандарт» и «Премиум» доступна рассрочка на 2-4 месяца без процентов. Подробности обсудим при записи.
+              </p>
+            </div>
+          </details>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Финальный CTA с улучшенной формой -->
+    <section class="section section-cta" id="ctaFinal">
+      <div class="container cta-inner">
+        <div class="cta-text">
+          <h2 class="cta-title reveal">Хочешь такой же результат?</h2>
+          <p class="cta-subtitle reveal">
+            Оставь заявку — я свяжусь с тобой и предложу формат работы под твою цель и уровень.
+          </p>
+          
+          <!-- Urgency элемент -->
+          <div class="cta-urgency reveal">
+            <div class="urgency-timer" id="urgencyTimer">
+              <div class="urgency-icon">⏰</div>
+              <div class="urgency-text">
+                <div class="urgency-title">Акция заканчивается через:</div>
+                <div class="urgency-countdown">
+                  <span id="timerHours">00</span>:<span id="timerMinutes">00</span>:<span id="timerSeconds">00</span>
+                </div>
+              </div>
+            </div>
+            <div class="cta-note">
+              Сейчас открыто <strong>3 места</strong> на бесплатный вводный план.  
+              Без спама и навязчивых продаж.
+            </div>
+          </div>
+        </div>
+        
+        <form class="cta-form reveal" id="ctaForm" aria-labelledby="cta-title">
+          <!-- Honeypot для защиты от спама -->
+          <input type="text" name="website" style="position: absolute; left: -9999px;" tabindex="-1" autocomplete="off" aria-hidden="true">
+          
+          <div class="form-field">
+            <label for="inputName" class="form-label">Имя</label>
+            <input 
+              type="text" 
+              class="input" 
+              id="inputName" 
+              name="name"
+              placeholder="Как к тебе обращаться?" 
+              required
+              minlength="2"
+              autocomplete="name"
+              aria-required="true">
+          </div>
+          
+          <div class="form-field">
+            <label for="inputContact" class="form-label">Контакт</label>
+            <input 
+              type="text" 
+              class="input" 
+              id="inputContact"
+              name="contact"
+              placeholder="Telegram, WhatsApp или телефон" 
+              required
+              minlength="5"
+              autocomplete="tel"
+              aria-required="true">
+          </div>
+          
+          <!-- Дополнительные поля из квиза для качества лидов -->
+          <div class="form-field">
+            <label for="inputGoal" class="form-label">Цель</label>
+            <select class="input" id="inputGoal" name="goal" required aria-required="true">
+              <option value="">Выбери свою цель</option>
+              <option value="loss">Похудение</option>
+              <option value="gain">Набор массы</option>
+              <option value="tone">Тонус и здоровье</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="btn btn-primary pulse" aria-label="Отправить заявку">
+            <span class="btn-text">Отправить заявку</span>
+            <span class="btn-loader" style="display: none;">
+              <span class="spinner"></span> Отправка...
+            </span>
+          </button>
+          
+          <div class="form-note">Нажимая кнопку, ты соглашаешься с <a href="/privacy">обработкой данных</a></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="footer" role="contentinfo">
+      <div class="container footer-inner">
+        <div class="footer-left">
+          <div class="logo">Fitness_Coach_Vitaliy</div>
+          <div class="footer-copy">© 2026. Онлайн‑коуч Виталий.</div>
+        </div>
+        <nav class="footer-nav" aria-label="Навигация в футере">
+          <a href="#hero" class="footer-link">Наверх</a>
+          <a href="#cases" class="footer-link">Кейсы</a>
+          <a href="#pricing" class="footer-link">Тарифы</a>
+          <a href="#faq" class="footer-link">FAQ</a>
+        </nav>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Фиксированная кнопка Telegram -->
+  <a href="https://t.me/fitness_coach_vitaliy" 
+     class="telegram-fab" 
+     target="_blank" 
+     rel="noopener noreferrer"
+     aria-label="Написать в Telegram">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18.717-3.146 6.537-3.146 6.537s-.178.448-.534.448c-.178 0-.356-.09-.534-.269L9.79 12.359l-2.853-.895s-.445-.179-.445-.537c0-.269.267-.448.445-.537l11.073-4.298s.534-.179.712 0c.089.09.089.269.089.448-.089.179-.178.358-.268.627z"/>
+    </svg>
+  </a>
+
+  <!-- ВАЖНО: Правильный путь для структуры public/ -->
+  <script src="js/app.js"></script>
+</body>
+</html>
