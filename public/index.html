@@ -108,70 +108,184 @@
   </section>
 
   <!-- ========== CASES ========== -->
-  <section class="section" id="cases">
-    <div class="container">
-      <h2 class="section-title reveal">Реальные трансформации</h2>
-      <p class="section-subtitle reveal">Результаты моих клиентов</p>
-      <div class="cases-filters reveal">
-        <button class="filter-btn active" data-filter="all">Все</button>
-        <button class="filter-btn" data-filter="loss">Похудение</button>
-        <button class="filter-btn" data-filter="gain">Набор</button>
-        <button class="filter-btn" data-filter="home">Дома</button>
-      </div>
-      <div class="cases-carousel" id="casesCarousel">
-        <div class="cases-track" id="casesTrack">
-          <article class="case-slide active" data-tags="loss home">
-            <div class="case-inner">
-              <div class="case-photos">
-                <figure class="case-photo"><div class="case-photo-placeholder">ДО</div></figure>
-                <figure class="case-photo"><div class="case-photo-placeholder after">ПОСЛЕ</div></figure>
-              </div>
-              <div class="case-content">
-                <h3 class="case-title">Алексей, 32 года</h3>
-                <div class="case-result">−14 кг за 8 недель</div>
-                <p class="case-text">Тренировки дома 30 мин, 4 раза в неделю.</p>
-                <div class="case-tags"><span class="case-tag">Похудение</span><span class="case-tag">Дома</span></div>
-              </div>
-            </div>
-          </article>
-          <article class="case-slide" data-tags="gain gym">
-            <div class="case-inner">
-              <div class="case-photos">
-                <figure class="case-photo"><div class="case-photo-placeholder">ДО</div></figure>
-                <figure class="case-photo"><div class="case-photo-placeholder after">ПОСЛЕ</div></figure>
-              </div>
-              <div class="case-content">
-                <h3 class="case-title">Мария, 28 лет</h3>
-                <div class="case-result">+6 кг мышц за 12 недель</div>
-                <p class="case-text">Работали в зале 3 раза в неделю.</p>
-                <div class="case-tags"><span class="case-tag">Набор массы</span><span class="case-tag">Зал</span></div>
-              </div>
-            </div>
-          </article>
-          <article class="case-slide" data-tags="loss home">
-            <div class="case-inner">
-              <div class="case-photos">
-                <figure class="case-photo"><div class="case-photo-placeholder">ДО</div></figure>
-                <figure class="case-photo"><div class="case-photo-placeholder after">ПОСЛЕ</div></figure>
-              </div>
-              <div class="case-content">
-                <h3 class="case-title">Анна, 29 лет</h3>
-                <div class="case-result">−11 кг за 8 недель</div>
-                <p class="case-text">Молодая мама, тренировки 25 мин дома.</p>
-                <div class="case-tags"><span class="case-tag">Похудение</span><span class="case-tag">Дома</span></div>
-              </div>
-            </div>
-          </article>
-        </div>
-        <div class="cases-controls">
-          <button class="cases-arrow" id="casesPrev"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
-          <button class="cases-arrow" id="casesNext"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
-        </div>
-        <div class="cases-dots" id="casesDots"></div>
-      </div>
-      <button class="btn btn-ghost leave-review-btn" id="leaveReviewBtn">✍️ Оставить отзыв</button>
+<section class="section" id="cases">
+  <div class="container">
+    <h2 class="section-title reveal">Реальные трансформации</h2>
+    <p class="section-subtitle reveal">Результаты моих клиентов</p>
+    <div class="cases-filters reveal">
+      <button class="filter-btn active" data-filter="all">Все</button>
+      <button class="filter-btn" data-filter="loss">Похудение</button>
+      <button class="filter-btn" data-filter="gain">Набор</button>
+      <button class="filter-btn" data-filter="home">Дома</button>
+      <button class="filter-btn" data-filter="gym">Зал</button>
     </div>
-  </section>
+    <div class="cases-carousel" id="casesCarousel">
+      <div class="cases-track" id="casesTrack">
+
+        <!-- Кейс 1 -->
+        <article class="case-slide active" data-tags="loss home">
+          <div class="case-inner">
+            <div class="case-photos">
+              <figure class="case-photo">
+                <img src="images/case1_before.jpg" alt="Алексей до" loading="lazy">
+                <span class="case-label">ДО</span>
+              </figure>
+              <figure class="case-photo">
+                <img src="images/case1_after.jpg" alt="Алексей после" loading="lazy">
+                <span class="case-label">ПОСЛЕ</span>
+              </figure>
+            </div>
+            <div class="case-content">
+              <h3 class="case-title">Алексей, 32 года</h3>
+              <div class="case-result">−14 кг за 8 недель</div>
+              <p class="case-text">Тренировки дома 30 мин, 4 раза в неделю.</p>
+              <div class="case-tags"><span class="case-tag">Похудение</span><span class="case-tag">Дома</span></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Кейс 2 -->
+        <article class="case-slide" data-tags="gain gym">
+          <div class="case-inner">
+            <div class="case-photos">
+              <figure class="case-photo">
+                <img src="images/case2_before.jpg" alt="Мария до" loading="lazy">
+                <span class="case-label">ДО</span>
+              </figure>
+              <figure class="case-photo">
+                <img src="images/case2_after.jpg" alt="Мария после" loading="lazy">
+                <span class="case-label">ПОСЛЕ</span>
+              </figure>
+            </div>
+            <div class="case-content">
+              <h3 class="case-title">Мария, 28 лет</h3>
+              <div class="case-result">+6 кг мышц за 12 недель</div>
+              <p class="case-text">Работали в зале 3 раза в неделю.</p>
+              <div class="case-tags"><span class="case-tag">Набор массы</span><span class="case-tag">Зал</span></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Кейс 3 -->
+        <article class="case-slide" data-tags="loss gym">
+          <div class="case-inner">
+            <div class="case-photos">
+              <figure class="case-photo">
+                <img src="images/case3_before.jpg" alt="Дмитрий до" loading="lazy">
+                <span class="case-label">ДО</span>
+              </figure>
+              <figure class="case-photo">
+                <img src="images/case3_after.jpg" alt="Дмитрий после" loading="lazy">
+                <span class="case-label">ПОСЛЕ</span>
+              </figure>
+            </div>
+            <div class="case-content">
+              <h3 class="case-title">Дмитрий, 35 лет</h3>
+              <div class="case-result">−18 кг за 10 недель</div>
+              <p class="case-text">Офисный работник. Силовые + кардио в зале.</p>
+              <div class="case-tags"><span class="case-tag">Похудение</span><span class="case-tag">Зал</span></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Кейс 4 -->
+        <article class="case-slide" data-tags="loss home">
+          <div class="case-inner">
+            <div class="case-photos">
+              <figure class="case-photo">
+                <img src="images/case4_before.jpg" alt="Анна до" loading="lazy">
+                <span class="case-label">ДО</span>
+              </figure>
+              <figure class="case-photo">
+                <img src="images/case4_after.jpg" alt="Анна после" loading="lazy">
+                <span class="case-label">ПОСЛЕ</span>
+              </figure>
+            </div>
+            <div class="case-content">
+              <h3 class="case-title">Анна, 29 лет</h3>
+              <div class="case-result">−11 кг за 8 недель</div>
+              <p class="case-text">Молодая мама, тренировки 25 мин дома.</p>
+              <div class="case-tags"><span class="case-tag">Похудение</span><span class="case-tag">Дома</span></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Кейс 5 -->
+        <article class="case-slide" data-tags="gain gym">
+          <div class="case-inner">
+            <div class="case-photos">
+              <figure class="case-photo">
+                <img src="images/case5_before.jpg" alt="Игорь до" loading="lazy">
+                <span class="case-label">ДО</span>
+              </figure>
+              <figure class="case-photo">
+                <img src="images/case5_after.jpg" alt="Игорь после" loading="lazy">
+                <span class="case-label">ПОСЛЕ</span>
+              </figure>
+            </div>
+            <div class="case-content">
+              <h3 class="case-title">Игорь, 24 года</h3>
+              <div class="case-result">+12 кг за 16 недель</div>
+              <p class="case-text">Худой от природы. Силовые 4 раза в неделю.</p>
+              <div class="case-tags"><span class="case-tag">Набор массы</span><span class="case-tag">Зал</span></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Кейс 6 -->
+        <article class="case-slide" data-tags="loss home">
+          <div class="case-inner">
+            <div class="case-photos">
+              <figure class="case-photo">
+                <img src="images/case6_before.jpg" alt="Елена до" loading="lazy">
+                <span class="case-label">ДО</span>
+              </figure>
+              <figure class="case-photo">
+                <img src="images/case6_after.jpg" alt="Елена после" loading="lazy">
+                <span class="case-label">ПОСЛЕ</span>
+              </figure>
+            </div>
+            <div class="case-content">
+              <h3 class="case-title">Елена, 34 года</h3>
+              <div class="case-result">−9 кг за 6 недель</div>
+              <p class="case-text">Тренировки дома без инвентаря + питание.</p>
+              <div class="case-tags"><span class="case-tag">Похудение</span><span class="case-tag">Дома</span></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Кейс 7 -->
+        <article class="case-slide" data-tags="gain gym">
+          <div class="case-inner">
+            <div class="case-photos">
+              <figure class="case-photo">
+                <img src="images/case7_before.jpg" alt="Максим до" loading="lazy">
+                <span class="case-label">ДО</span>
+              </figure>
+              <figure class="case-photo">
+                <img src="images/case7_after.jpg" alt="Максим после" loading="lazy">
+                <span class="case-label">ПОСЛЕ</span>
+              </figure>
+            </div>
+            <div class="case-content">
+              <h3 class="case-title">Максим, 27 лет</h3>
+              <div class="case-result">+8 кг мышц за 12 недель</div>
+              <p class="case-text">Программа в зале + план питания на массу.</p>
+              <div class="case-tags"><span class="case-tag">Набор массы</span><span class="case-tag">Зал</span></div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+      <div class="cases-controls">
+        <button class="cases-arrow" id="casesPrev"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="cases-arrow" id="casesNext"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+      <div class="cases-dots" id="casesDots"></div>
+    </div>
+    <button class="btn btn-ghost leave-review-btn" id="leaveReviewBtn">✍️ Оставить отзыв</button>
+  </div>
+</section>
 
   <!-- ========== REVIEWS ========== -->
   <section class="section section-dark" id="reviews">
