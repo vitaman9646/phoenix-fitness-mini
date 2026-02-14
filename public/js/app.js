@@ -1,1166 +1,420 @@
-// ===============================
-// КОНФИГУРАЦИЯ
-// ===============================
-const CONFIG = {
-  ANALYTICS_ENABLED: true,
-  URGENCY_TIMER_HOURS: 6 // Часов до конца акции
-};
+/* =============================================
+   ЕДИНЫЙ CSS — ВСЕ СТИЛИ
+   ============================================= */
 
-// ===============================
-// УТИЛИТЫ
-// ===============================
-const Utils = {
-  // Показать уведомление
-  showNotification(title, message, type = 'success') {
-    const container = document.getElementById('notificationContainer');
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.setAttribute('role', 'alert');
-    
-    const icon = type === 'success' ? '✅' : '❌';
-    
-    notification.innerHTML = `
-      <div class="notification-icon">${icon}</div>
-      <div class="notification-content">
-        <div class="notification-title">${title}</div>
-        <div class="notification-message">${message}</div>
-      </div>
-    `;
-    
-    container.appendChild(notification);
-    
-    setTimeout(() => {
-      notification.style.opacity = '0';
-      notification.style.transform = 'translateX(400px)';
-      setTimeout(() => notification.remove(), 300);
-    }, 4000);
-  },
-
-  // Показать/скрыть лоадер
-  toggleLoader(show) {
-    const loader = document.getElementById('loaderOverlay');
-    if (show) {
-      loader.classList.remove('hidden');
-    } else {
-      loader.classList.add('hidden');
-    }
-  },
-
-  // Отправить событие в аналитику
-  trackEvent(category, action, label) {
-    if (!CONFIG.ANALYTICS_ENABLED) return;
-    
-    console.log(`📊 Analytics: ${category} - ${action} - ${label}`);
-    
-    // Интеграция с Google Analytics 4
-    if (typeof gtag !== 'undefined') {
-      gtag('event', action, {
-        'event_category': category,
-        'event_label': label
-      });
-    }
-    
-    // Интеграция с Яндекс.Метрика
-    if (typeof ym !== 'undefined') {
-      ym(YANDEX_METRIKA_ID, 'reachGoal', action);
-    }
-  },
-  
-  // Debounce для оптимизации событий
-  debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  }
-};
-
-// ===============================
-// ЛОАДЕР ПРИ ЗАГРУЗКЕ
-// ===============================
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    Utils.toggleLoader(false);
-  }, 500);
-});
-
-// ===============================
-// ПЛАВНЫЙ СКРОЛЛ
-// ===============================
-document.querySelectorAll("[data-scroll-target]").forEach(btn => {
-  btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    const targetId = btn.dataset.scrollTarget;
-    const target = document.querySelector(targetId);
-    
-    if (target) {
-      const offset = 80;
-      const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
-      
-      window.scrollTo({
-        top: targetPosition,
-        behavior: "smooth"
-      });
-      
-      Utils.trackEvent('Navigation', 'Click', targetId);
-    }
-  });
-});
-
-// ===============================
-// REVEAL-АНИМАЦИИ С INTERSECTION OBSERVER
-// ===============================
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      revealObserver.unobserve(entry.target);
-    }
-  });
-}, {
-  threshold: 0.1,
-  rootMargin: '0px 0px -50px 0px'
-});
-
-document.querySelectorAll('.reveal').forEach(el => {
-  revealObserver.observe(el);
-});
-
-// ===============================
-// STICKY HEADER
-// ===============================
-const header = document.querySelector('.header');
-let lastScroll = 0;
-
-const handleScroll = Utils.debounce(() => {
-  const currentScroll = window.pageYOffset;
-  
-  if (currentScroll > 100) {
-    header.classList.add('scrolled');
-  } else {
-    header.classList.remove('scrolled');
-  }
-  
-  lastScroll = currentScroll;
-}, 10);
-
-window.addEventListener('scroll', handleScroll, { passive: true });
-
-// ===============================
-// АНИМИРОВАННЫЕ СЧЁТЧИКИ
-// ===============================
-const statObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const target = entry.target;
-      const endValue = parseFloat(target.dataset.target);
-      const isDecimal = endValue % 1 !== 0;
-      
-      animateNumber(target, 0, endValue, 2000, isDecimal);
-      statObserver.unobserve(target);
-    }
-  });
-}, { threshold: 0.5 });
-
-document.querySelectorAll('.stat-number').forEach(el => {
-  statObserver.observe(el);
-});
-
-function animateNumber(element, start, end, duration, isDecimal = false) {
-  const range = end - start;
-  const increment = range / (duration / 16);
-  let current = start;
-  
-  const timer = setInterval(() => {
-    current += increment;
-    if (current >= end) {
-      current = end;
-      clearInterval(timer);
-    }
-    
-    if (isDecimal) {
-      element.textContent = current.toFixed(1);
-    } else {
-      element.textContent = Math.floor(current) + '+';
-    }
-  }, 16);
+/* --- VARIABLES --- */
+:root{
+  --accent:#00e5ff;--accent-rgb:0,229,255;
+  --success:#4caf50;--error:#f44336;--warning:#ff9800;
+  --r-sm:.5rem;--r-md:1rem;--r-lg:1.5rem;
+  --ease:cubic-bezier(.4,0,.2,1);--tr:.3s var(--ease);
+}
+[data-theme="dark"]{
+  --bg1:#0a0a0a;--bg2:#111;--bgc:#1a1a1a;
+  --t1:#fff;--t2:rgba(255,255,255,.7);--t3:rgba(255,255,255,.4);
+  --border:rgba(255,255,255,.1);--shadow:0 4px 24px rgba(0,0,0,.3);
+}
+[data-theme="light"]{
+  --bg1:#fff;--bg2:#f5f5f5;--bgc:#fff;
+  --t1:#1a1a1a;--t2:rgba(0,0,0,.65);--t3:rgba(0,0,0,.4);
+  --border:rgba(0,0,0,.1);--shadow:0 4px 24px rgba(0,0,0,.08);
 }
 
-// ===============================
-// ГЕНЕРАЦИЯ APPROACH TIMELINE
-// ===============================
-const approachSteps = [
-  {
-    number: 1,
-    title: "Диагностика",
-    text: "Разбираем твою цель, опыт, ограничения, график, доступный инвентарь и питание."
-  },
-  {
-    number: 2,
-    title: "План",
-    text: "Составляю программу тренировок и питания под тебя. Без шаблонов и «универсальных» схем."
-  },
-  {
-    number: 3,
-    title: "Контроль техники",
-    text: "Разбираем технику, корректируем ошибки, чтобы ты тренировал мышцы, а не суставы."
-  },
-  {
-    number: 4,
-    title: "Поддержка и результат",
-    text: "Я веду тебя по плану, корректирую нагрузку и питание, чтобы ты дошёл до результата."
-  }
-];
+/* --- RESET --- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg1);color:var(--t1);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+img{max-width:100%;display:block}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit}
+ul{list-style:none}
 
-function renderApproachTimeline() {
-  const timeline = document.getElementById('approachTimeline');
-  if (!timeline) return;
-  
-  timeline.innerHTML = `
-    <div class="approach-line" aria-hidden="true"></div>
-    ${approachSteps.map(step => `
-      <li class="approach-step enhanced reveal">
-        <div class="approach-number" aria-label="Шаг ${step.number}">${step.number}</div>
-        <div class="approach-content">
-          <h3 class="approach-title">${step.title}</h3>
-          <p class="approach-text">${step.text}</p>
-        </div>
-      </li>
-    `).join('')}
-  `;
-  
-  // Re-apply observer for new elements
-  timeline.querySelectorAll('.reveal').forEach(el => {
-    revealObserver.observe(el);
-  });
-}
+/* --- UTILITY --- */
+.container{max-width:960px;margin:0 auto;padding:0 1.25rem}
+.section{padding:4rem 0}
+.section-dark{background:var(--bg2)}
+.section-title{font-size:1.75rem;font-weight:800;margin-bottom:.5rem;text-align:center}
+.section-subtitle{text-align:center;color:var(--t2);margin-bottom:2rem;font-size:.95rem}
 
-renderApproachTimeline();
+/* --- REVEAL --- */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.reveal.revealed{opacity:1;transform:translateY(0)}
 
-// ===============================
-// КАРУСЕЛЬ КЕЙСОВ
-// ===============================
-class CasesCarousel {
-  constructor() {
-    this.track = document.getElementById("casesTrack");
-    if (!this.track) return;
-    
-    this.allSlides = Array.from(document.querySelectorAll(".case-slide"));
-    this.prevBtn = document.getElementById("casesPrev");
-    this.nextBtn = document.getElementById("casesNext");
-    this.dotsContainer = document.getElementById("casesDots");
-    this.thumbsContainer = document.getElementById("casesThumbs");
-    this.progressBar = document.getElementById("casesProgress");
-    
-    this.visibleSlides = [...this.allSlides];
-    this.index = 0;
-    
-    this.init();
-  }
-  
-  init() {
-    this.createDots();
-    this.createThumbs();
-    this.updateCarousel();
-    this.setupListeners();
-    this.loadImages();
-    this.setupSwipe();
-  }
-  
-  createDots() {
-    if (!this.dotsContainer) return;
-    
-    this.dotsContainer.innerHTML = "";
-    this.visibleSlides.forEach((_, i) => {
-      const dot = document.createElement("button");
-      dot.className = "cases-dot";
-      dot.setAttribute('role', 'tab');
-      dot.setAttribute('aria-label', `Кейс ${i + 1}`);
-      dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-      
-      if (i === 0) dot.classList.add("active");
-      this.dotsContainer.appendChild(dot);
-      
-      dot.addEventListener("click", () => this.goToSlide(i));
-    });
-  }
-  
-  createThumbs() {
-    if (!this.thumbsContainer) return;
-    
-    this.thumbsContainer.innerHTML = "";
-    this.visibleSlides.forEach((slide, i) => {
-      const thumb = document.createElement("button");
-      thumb.className = "cases-thumb";
-      thumb.setAttribute('aria-label', `Перейти к кейсу ${i + 1}`);
-      
-      const img = slide.querySelector("img[data-src]");
-      if (img) {
-        const thumbImg = document.createElement('img');
-        thumbImg.src = img.dataset.src;
-        thumbImg.alt = "";
-        thumb.appendChild(thumbImg);
-      }
-      if (i === 0) thumb.classList.add("active");
-      this.thumbsContainer.appendChild(thumb);
-      
-      thumb.addEventListener("click", () => this.goToSlide(i));
-    });
-  }
-  
-  updateCarousel() {
-    if (this.visibleSlides.length === 0) return;
-    
-    if (this.index >= this.visibleSlides.length) {
-      this.index = this.visibleSlides.length - 1;
-    }
-    if (this.index < 0) {
-      this.index = 0;
-    }
-    
-    this.track.style.transform = `translateX(-${this.index * 100}%)`;
-    
-    if (this.dotsContainer) {
-      this.dotsContainer.querySelectorAll(".cases-dot").forEach((dot, i) => {
-        const isActive = i === this.index;
-        dot.classList.toggle("active", isActive);
-        dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
-      });
-    }
-    
-    if (this.thumbsContainer) {
-      this.thumbsContainer.querySelectorAll(".cases-thumb").forEach((thumb, i) => {
-        thumb.classList.toggle("active", i === this.index);
-      });
-    }
-    
-    if (this.progressBar) {
-      const progress = ((this.index + 1) / this.visibleSlides.length) * 100;
-      this.progressBar.style.width = progress + "%";
-    }
-  }
-  
-  goToSlide(i) {
-    this.index = i;
-    this.updateCarousel();
-    Utils.trackEvent('Cases', 'Slide', `Slide ${i + 1}`);
-  }
-  
-  prev() {
-    this.index = (this.index - 1 + this.visibleSlides.length) % this.visibleSlides.length;
-    this.updateCarousel();
-  }
-  
-  next() {
-    this.index = (this.index + 1) % this.visibleSlides.length;
-    this.updateCarousel();
-  }
-  
-  filterSlides(filter) {
-    this.allSlides.forEach(slide => {
-      const tags = slide.dataset.tags.split(" ");
-      
-      if (filter === "all" || tags.includes(filter)) {
-        slide.style.display = "block";
-      } else {
-        slide.style.display = "none";
-      }
-    });
-    
-    this.visibleSlides = this.allSlides.filter(slide => slide.style.display !== "none");
-    this.index = 0;
-    this.createDots();
-    this.createThumbs();
-    this.updateCarousel();
-  }
-  
-  setupListeners() {
-    if (this.prevBtn) {
-      this.prevBtn.addEventListener("click", () => this.prev());
-    }
-    if (this.nextBtn) {
-      this.nextBtn.addEventListener("click", () => this.next());
-    }
-    
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') this.prev();
-      if (e.key === 'ArrowRight') this.next();
-    });
-  }
-  
-  setupSwipe() {
-    let startX = 0;
-    let currentX = 0;
-    let isDragging = false;
-    
-    this.track.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
-      isDragging = true;
-    }, { passive: true });
-    
-    this.track.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      currentX = e.touches[0].clientX;
-    }, { passive: true });
-    
-    this.track.addEventListener('touchend', () => {
-      if (!isDragging) return;
-      isDragging = false;
-      
-      const diff = startX - currentX;
-      if (Math.abs(diff) > 50) {
-        if (diff > 0) {
-          this.next();
-        } else {
-          this.prev();
-        }
-      }
-    });
-  }
-  
-  loadImages() {
-    const images = this.track.querySelectorAll('img[data-src]');
-    const imageObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          img.src = img.dataset.src;
-          img.removeAttribute('data-src');
-          imageObserver.unobserve(img);
-        }
-      });
-    });
-    
-    images.forEach(img => imageObserver.observe(img));
-  }
-}
+/* --- BUTTONS --- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.85rem 1.75rem;border-radius:var(--r-md);font-weight:700;font-size:.9rem;border:none;transition:var(--tr);min-height:48px}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--t1);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-outline{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn-outline:hover{background:rgba(var(--accent-rgb),.1)}
+.btn-sm{padding:.5rem 1rem;font-size:.8rem;min-height:36px}
 
-const casesCarousel = new CasesCarousel();
+/* --- INPUT --- */
+.input{width:100%;padding:.75rem 1rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--t1);font-size:.9rem;transition:var(--tr)}
+.input:focus{outline:none;border-color:var(--accent)}
+.form-field{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.75rem}
+.form-label{font-size:.8rem;color:var(--t3);font-weight:500}
+select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23999' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center}
 
-// Фильтры кейсов
-document.querySelectorAll(".filter-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const filter = btn.dataset.filter;
-    
-    document.querySelectorAll(".filter-btn").forEach(b => {
-      b.classList.remove("active");
-      b.setAttribute('aria-selected', 'false');
-    });
-    
-    btn.classList.add("active");
-    btn.setAttribute('aria-selected', 'true');
-    
-    if (casesCarousel) {
-      casesCarousel.filterSlides(filter);
-    }
-    
-    Utils.trackEvent('Cases', 'Filter', filter);
-  });
-});
+/* --- SKELETON --- */
+.skeleton-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg1);padding:2rem 1rem;transition:opacity .4s,visibility .4s}
+.skeleton-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.skeleton-page{max-width:600px;margin:0 auto}
+.skeleton-line{height:1rem;border-radius:var(--r-sm);margin-bottom:.75rem;background:linear-gradient(90deg,rgba(255,255,255,.05) 25%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.05) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+.skeleton-badge{width:40%;height:1.5rem;border-radius:2rem}
+.skeleton-title{height:2rem;width:90%}.skeleton-title.short{width:60%}
+.skeleton-text{width:100%}.skeleton-text.short{width:75%}
+.skeleton-buttons{display:flex;gap:1rem;margin-top:1.5rem}
+.skeleton-btn{height:3rem;flex:1;border-radius:var(--r-md);background:linear-gradient(90deg,rgba(255,255,255,.05) 25%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.05) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 
-// ===============================
-// КВИЗ С УЛУЧШЕННОЙ ЛОГИКОЙ
-// ===============================
-class Quiz {
-  constructor() {
-    this.wrapper = document.getElementById('quizWrapper');
-    if (!this.wrapper) return;
-    
-    this.currentStep = 1;
-    this.answers = this.loadAnswers();
-    this.totalSteps = 4;
-    this.history = [1];
-    
-    this.init();
-  }
-  
-  init() {
-    this.setupListeners();
-    this.updateProgress();
-    this.loadSavedState();
-  }
-  
-  setupListeners() {
-    // Опции квиза
-    this.wrapper.querySelectorAll('.quiz-option').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const step = parseInt(btn.closest('.quiz-step').dataset.step);
-        const value = btn.dataset.value;
-        const nextStep = btn.dataset.next;
-        
-        this.saveAnswer(step, value);
-        
-        if (nextStep === 'result') {
-          this.showResult();
-        } else {
-          this.showStep(parseInt(nextStep));
-        }
-      });
-    });
-    
-    // Кнопка "Назад"
-    const backBtn = document.getElementById('quizBackBtn');
-    if (backBtn) {
-      backBtn.addEventListener('click', () => this.goBack());
-    }
-    
-    // Кнопка "Пройти заново"
-    const restartBtn = document.getElementById('quizRestart');
-    if (restartBtn) {
-      restartBtn.addEventListener('click', () => this.restart());
-    }
-    
-    // Кнопка скачать бонус
-    const downloadBtn = document.getElementById('downloadBonus');
-    if (downloadBtn) {
-      downloadBtn.addEventListener('click', () => this.downloadBonus());
-    }
-  }
-  
-  saveAnswer(step, value) {
-    this.answers[`step${step}`] = value;
-    this.saveAnswers();
-    Utils.trackEvent('Quiz', `Step${step}`, value);
-  }
-  
-  showStep(step) {
-    this.wrapper.querySelectorAll('.quiz-step').forEach(s => {
-      s.classList.remove('active');
-    });
-    
-    const targetStep = this.wrapper.querySelector(`[data-step="${step}"]`);
-    if (targetStep) {
-      targetStep.classList.add('active');
-    }
-    
-    this.currentStep = step;
-    this.history.push(step);
-    this.updateProgress();
-    this.updateBackButton();
-  }
-  
-  goBack() {
-    if (this.history.length <= 1) return;
-    
-    this.history.pop(); // Remove current
-    const prevStep = this.history[this.history.length - 1];
-    
-    this.wrapper.querySelectorAll('.quiz-step').forEach(s => {
-      s.classList.remove('active');
-    });
-    
-    const targetStep = this.wrapper.querySelector(`[data-step="${prevStep}"]`);
-    if (targetStep) {
-      targetStep.classList.add('active');
-    }
-    
-    this.currentStep = prevStep;
-    this.updateProgress();
-    this.updateBackButton();
-  }
-  
-  updateBackButton() {
-    const backBtn = document.getElementById('quizBackBtn');
-    if (!backBtn) return;
-    
-    if (this.history.length > 1 && this.currentStep !== 'result') {
-      backBtn.style.display = 'block';
-    } else {
-      backBtn.style.display = 'none';
-    }
-  }
-  
-  updateProgress() {
-    const progress = document.getElementById('quizProgress');
-    if (!progress) return;
-    
-    const percentage = (this.currentStep / this.totalSteps) * 100;
-    progress.style.width = percentage + '%';
-    
-    const progressBar = progress.closest('.quiz-progress');
-    if (progressBar) {
-      progressBar.setAttribute('aria-valuenow', percentage);
-    }
-  }
-  
-  showResult() {
-    this.wrapper.querySelectorAll('.quiz-step').forEach(s => {
-      s.classList.remove('active');
-    });
-    
-    const resultStep = this.wrapper.querySelector('[data-step="result"]');
-    if (resultStep) {
-      resultStep.classList.add('active');
-    }
-    
-    this.currentStep = 'result';
-    this.updateBackButton();
-    this.generatePersonalizedResult();
-    Utils.trackEvent('Quiz', 'Complete', 'Result');
-  }
-  
-  generatePersonalizedResult() {
-    const resultContainer = document.getElementById('quizResultText');
-    if (!resultContainer) return;
-    
-    const goal = this.answers.step1;
-    const place = this.answers.step2;
-    const frequency = this.answers.step3;
-    const level = this.answers.step4;
-    
-    const goalTexts = {
-      loss: 'похудение и рельеф',
-      gain: 'набор мышечной массы',
-      tone: 'тонус и общее здоровье'
-    };
-    
-    const placeTexts = {
-      home: 'тренировки дома',
-      gym: 'тренировки в зале',
-      both: 'комбинированные тренировки'
-    };
-    
-    const levelTexts = {
-      beginner: 'новичок',
-      middle: 'продолжающий',
-      advanced: 'продвинутый уровень'
-    };
-    
-    const recommendedPlan = this.getRecommendedPlan(goal, frequency, level);
-    
-    resultContainer.innerHTML = `
-      <div class="quiz-result-summary">
-        <p><strong>Твоя цель:</strong> ${goalTexts[goal] || 'не указана'}</p>
-        <p><strong>Формат:</strong> ${placeTexts[place] || 'не указан'}</p>
-        <p><strong>Частота:</strong> ${frequency || '?'} раз в неделю</p>
-        <p><strong>Уровень:</strong> ${levelTexts[level] || 'не указан'}</p>
-      </div>
-      
-      <div class="quiz-result-recommendation">
-        <h4>Тебе подойдёт тариф «${recommendedPlan.name}»:</h4>
-        <p>${recommendedPlan.description}</p>
-        <div class="quiz-result-price">
-          от <strong>${recommendedPlan.price}</strong>
-        </div>
-      </div>
-    `;
-  }
-  
-  getRecommendedPlan(goal, frequency, level) {
-    // Логика рекомендации тарифа под НОВЫЕ цены
-    if (level === 'beginner' || frequency <= 3) {
-      return {
-        name: 'Базовый',
-        description: 'Библиотека программ похудения, набора массы, женский фитнес и домашние тренировки. Трекеры веса и КБЖУ. Для самостоятельных занятий.',
-        price: '890₽/месяц'
-      };
-    } else if (level === 'advanced' || frequency >= 5) {
-      return {
-        name: 'VIP',
-        description: 'Всё из Оптимального + live-занятия 1-2 раза в неделю, еженедельный видео-разбор техники, чат 24/7 без лимита, полная индивидуалка.',
-        price: '3 990₽/месяц'
-      };
-    } else {
-      return {
-        name: 'Оптимальный',
-        description: 'Самый популярный тариф! Всё из Базового + чат с тренером 4-6 раз в неделю, 3-4 корректировки в месяц, персональный подбор под цель, чек-ин по фото.',
-        price: '1 490₽/месяц'
-      };
-    }
-  }
-  
-  downloadBonus() {
-    // Запрашиваем email для отправки бонусов
-    const email = prompt('Введи свой email для получения бонусов:');
-    
-    if (!email || email.trim() === '') {
-      Utils.showNotification('Отмена', 'Email не указан', 'error');
-      return;
-    }
-    
-    // Простая валидация email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Utils.showNotification('Ошибка', 'Укажи корректный email', 'error');
-      return;
-    }
-    
-    // Здесь можно отправить на сервер для реальной отправки
-    // await fetch('/api/send-bonus', { method: 'POST', body: JSON.stringify({ email, quiz: this.getAnswers() }) });
-    
-    Utils.showNotification('Успех!', `Бонусы отправлены на ${email}. Проверь почту!`, 'success');
-    Utils.trackEvent('Quiz', 'DownloadBonus', email);
-    
-    // Вариант 2: Просто открыть PDF файл
-    // window.open('/bonuses/first-week-plan.pdf', '_blank');
-  }
-  
-  saveAnswers() {
-    localStorage.setItem('quizAnswers', JSON.stringify(this.answers));
-  }
-  
-  loadAnswers() {
-    const saved = localStorage.getItem('quizAnswers');
-    return saved ? JSON.parse(saved) : {};
-  }
-  
-  loadSavedState() {
-    // Можно восстановить прогресс если пользователь вернулся
-    if (Object.keys(this.answers).length > 0) {
-      console.log('Найдены сохранённые ответы:', this.answers);
-    }
-  }
-  
-  restart() {
-    this.currentStep = 1;
-    this.answers = {};
-    this.history = [1];
-    this.saveAnswers();
-    this.showStep(1);
-    Utils.trackEvent('Quiz', 'Restart', '');
-  }
-  
-  getAnswers() {
-    return this.answers;
-  }
-}
+/* --- NOTIFICATIONS --- */
+.notification-container{position:fixed;top:1rem;right:1rem;z-index:2000;display:flex;flex-direction:column;gap:.5rem;max-width:350px;width:calc(100% - 2rem)}
+.notification{padding:.75rem 1rem;border-radius:var(--r-md);display:flex;align-items:center;gap:.5rem;animation:slideIn .3s ease;backdrop-filter:blur(12px);border:1px solid;font-size:.85rem}
+.notif-success{background:rgba(76,175,80,.15);border-color:rgba(76,175,80,.3);color:#81c784}
+.notif-error{background:rgba(244,67,54,.15);border-color:rgba(244,67,54,.3);color:#ef9a9a}
+.notif-warning{background:rgba(255,152,0,.15);border-color:rgba(255,152,0,.3);color:#ffcc80}
+.notif-info{background:rgba(0,229,255,.15);border-color:rgba(0,229,255,.3);color:#80deea}
+.notif-close{background:none;border:none;color:inherit;opacity:.6;cursor:pointer;margin-left:auto;font-size:1.1rem;padding:0}
+.notification.removing{animation:slideOut .3s ease forwards}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
 
-const quiz = new Quiz();
+/* --- MODAL --- */
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden;transition:var(--tr)}
+.modal-overlay.active{opacity:1;visibility:visible}
+.modal{background:var(--bgc);border-radius:var(--r-lg);padding:2rem;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;position:relative;transform:translateY(20px) scale(.95);transition:var(--tr)}
+.modal-overlay.active .modal{transform:translateY(0) scale(1)}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--t2);font-size:1.5rem;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;border-radius:50%}
 
-// ===============================
-// FAQ (работает нативно с details)
-// ===============================
-document.querySelectorAll(".faq-item").forEach(item => {
-  item.addEventListener("toggle", () => {
-    if (item.open) {
-      const question = item.querySelector("summary").textContent.trim();
-      Utils.trackEvent('FAQ', 'Open', question);
-    }
-  });
-});
+/* --- BOTTOM SHEET --- */
+.bottom-sheet-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:var(--tr)}
+.bottom-sheet-overlay.active{opacity:1;visibility:visible}
+.bottom-sheet{position:fixed;bottom:0;left:0;right:0;z-index:1001;background:var(--bgc);border-radius:var(--r-lg) var(--r-lg) 0 0;padding:1rem 1.5rem 2rem;max-height:85vh;overflow-y:auto;transform:translateY(100%);transition:transform .4s var(--ease)}
+.bottom-sheet-overlay.active .bottom-sheet{transform:translateY(0)}
+.bottom-sheet-handle{width:40px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 1.5rem}
 
-// ===============================
-// ФОРМА CTA С ВАЛИДАЦИЕЙ
-// ===============================
-class CTAForm {
-  constructor() {
-    this.form = document.getElementById('ctaForm');
-    if (!this.form) return;
-    
-    this.nameInput = document.getElementById('inputName');
-    this.contactInput = document.getElementById('inputContact');
-    this.goalInput = document.getElementById('inputGoal');
-    this.honeypot = this.form.querySelector('input[name="website"]');
-    
-    this.init();
-  }
-  
-  init() {
-    this.autoFillFromQuiz();
-    this.autoFillFromTelegram();
-    this.setupRealTimeValidation();
-    this.setupSubmit();
-  }
-  
-  autoFillFromQuiz() {
-    if (quiz && this.goalInput) {
-      const quizAnswers = quiz.getAnswers();
-      if (quizAnswers.step1) {
-        this.goalInput.value = quizAnswers.step1;
-      }
-    }
-  }
-  
-  autoFillFromTelegram() {
-    if (window.Telegram && window.Telegram.WebApp) {
-      const tg = window.Telegram.WebApp;
-      const user = tg.initDataUnsafe.user;
-      
-      if (user) {
-        if (user.first_name && this.nameInput) {
-          this.nameInput.value = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-        }
-        
-        if (user.username && this.contactInput) {
-          this.contactInput.value = '@' + user.username;
-        }
-      }
-    }
-  }
-  
-  setupRealTimeValidation() {
-    // Валидация имени
-    if (this.nameInput) {
-      this.nameInput.addEventListener('blur', () => {
-        if (this.nameInput.value.trim().length < 2) {
-          this.showFieldError(this.nameInput, 'Имя должно быть минимум 2 символа');
-        } else {
-          this.clearFieldError(this.nameInput);
-        }
-      });
-    }
-    
-    // Валидация контакта
-    if (this.contactInput) {
-      this.contactInput.addEventListener('blur', () => {
-        if (!this.validateContact(this.contactInput.value)) {
-          this.showFieldError(this.contactInput, 'Укажи корректный Telegram, WhatsApp или телефон');
-        } else {
-          this.clearFieldError(this.contactInput);
-        }
-      });
-    }
-  }
-  
-  showFieldError(input, message) {
-    this.clearFieldError(input);
-    
-    input.classList.add('input-error');
-    const error = document.createElement('div');
-    error.className = 'field-error';
-    error.textContent = message;
-    error.setAttribute('role', 'alert');
-    
-    input.parentElement.appendChild(error);
-  }
-  
-  clearFieldError(input) {
-    input.classList.remove('input-error');
-    const existingError = input.parentElement.querySelector('.field-error');
-    if (existingError) {
-      existingError.remove();
-    }
-  }
-  
-  setupSubmit() {
-    this.form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      // Проверка honeypot
-      if (this.honeypot && this.honeypot.value !== '') {
-        console.log('Bot detected');
-        return;
-      }
-      
-      const name = this.nameInput.value.trim();
-      const contact = this.contactInput.value.trim();
-      const goal = this.goalInput.value;
-      
-      // Валидация
-      let hasErrors = false;
-      
-      if (!name || name.length < 2) {
-        this.showFieldError(this.nameInput, 'Введи своё имя');
-        hasErrors = true;
-      }
-      
-      if (!this.validateContact(contact)) {
-        this.showFieldError(this.contactInput, 'Укажи корректный контакт');
-        hasErrors = true;
-      }
-      
-      if (!goal) {
-        this.showFieldError(this.goalInput, 'Выбери свою цель');
-        hasErrors = true;
-      }
-      
-      if (hasErrors) {
-        Utils.showNotification('Ошибка', 'Проверь правильность заполнения полей', 'error');
-        return;
-      }
-      
-      // Показываем состояние загрузки
-      this.setButtonLoading(true);
-      
-      try {
-        await this.sendForm({ name, contact, goal });
-        
-        this.setButtonLoading(false);
-        Utils.showNotification('Успех!', 'Заявка отправлена! Я свяжусь с тобой в ближайшее время.', 'success');
-        
-        // Очистка формы
-        this.form.reset();
-        
-        Utils.trackEvent('Form', 'Submit', 'CTA Form Success');
-        
-        // Если в Telegram Web App - закрываем
-        if (window.Telegram && window.Telegram.WebApp) {
-          setTimeout(() => {
-            window.Telegram.WebApp.close();
-          }, 2000);
-        }
-      } catch (error) {
-        this.setButtonLoading(false);
-        Utils.showNotification('Ошибка', 'Не удалось отправить заявку. Попробуй ещё раз или напиши напрямую в Telegram.', 'error');
-        console.error('Submit error:', error);
-        Utils.trackEvent('Form', 'Submit', 'CTA Form Error');
-      }
-    });
-  }
-  
-  setButtonLoading(loading) {
-    const btn = this.form.querySelector('button[type="submit"]');
-    if (!btn) return;
-    
-    const btnText = btn.querySelector('.btn-text');
-    const btnLoader = btn.querySelector('.btn-loader');
-    
-    if (loading) {
-      btn.disabled = true;
-      btnText.style.display = 'none';
-      btnLoader.style.display = 'inline-flex';
-    } else {
-      btn.disabled = false;
-      btnText.style.display = 'inline';
-      btnLoader.style.display = 'none';
-    }
-  }
-  
-  validateContact(contact) {
-    // Проверка на Telegram username (@username)
-    if (contact.startsWith('@')) return contact.length > 1;
-    
-    // Проверка на телефон
-    const phoneRegex = /^[\d\s\+\-\(\)]+$/;
-    if (phoneRegex.test(contact) && contact.replace(/\D/g, '').length >= 10) return true;
-    
-    // Проверка на возможный WhatsApp или другой мессенджер
-    if (contact.includes('whatsapp') || contact.includes('wa.me')) return true;
-    
-    return false;
-  }
-  
-  async sendForm(data) {
-    // Добавляем ответы квиза если есть
-    const quizAnswers = quiz ? quiz.getAnswers() : {};
-    
-    const payload = {
-      ...data,
-      quiz: quizAnswers,
-      timestamp: new Date().toISOString(),
-      source: window.location.href
-    };
-    
-    // Отправка через API endpoint
-    const response = await fetch('/api/submit-form', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('API error:', errorData);
-      throw new Error(errorData.message || 'Failed to send form');
-    }
-    
-    return response.json();
-  }
-}
+/* --- PAGE PROGRESS --- */
+.page-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:1000}
 
-const ctaForm = new CTAForm();
+/* --- STICKY NAV --- */
+.sticky-nav{position:fixed;bottom:0;left:0;right:0;z-index:900;display:flex;background:rgba(10,10,10,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:.5rem 0;padding-bottom:env(safe-area-inset-bottom,.5rem)}
+[data-theme="light"] .sticky-nav{background:rgba(255,255,255,.95)}
+.sticky-link{flex:1;text-align:center;padding:.5rem;color:var(--t3);text-decoration:none;font-size:.75rem;font-weight:600;transition:var(--tr)}
+.sticky-link.active{color:var(--accent)}
 
-// ===============================
-// URGENCY ТАЙМЕР
-// ===============================
-class UrgencyTimer {
-  constructor() {
-    this.hoursElement = document.getElementById('timerHours');
-    this.minutesElement = document.getElementById('timerMinutes');
-    this.secondsElement = document.getElementById('timerSeconds');
-    
-    if (!this.hoursElement) return;
-    
-    this.init();
-  }
-  
-  init() {
-    // Получаем или создаём время окончания акции
-    let endTime = localStorage.getItem('urgencyEndTime');
-    
-    if (!endTime) {
-      // Создаём новое время окончания (через X часов)
-      const now = new Date();
-      const end = new Date(now.getTime() + CONFIG.URGENCY_TIMER_HOURS * 60 * 60 * 1000);
-      endTime = end.getTime();
-      localStorage.setItem('urgencyEndTime', endTime);
-    }
-    
-    this.endTime = parseInt(endTime);
-    this.update();
-    
-    // Обновляем каждую секунду
-    setInterval(() => this.update(), 1000);
-  }
-  
-  update() {
-    const now = new Date().getTime();
-    const distance = this.endTime - now;
-    
-    if (distance < 0) {
-      // Таймер истёк - можно перезапустить или скрыть
-      this.hoursElement.textContent = '00';
-      this.minutesElement.textContent = '00';
-      this.secondsElement.textContent = '00';
-      return;
-    }
-    
-    const hours = Math.floor(distance / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-    
-    this.hoursElement.textContent = String(hours).padStart(2, '0');
-    this.minutesElement.textContent = String(minutes).padStart(2, '0');
-    this.secondsElement.textContent = String(seconds).padStart(2, '0');
-  }
-}
+/* --- HERO --- */
+.hero{position:relative;padding:4rem 0 2rem;overflow:hidden;min-height:80vh;display:flex;align-items:center}
+.hero-bg{position:absolute;inset:0;overflow:hidden}
+.hero-glow{position:absolute;width:40rem;height:40rem;border-radius:50%;background:radial-gradient(circle,rgba(var(--accent-rgb),.12),transparent 70%);top:-10rem;right:-10rem;animation:glowFloat 8s ease-in-out infinite}
+@keyframes glowFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(-2rem,2rem)}}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:4rem 4rem}
+.hero-inner{display:grid;grid-template-columns:1fr;gap:2rem;position:relative;z-index:1}
+@media(min-width:768px){.hero-inner{grid-template-columns:1.2fr .8fr}}
+.hero-badge{display:inline-block;background:rgba(var(--accent-rgb),.1);color:var(--accent);padding:.4rem 1rem;border-radius:2rem;font-size:.8rem;font-weight:600;margin-bottom:1rem}
+.hero-title{font-size:2rem;font-weight:800;line-height:1.15;margin-bottom:1rem}
+@media(min-width:768px){.hero-title{font-size:2.5rem}}
+.hero-subtitle{color:var(--t2);font-size:1rem;margin-bottom:1rem;line-height:1.6}
+.hero-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.hero-card{background:var(--bgc);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem}
+.hero-card-title{font-weight:700;margin-bottom:.75rem}
+.hero-list{margin-bottom:1rem}
+.hero-list li{padding:.3rem 0;padding-left:1.5rem;position:relative;color:var(--t2);font-size:.9rem}
+.hero-list li::before{content:'✓';position:absolute;left:0;color:var(--accent);font-weight:700}
+.tooltip-hint{background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.2);border-radius:var(--r-sm);padding:.5rem 1rem;font-size:.85rem;color:var(--t2);margin-bottom:1rem}
 
-const urgencyTimer = new UrgencyTimer();
+/* Recommendations */
+.recommendations{display:flex;align-items:center;gap:1rem;margin-top:2rem;flex-wrap:wrap;position:relative;z-index:1}
+.rec-avatars{display:flex}
+.rec-avatar{width:36px;height:36px;border-radius:50%;background:rgba(var(--accent-rgb),.2);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;margin-left:-8px;border:2px solid var(--bg1)}
+.rec-avatar:first-child{margin-left:0}
+.rec-count{background:var(--accent);color:#000}
+.rec-text{font-size:.85rem;color:var(--t2)}
 
-// ===============================
-// TELEGRAM WEB APP ИНТЕГРАЦИЯ
-// ===============================
-if (window.Telegram && window.Telegram.WebApp) {
-  const tg = window.Telegram.WebApp;
-  
-  // Раскрываем приложение на весь экран
-  tg.expand();
-  
-  // Включаем swipe-to-close
-  tg.enableClosingConfirmation();
-  
-  // Настраиваем цветовую схему
-  if (tg.themeParams.bg_color) {
-    document.documentElement.style.setProperty("--bg-main", tg.themeParams.bg_color);
-  }
-  if (tg.themeParams.text_color) {
-    document.documentElement.style.setProperty("--text-main", tg.themeParams.text_color);
-  }
-  
-  // Настраиваем главную кнопку
-  tg.MainButton.text = "Получить план 🚀";
-  tg.MainButton.color = "#00e5ff";
-  tg.MainButton.textColor = "#000000";
-  
-  // Показываем кнопку только после квиза
-  const quizObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        tg.MainButton.show();
-      } else {
-        tg.MainButton.hide();
-      }
-    });
-  }, { threshold: 0.3 });
-  
-  const quizSection = document.getElementById('quiz');
-  if (quizSection) {
-    quizObserver.observe(quizSection);
-  }
-  
-  tg.MainButton.onClick(() => {
-    const ctaSection = document.querySelector("#ctaFinal");
-    if (ctaSection) {
-      ctaSection.scrollIntoView({ behavior: "smooth" });
-    }
-  });
-  
-  Utils.trackEvent('Telegram', 'WebAppOpened', tg.platform);
-}
+/* --- STATS --- */
+.stats-section{padding:2rem 0}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+@media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-item{text-align:center;padding:1rem .5rem;background:var(--bgc);border:1px solid var(--border);border-radius:var(--r-md)}
+.stat-number{font-size:1.5rem;font-weight:800;color:var(--accent)}
+.stat-label{font-size:.7rem;color:var(--t3);margin-top:.2rem}
 
-// ===============================
-// PWA SUPPORT
-// ===============================
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(registration => {
-        console.log('✅ Service Worker registered:', registration.scope);
-      })
-      .catch(error => {
-        console.log('❌ Service Worker registration failed:', error);
-      });
-  });
-}
+/* --- CASES --- */
+.cases-filters{display:flex;gap:.5rem;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap}
+.filter-btn{padding:.5rem 1rem;border:1px solid var(--border);border-radius:2rem;background:transparent;color:var(--t2);font-size:.8rem;font-weight:600;transition:var(--tr)}
+.filter-btn.active{background:rgba(var(--accent-rgb),.15);border-color:var(--accent);color:var(--accent)}
+.cases-carousel{position:relative}
+.case-slide{display:none}.case-slide.active{display:block;animation:fadeInUp .4s ease}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+.case-inner{background:var(--bgc);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.case-photos{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.case-photo-placeholder{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;background:rgba(255,255,255,.05);color:var(--t3)}
+.case-photo-placeholder.after{background:rgba(var(--accent-rgb),.08);color:var(--accent)}
+.case-content{padding:1.25rem}
+.case-title{font-size:1.1rem;font-weight:700}
+.case-result{color:var(--accent);font-weight:700;font-size:1rem;margin:.3rem 0}
+.case-text{color:var(--t2);font-size:.85rem;margin-bottom:.75rem}
+.case-tags{display:flex;gap:.4rem;flex-wrap:wrap}
+.case-tag{background:rgba(var(--accent-rgb),.1);color:var(--accent);padding:.2rem .6rem;border-radius:2rem;font-size:.7rem;font-weight:600}
+.cases-controls{display:flex;justify-content:space-between;position:absolute;top:25%;left:0;right:0;padding:0 .5rem;pointer-events:none}
+.cases-arrow{pointer-events:all;background:var(--bgc);border:1px solid var(--border);border-radius:50%;width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;color:var(--t1);transition:var(--tr)}
+.cases-arrow:hover{border-color:var(--accent)}
+.cases-dots{display:flex;justify-content:center;gap:.4rem;margin-top:1rem}
+.cases-dot{width:8px;height:8px;border-radius:50%;background:var(--border);border:none;cursor:pointer;transition:var(--tr)}
+.cases-dot.active{background:var(--accent);width:24px;border-radius:4px}
+.leave-review-btn{display:block;margin:1.5rem auto 0}
 
-// ===============================
-// ВИДЕО PLACEHOLDERS
-// ===============================
-document.querySelectorAll('.video-placeholder').forEach(placeholder => {
-  placeholder.addEventListener('click', function() {
-    const videoId = this.dataset.videoId;
-    // Здесь можно открыть модальное окно с видео или встроить iframe
-    console.log('Play video:', videoId);
-    Utils.trackEvent('Video', 'Play', videoId);
-    
-    // Пример: открыть в модальном окне
-    // showVideoModal(videoId);
-  });
-});
+/* --- REVIEWS --- */
+.reviews-grid{display:grid;gap:1rem}
+@media(min-width:600px){.reviews-grid{grid-template-columns:1fr 1fr}}
+.review-card{background:var(--bgc);border:1px solid var(--border);border-radius:var(--r-md);padding:1.25rem}
+.review-stars{font-size:.9rem;margin-bottom:.5rem}
+.review-text{color:var(--t2);font-size:.9rem;font-style:italic;margin-bottom:.75rem;line-height:1.5}
+.review-author{display:flex;justify-content:space-between;font-size:.8rem;color:var(--t3)}
+.review-name{font-weight:600;color:var(--t1)}
 
-// ===============================
-// КОНСОЛЬНОЕ СООБЩЕНИЕ
-// ===============================
-console.log(`
-%c🔥 Fitness Coach Vitaliy 🔥
-%cВерсия: 3.0 (Improved)
-%cMade with ❤️ by Claude
-%c
-📊 Tracking: ${CONFIG.ANALYTICS_ENABLED ? 'Enabled' : 'Disabled'}
-`,
-'color: #00e5ff; font-size: 20px; font-weight: bold;',
-'color: #9aa3b8; font-size: 12px;',
-'color: #9aa3b8; font-size: 12px;',
-'color: #9aa3b8; font-size: 10px;'
-);
+/* --- QUIZ --- */
+.quiz-wrapper{max-width:500px;margin:0 auto}
+.quiz-step{display:none;animation:fadeInUp .3s ease}.quiz-step.active{display:block}
+.quiz-counter{font-size:.8rem;color:var(--t3);margin-bottom:.5rem}
+.quiz-question{font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.quiz-hint{color:var(--t3);font-size:.85rem;font-style:italic;margin-bottom:1.5rem}
+.quiz-options{display:flex;flex-direction:column;gap:.5rem}
+.quiz-option{display:flex;align-items:center;gap:.75rem;padding:1rem;background:var(--bgc);border:1px solid var(--border);border-radius:var(--r-md);color:var(--t1);font-size:.95rem;font-weight:500;transition:var(--tr);text-align:left;width:100%}
+.quiz-option:hover{border-color:var(--accent)}
+.quiz-option.selected{border-color:var(--accent);background:rgba(var(--accent-rgb),.08)}
+.quiz-option-icon{font-size:1.5rem}
+.quiz-result-icon{font-size:3rem;text-align:center;margin-bottom:.5rem}
+.quiz-result-title{font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:1rem}
+.quiz-bonus{background:rgba(var(--accent-rgb),.05);border:1px solid rgba(var(--accent-rgb),.15);border-radius:var(--r-md);padding:1.25rem;margin:1.5rem 0;text-align:center}
+.quiz-bonus-icon{font-size:2rem}
+.quiz-bonus-title{font-weight:700;margin:.25rem 0}
+.quiz-bonus-list{text-align:left;margin:.75rem 0}
+.quiz-bonus-list li{padding:.2rem 0;font-size:.9rem;color:var(--t2)}
+.quiz-result-actions{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-top:1rem}
+.quiz-controls{margin-top:1.5rem}
+.quiz-back{background:none;border:none;color:var(--t2);font-size:.85rem;margin-bottom:.5rem}
+.quiz-progress{height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.quiz-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s ease;width:0%}
 
-// ===============================
-// ЭКСПОРТ ДЛЯ ДЕБАГА
-// ===============================
-window.DEBUG = {
-  quiz,
-  casesCarousel,
-  ctaForm,
-  urgencyTimer,
-  Utils,
-  CONFIG
-};
+/* Week Plan */
+.quiz-week-plan{background:rgba(var(--accent-rgb),.05);border:1px solid rgba(var(--accent-rgb),.15);border-radius:var(--r-md);padding:1.25rem;margin:1rem 0}
+.week-plan-title{font-weight:700;margin-bottom:.75rem;color:var(--accent)}
+.week-plan-day{display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.85rem}
+.week-plan-day:last-child{border:none}
+.week-plan-name{font-weight:600;color:var(--t1)}
+.week-plan-workout{color:var(--t2)}
+.week-plan-rest{color:var(--t3);font-style:italic}
 
+/* --- GRID --- */
+.grid-3{display:grid;gap:1rem}
+@media(min-width:768px){.grid-3{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--bgc);border:1px solid var(--border);border-radius:var(--r-md);padding:1.5rem}
+.card-label{color:var(--accent);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem}
+.card-title{font-weight:700;margin-bottom:.5rem}
+.card-text{color:var(--t2);font-size:.9rem}
 
-// После отправки формы — показать кнопку ЛК
-function showCabinetAfterSubmit() {
-  const fab = document.getElementById('cabinetFab');
-  if (fab) {
-    fab.style.display = 'flex';
-    
-    // Сохранить данные из формы в ЛК
-    const name = document.getElementById('inputName')?.value;
-    const goal = document.getElementById('inputGoal')?.value;
-    
-    if (name && window.Storage) {
-      window.Storage.set('user.name', name);
-    }
-  }
-}
+/* --- ABOUT --- */
+.about-inner{display:grid;gap:2rem}
+@media(min-width:768px){.about-inner{grid-template-columns:.4fr .6fr;align-items:start}}
+.about-photo{position:relative}
+.about-photo-placeholder{aspect-ratio:3/4;background:rgba(var(--accent-rgb),.05);border:1px solid var(--border);border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;color:var(--t3);font-weight:700}
+.about-badge-label{position:absolute;bottom:1rem;right:1rem;background:var(--accent);color:#000;padding:.3rem .8rem;border-radius:2rem;font-size:.75rem;font-weight:700}
+.about-content p{color:var(--t2);margin-bottom:.75rem;line-height:1.6}
+.credentials{display:flex;flex-direction:column;gap:.4rem;margin-top:1rem}
+.credential{font-size:.85rem;color:var(--t2)}
+.chat-preview{background:var(--bgc);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;margin-top:1.5rem}
+.chat-preview-title{font-size:.8rem;color:var(--t3);margin-bottom:.75rem}
+.chat-msg{padding:.5rem .75rem;border-radius:var(--r-sm);margin-bottom:.4rem;font-size:.85rem;max-width:80%;animation:fadeInUp .4s ease}
+.chat-in{background:rgba(var(--accent-rgb),.1);color:var(--t1);border-bottom-left-radius:2px}
+.chat-out{background:var(--accent);color:#000;margin-left:auto;border-bottom-right-radius:2px}
 
-// Вызвать после успешной отправки формы
-// showCabinetAfterSubmit();
+/* --- TIMELINE --- */
+.timeline{max-width:600px;margin:0 auto;padding-left:3rem;position:relative}
+.timeline::before{content:'';position:absolute;left:1.25rem;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--accent),rgba(var(--accent-rgb),.2))}
+.timeline-step{position:relative;margin-bottom:2rem}
+.timeline-step:last-child{margin-bottom:0}
+.timeline-num{position:absolute;left:-3rem;top:0;width:2.5rem;height:2.5rem;background:var(--accent);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;z-index:1}
+.timeline-card{background:var(--bgc);border:1px solid var(--border);border-radius:var(--r-md);padding:1.25rem}
+.timeline-icon{font-size:1.5rem;margin-bottom:.3rem}
+.timeline-card h3{font-weight:700;margin-bottom:.3rem}
+.timeline-card p{color:var(--t2);font-size:.85rem}
+.timeline-badge{display:inline-block;margin-top:.5rem;background:rgba(var(--accent-rgb),.1);color:var(--accent);padding:.15rem .6rem;border-radius:2rem;font-size:.75rem;font-weight:600}
 
-// Также показать FAB если есть данные в Telegram
-document.addEventListener('DOMContentLoaded', () => {
-  const tg = window.Telegram?.WebApp;
-  if (tg?.initDataUnsafe?.user) {
-    setTimeout(() => {
-      const fab = document.getElementById('cabinetFab');
-      if (fab) fab.style.display = 'flex';
-    }, 2000);
-  }
-});
+/* --- CALCULATORS --- */
+.calc-card{background:var(--bgc);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.75rem;max-width:500px;margin:0 auto}
+.calc-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+@media(max-width:500px){.calc-grid-3{grid-template-columns:1fr}}
+.calc-btn{width:100%}
+.calc-results{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin:1.25rem 0;animation:fadeInUp .4s ease}
+@media(max-width:400px){.calc-results{grid-template-columns:1fr}}
+.calc-result-item{text-align:center;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:1rem .5rem}
+.calc-result-item.highlight{border-color:var(--accent);background:rgba(var(--accent-rgb),.05)}
+.calc-result-icon{font-size:1.5rem;margin-bottom:.2rem}
+.calc-result-value{font-size:1.3rem;font-weight:800;color:var(--accent)}
+.calc-result-label{font-size:.7rem;color:var(--t3);margin-top:.15rem}
+.progress-bar-wrap{margin:1rem 0;animation:fadeInUp .4s ease}
+.progress-bar-track{height:12px;background:rgba(var(--accent-rgb),.1);border-radius:6px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#00ff88);border-radius:6px;transition:width 1s var(--ease)}
+.progress-labels{display:flex;justify-content:space-between;font-size:.75rem;color:var(--t3);margin-top:.3rem}
+.toggle-row{display:flex;gap:.5rem;margin-bottom:1rem}
+.toggle-btn{flex:1;padding:.65rem;border:1px solid var(--border);border-radius:var(--r-sm);background:transparent;color:var(--t2);font-weight:500;transition:var(--tr)}
+.toggle-btn.active{background:rgba(var(--accent-rgb),.15);border-color:var(--accent);color:var(--accent)}
+.kbju-results{margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);animation:fadeInUp .4s ease}
+.kbju-title{font-weight:700;text-align:center;margin-bottom:1rem}
+.kbju-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1rem}
+@media(max-width:500px){.kbju-grid{grid-template-columns:repeat(2,1fr)}}
+.kbju-item{text-align:center;background:rgba(var(--accent-rgb),.05);border-radius:var(--r-sm);padding:.75rem .25rem}
+.kbju-value{font-size:1.3rem;font-weight:800;color:var(--accent)}
+.kbju-label{font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:.15rem}
+.kbju-note{color:var(--t3);font-size:.8rem;text-align:center;margin-bottom:1rem}
+
+/* --- CHALLENGE --- */
+.challenge-card{background:linear-gradient(135deg,rgba(255,152,0,.08),rgba(255,87,34,.05));border:1px solid rgba(255,152,0,.2);border-radius:var(--r-lg);padding:2rem;text-align:center;max-width:500px;margin:0 auto}
+.challenge-icon{font-size:3rem}
+.challenge-title{font-size:1.2rem;font-weight:700;margin:.25rem 0}
+.challenge-desc{color:var(--t2);margin-bottom:1rem}
+.challenge-days{display:flex;justify-content:center;gap:.4rem;margin-bottom:.75rem}
+.challenge-day{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;color:var(--t3);cursor:pointer;transition:var(--tr)}
+.challenge-day.done{background:var(--accent);border-color:var(--accent);color:#000}
+.challenge-day.today{border-color:var(--accent);color:var(--accent)}
+.challenge-stats{font-size:.85rem;color:var(--t2);margin-bottom:.5rem}
+.challenge-bar{height:6px;background:rgba(var(--accent-rgb),.1);border-radius:3px;overflow:hidden;margin-bottom:1.25rem}
+.challenge-bar-fill{height:100%;background:linear-gradient(90deg,#ff9800,#ff5722);border-radius:3px;transition:width .5s ease}
+
+/* --- PRICING --- */
+.pricing-toggle{display:flex;justify-content:center;gap:.5rem;margin-bottom:2rem}
+.pricing-toggle-btn{padding:.5rem 1.2rem;border:1px solid var(--border);border-radius:2rem;background:transparent;color:var(--t2);font-weight:600;font-size:.85rem;transition:var(--tr)}
+.pricing-toggle-btn.active{background:var(--accent);border-color:var(--accent);color:#000}
+.save-badge{background:#ff4757;color:#fff;padding:.1rem .35rem;border-radius:3px;font-size:.6rem;font-weight:700}
+.pricing-grid{display:grid;gap:1rem}
+@media(min-width:768px){.pricing-grid{grid-template-columns:repeat(3,1fr)}}
+.pricing-card{background:var(--bgc);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;position:relative}
+.pricing-featured{border-color:var(--accent);background:rgba(var(--accent-rgb),.03)}
+.pricing-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:.2rem .8rem;border-radius:2rem;font-size:.7rem;font-weight:700;white-space:nowrap}
+.pricing-header h3{font-size:1.15rem;font-weight:700}
+.pricing-sub{color:var(--t3);font-size:.8rem;margin-bottom:.75rem}
+.pricing-price{margin-bottom:1rem}
+.pricing-amount{font-size:1.5rem;font-weight:800;color:var(--accent)}
+.pricing-period{font-size:.85rem;color:var(--t3)}
+.pricing-features{margin-bottom:1.25rem}
+.pricing-features li{padding:.3rem 0;padding-left:1.5rem;position:relative;font-size:.85rem;color:var(--t2)}
+.feature-yes::before{content:'✓';position:absolute;left:0;color:var(--accent);font-weight:700}
+.feature-no::before{content:'✕';position:absolute;left:0;color:var(--error);font-weight:700}
+.feature-no{opacity:.5}
+.pricing-btn{width:100%}
+
+/* --- GUARANTEE --- */
+.guarantee-card{background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),rgba(var(--accent-rgb),.02));border:1px solid rgba(var(--accent-rgb),.2);border-radius:var(--r-lg);padding:2rem;text-align:center;max-width:600px;margin:0 auto}
+.guarantee-icon{font-size:3rem;margin-bottom:.5rem}
+.guarantee-title{font-size:1.4rem;font-weight:700;color:var(--accent);margin-bottom:.5rem}
+.guarantee-text{color:var(--t2);margin-bottom:1rem}
+.guarantee-details{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;font-weight:600;font-size:.9rem;color:var(--t1)}
+
+/* --- CABINET --- */
+.cabinet-card{background:var(--bgc);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;max-width:600px;margin:0 auto}
+.cabinet-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem}
+.cabinet-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#0088cc);display:flex;align-items:center;justify-content:center;font-weight:800;color:#000;font-size:1.1rem;flex-shrink:0}
+.cabinet-name{font-weight:700;font-size:1rem}
+.cabinet-tariff{color:var(--accent);font-size:.8rem;font-weight:600}
+.cabinet-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.5rem}
+.cabinet-stat{text-align:center;background:rgba(var(--accent-rgb),.05);border-radius:var(--r-sm);padding:.75rem .25rem}
+.cabinet-stat-icon{display:block;font-size:1.1rem}
+.cabinet-stat-value{display:block;font-size:1.1rem;font-weight:800;color:var(--accent);margin:.15rem 0}
+.cabinet-stat-label{display:block;font-size:.65rem;color:var(--t3)}
+
+/* Habits */
+.habits-section{margin-bottom:1.5rem}
+.habits-title,.badges-title{font-size:.95rem;font-weight:700;margin-bottom:.75rem}
+.habits-list{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.75rem}
+.habit-item{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);transition:var(--tr)}
+.habit-item.done{border-color:rgba(76,175,80,.3);background:rgba(76,175,80,.05)}
+.habit-check{width:1.3rem;height:1.3rem;border-radius:50%;border:2px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:transparent;transition:var(--tr);flex-shrink:0;padding:0}
+.habit-item.done .habit-check{background:var(--success);border-color:var(--success);color:#fff}
+.habit-text{flex:1;font-size:.85rem;color:var(--t1)}
+.habit-item.done .habit-text{text-decoration:line-through;opacity:.5}
+.habit-del{background:none;border:none;color:var(--t3);font-size:.75rem;opacity:0;transition:var(--tr);padding:.2rem}
+.habit-item:hover .habit-del{opacity:.6}
+.habit-add-row{display:flex;gap:.4rem;margin-bottom:.75rem}
+.habit-add-row .input{flex:1;font-size:.85rem}
+.streak-bar{text-align:center;font-size:.85rem;color:var(--t2)}
+
+/* Badges */
+.badges-section{margin-bottom:1.5rem;padding-top:1rem;border-top:1px solid var(--border)}
+.badges-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem}
+@media(max-width:400px){.badges-grid{grid-template-columns:repeat(4,1fr)}}
+.badge{text-align:center;padding:.5rem .2rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;transition:var(--tr);position:relative}
+.badge-icon{font-size:1.3rem}
+.badge-name{font-size:.55rem;color:var(--t3);margin-top:.15rem;line-height:1.2}
+.badge.locked{opacity:.3;filter:grayscale(1)}
+.badge.earned{border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.05)}
+.badge.earned.new{animation:badgeGlow 2s ease infinite}
+@keyframes badgeGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0)}50%{box-shadow:0 0 10px 3px rgba(255,215,0,.2)}}
+
+/* Referral */
+.referral-section{text-align:center;padding-top:1rem;border-top:1px solid var(--border)}
+.referral-icon{font-size:1.5rem;margin-bottom:.25rem}
+.referral-section p{color:var(--t2);font-size:.85rem;margin-bottom:.75rem}
+.referral-code-row{display:flex;gap:.4rem;margin-bottom:.5rem}
+.referral-input{flex:1;font-family:monospace;font-weight:700;text-align:center;color:var(--accent);letter-spacing:2px;border-style:dashed;border-color:var(--accent)}
+
+/* --- FAQ --- */
+.faq-search{max-width:400px;margin:0 auto 1rem}
+.faq-cats{display:flex;justify-content:center;gap:.4rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.faq-list{max-width:600px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--border);margin-bottom:0}
+.faq-item summary{padding:1rem 0;font-weight:600;cursor:pointer;list-style:none;color:var(--t1);font-size:.95rem;position:relative;padding-right:1.5rem}
+.faq-item summary::after{content:'+';position:absolute;right:0;font-size:1.2rem;color:var(--accent);transition:var(--tr)}
+.faq-item[open] summary::after{transform:rotate(45deg)}
+.faq-item p{padding:0 0 1rem;color:var(--t2);font-size:.9rem;line-height:1.6}
+.faq-item[hidden]{display:none}
+.faq-empty{text-align:center;padding:2rem;color:var(--t2)}
+
+/* --- CTA --- */
+.section-cta{background:linear-gradient(135deg,rgba(var(--accent-rgb),.05),transparent)}
+.cta-inner{display:grid;gap:2rem}
+@media(min-width:768px){.cta-inner{grid-template-columns:1fr 1fr;align-items:center}}
+.cta-title{font-size:1.75rem;font-weight:800}
+.cta-subtitle{color:var(--t2);margin-top:.5rem}
+.cta-form{display:flex;flex-direction:column}
+
+/* --- SUCCESS --- */
+.section-success{min-height:60vh;display:flex;align-items:center}
+.success-card{background:var(--bgc);border:1px solid rgba(var(--accent-rgb),.2);border-radius:var(--r-lg);padding:3rem 2rem;text-align:center;max-width:500px;margin:0 auto;animation:fadeInUp .6s ease}
+.success-icon{font-size:4rem;margin-bottom:.5rem}
+.success-card h2{margin-bottom:.5rem}
+.success-card p{color:var(--t2);margin-bottom:1.5rem}
+.success-links{display:flex;flex-direction:column;gap:.4rem}
+.success-links a{color:var(--accent);font-weight:500}
+
+/* --- FOOTER --- */
+.footer{padding:2rem 0;border-top:1px solid var(--border)}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.logo{font-weight:800;font-size:1rem;color:var(--accent)}
+.footer-copy{font-size:.75rem;color:var(--t3)}
+.footer-nav{display:flex;gap:1rem}
+.footer-nav a{color:var(--t3);font-size:.8rem;font-weight:500}
+.footer-nav a:hover{color:var(--accent)}
+
+/* --- CHAT FAB --- */
+.chat-fab{position:fixed;bottom:4.5rem;right:1rem;z-index:100;background:var(--accent);color:#000;border:none;border-radius:2rem;padding:.7rem 1.1rem;display:flex;align-items:center;gap:.4rem;font-weight:600;font-size:.85rem;box-shadow:0 4px 16px rgba(var(--accent-rgb),.3);transition:var(--tr)}
+.chat-fab:hover{transform:translateY(-2px)}
+@media(max-width:480px){.chat-fab-text{display:none}.chat-fab{border-radius:50%;padding:.8rem}}
+
+/* --- BADGE TOAST --- */
+.badge-toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-120%);z-index:7000;background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border:1px solid rgba(255,215,0,.3);border-radius:var(--r-md);padding:.75rem 1.25rem;display:flex;align-items:center;gap:.6rem;transition:transform .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.badge-toast.show{transform:translateX(-50%) translateY(0)}
+.badge-toast-icon{font-size:1.5rem}
+.badge-toast-title{font-size:.7rem;color:var(--t3)}
+.badge-toast-name{font-size:.85rem;font-weight:700;color:#ffd700}
+
+/* --- REVIEW FORM (in bottom sheet) --- */
+.review-form h3{text-align:center;margin-bottom:1.25rem}
+.review-stars{display:flex;justify-content:center;gap:.4rem;margin-bottom:1.25rem}
+.review-star{font-size:1.75rem;cursor:pointer;filter:grayscale(1) opacity(.3);background:none;border:none;padding:0;transition:var(--tr)}
+.review-star.active{filter:none}
+
+/* --- SPACING BOTTOM (for sticky nav) --- */
+.page{padding-bottom:4rem}
