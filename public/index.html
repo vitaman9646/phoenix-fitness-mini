@@ -587,5 +587,12 @@
 </div>
 
 <script src="js/app.js"></script>
+  <script>
+  // Аварийное скрытие скелетона через 3 секунды
+  setTimeout(function(){
+    var s = document.getElementById('skeletonOverlay');
+    if(s) s.remove();
+  }, 3000);
+  </script>
 </body>
           </html>
