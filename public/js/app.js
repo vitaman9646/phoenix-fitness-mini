@@ -1133,3 +1133,34 @@ window.DEBUG = {
   Utils,
   CONFIG
 };
+
+
+// После отправки формы — показать кнопку ЛК
+function showCabinetAfterSubmit() {
+  const fab = document.getElementById('cabinetFab');
+  if (fab) {
+    fab.style.display = 'flex';
+    
+    // Сохранить данные из формы в ЛК
+    const name = document.getElementById('inputName')?.value;
+    const goal = document.getElementById('inputGoal')?.value;
+    
+    if (name && window.Storage) {
+      window.Storage.set('user.name', name);
+    }
+  }
+}
+
+// Вызвать после успешной отправки формы
+// showCabinetAfterSubmit();
+
+// Также показать FAB если есть данные в Telegram
+document.addEventListener('DOMContentLoaded', () => {
+  const tg = window.Telegram?.WebApp;
+  if (tg?.initDataUnsafe?.user) {
+    setTimeout(() => {
+      const fab = document.getElementById('cabinetFab');
+      if (fab) fab.style.display = 'flex';
+    }, 2000);
+  }
+});
