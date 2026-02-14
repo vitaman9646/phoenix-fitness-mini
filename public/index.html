@@ -39,6 +39,481 @@
   }
   </script>
 </head>
+
+  <!-- =============================================
+     ЛИЧНЫЙ КАБИНЕТ (скрыт по умолчанию)
+     ============================================= -->
+<div class="cabinet-overlay" id="cabinetOverlay" style="display:none">
+  <div class="cabinet">
+
+    <!-- Шапка кабинета -->
+    <header class="cabinet-header">
+      <button class="cabinet-back" id="cabinetClose">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <h1 class="cabinet-title">Личный кабинет</h1>
+      <button class="cabinet-settings-btn" id="settingsToggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36
+                   18.36l1.42 1.42M1 12h2M21 12h2M4.22
+                   19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Навигация табами -->
+    <nav class="cabinet-tabs">
+      <button class="cabinet-tab active" data-cab-tab="profile">
+        <span class="cab-tab-icon">👤</span>
+        <span class="cab-tab-text">Профиль</span>
+      </button>
+      <button class="cabinet-tab" data-cab-tab="progress">
+        <span class="cab-tab-icon">📊</span>
+        <span class="cab-tab-text">Прогресс</span>
+      </button>
+      <button class="cabinet-tab" data-cab-tab="habits">
+        <span class="cab-tab-icon">✅</span>
+        <span class="cab-tab-text">Привычки</span>
+      </button>
+      <button class="cabinet-tab" data-cab-tab="achievements">
+        <span class="cab-tab-icon">🏆</span>
+        <span class="cab-tab-text">Бейджи</span>
+      </button>
+    </nav>
+
+    <!-- Контент табов -->
+    <div class="cabinet-content">
+
+      <!-- ===== ТАБ: ПРОФИЛЬ ===== -->
+      <div class="cab-panel active" data-cab-panel="profile">
+
+        <!-- Карточка пользователя -->
+        <div class="user-profile-card">
+          <div class="user-avatar" id="userAvatar">
+            <span id="userInitials">ВК</span>
+          </div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Клиент</div>
+            <div class="user-tariff" id="userTariff">
+              <span class="tariff-badge tariff-standard">Оптимальный</span>
+            </div>
+            <div class="user-days" id="userDays">
+              Дней в системе: <strong>0</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Быстрая статистика -->
+        <div class="quick-stats">
+          <div class="quick-stat">
+            <div class="quick-stat-value" id="qsWeight">—</div>
+            <div class="quick-stat-label">Вес сейчас</div>
+          </div>
+          <div class="quick-stat">
+            <div class="quick-stat-value" id="qsLost">0 кг</div>
+            <div class="quick-stat-label">Потеряно</div>
+          </div>
+          <div class="quick-stat">
+            <div class="quick-stat-value" id="qsWorkouts">0</div>
+            <div class="quick-stat-label">Тренировок</div>
+          </div>
+          <div class="quick-stat">
+            <div class="quick-stat-value" id="qsStreak">0</div>
+            <div class="quick-stat-label">Дней подряд</div>
+          </div>
+        </div>
+
+        <!-- Челлендж недели -->
+        <div class="weekly-challenge" id="weeklyChallenge">
+          <div class="challenge-header">
+            <span class="challenge-icon">🎯</span>
+            <h3 class="challenge-title">Вызов недели</h3>
+          </div>
+          <p class="challenge-desc" id="challengeDesc">
+            Загрузка...
+          </p>
+          <div class="challenge-progress-wrap">
+            <div class="challenge-progress-bar">
+              <div class="challenge-progress-fill" id="challengeFill"
+                   style="width:0%"></div>
+            </div>
+            <span class="challenge-progress-text" id="challengeText">
+              0 / 7 дней
+            </span>
+          </div>
+          <button class="btn btn-sm btn-primary" id="challengeCheckIn">
+            ✓ Отметить сегодня
+          </button>
+        </div>
+
+        <!-- Реферальная секция -->
+        <div class="referral-card">
+          <div class="referral-icon">🎁</div>
+          <h3 class="referral-title">Пригласи друга</h3>
+          <p class="referral-text">
+            Получи <strong>скидку 20%</strong> за каждого
+            приглашённого друга
+          </p>
+          <div class="referral-code-wrap">
+            <input type="text" class="referral-code-input"
+                   id="referralCode" value="FIT-XXXXX" readonly>
+            <button class="referral-copy-btn" id="copyReferral">
+              📋
+            </button>
+          </div>
+          <div class="referral-stats">
+            <span>Приглашено: <strong id="referralCount">0</strong></span>
+            <span>Заработано: <strong id="referralEarned">0₽</strong></span>
+          </div>
+          <button class="btn btn-sm btn-ghost" id="shareReferral">
+            📤 Поделиться
+          </button>
+        </div>
+
+        <!-- Превью чата с тренером -->
+        <div class="chat-preview-card" id="chatPreview">
+          <h3 class="chat-preview-title">💬 Чат с тренером</h3>
+          <div class="chat-messages">
+            <div class="chat-msg chat-msg-in">
+              <div class="chat-msg-text">
+                Как прошла тренировка сегодня?
+              </div>
+              <div class="chat-msg-time">14:30</div>
+            </div>
+            <div class="chat-msg chat-msg-out">
+              <div class="chat-msg-text">
+                Отлично! Сделал все подходы 💪
+              </div>
+              <div class="chat-msg-time">14:35</div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-primary chat-open-btn"
+                  id="openTrainerChat">
+            Открыть чат
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== ТАБ: ПРОГРЕСС ===== -->
+      <div class="cab-panel" data-cab-panel="progress">
+
+        <!-- Калькулятор прогресса -->
+        <div class="progress-calculator">
+          <h3 class="calc-section-title">📐 Калькулятор прогресса</h3>
+
+          <div class="calc-inputs">
+            <div class="calc-input-group">
+              <label class="calc-label">Начальный вес (кг)</label>
+              <input type="number" class="input calc-input"
+                     id="startWeight" placeholder="90" step="0.1">
+            </div>
+            <div class="calc-input-group">
+              <label class="calc-label">Текущий вес (кг)</label>
+              <input type="number" class="input calc-input"
+                     id="currentWeight" placeholder="82" step="0.1">
+            </div>
+            <div class="calc-input-group">
+              <label class="calc-label">Целевой вес (кг)</label>
+              <input type="number" class="input calc-input"
+                     id="goalWeight" placeholder="75" step="0.1">
+            </div>
+          </div>
+
+          <button class="btn btn-primary calc-btn" id="calcProgress">
+            Рассчитать
+          </button>
+
+          <div class="calc-results" id="calcResults" style="display:none">
+            <div class="calc-result-item">
+              <div class="calc-result-icon">📉</div>
+              <div class="calc-result-value" id="lostWeight">0 кг</div>
+              <div class="calc-result-label">Потеряно</div>
+            </div>
+            <div class="calc-result-item calc-result-main">
+              <div class="calc-result-icon">🎯</div>
+              <div class="calc-result-value" id="progressPercent">0%</div>
+              <div class="calc-result-label">Прогресс к цели</div>
+            </div>
+            <div class="calc-result-item">
+              <div class="calc-result-icon">🏁</div>
+              <div class="calc-result-value" id="remainWeight">0 кг</div>
+              <div class="calc-result-label">Осталось</div>
+            </div>
+          </div>
+
+          <!-- Визуальный прогресс-бар -->
+          <div class="visual-progress" id="visualProgress" style="display:none">
+            <div class="visual-progress-track">
+              <div class="visual-progress-fill" id="visualFill"></div>
+              <div class="visual-progress-marker" id="visualMarker"></div>
+            </div>
+            <div class="visual-progress-labels">
+              <span id="vpStart">90 кг</span>
+              <span id="vpGoal">75 кг</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- График замеров -->
+        <div class="measurements-section">
+          <h3 class="calc-section-title">📈 История замеров</h3>
+
+          <div class="measurement-add">
+            <div class="measurement-inputs">
+              <input type="number" class="input" id="newWeight"
+                     placeholder="Вес (кг)" step="0.1">
+              <input type="date" class="input" id="newDate">
+            </div>
+            <button class="btn btn-sm btn-primary" id="addMeasurement">
+              + Добавить
+            </button>
+          </div>
+
+          <!-- Canvas график -->
+          <div class="chart-container">
+            <canvas id="weightChart" width="350" height="200"></canvas>
+          </div>
+
+          <!-- Список замеров -->
+          <div class="measurements-list" id="measurementsList">
+            <!-- Заполняется из JS -->
+          </div>
+        </div>
+
+        <!-- Замеры тела -->
+        <div class="body-measurements">
+          <h3 class="calc-section-title">📏 Замеры тела</h3>
+
+          <div class="body-measure-grid">
+            <div class="body-measure-item">
+              <label class="calc-label">Грудь (см)</label>
+              <input type="number" class="input" id="measureChest"
+                     placeholder="100" step="0.5">
+            </div>
+            <div class="body-measure-item">
+              <label class="calc-label">Талия (см)</label>
+              <input type="number" class="input" id="measureWaist"
+                     placeholder="85" step="0.5">
+            </div>
+            <div class="body-measure-item">
+              <label class="calc-label">Бёдра (см)</label>
+              <input type="number" class="input" id="measureHips"
+                     placeholder="100" step="0.5">
+            </div>
+            <div class="body-measure-item">
+              <label class="calc-label">Бицепс (см)</label>
+              <input type="number" class="input" id="measureBicep"
+                     placeholder="35" step="0.5">
+            </div>
+          </div>
+
+          <button class="btn btn-sm btn-primary" id="saveBodyMeasures">
+            💾 Сохранить замеры
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== ТАБ: ПРИВЫЧКИ ===== -->
+      <div class="cab-panel" data-cab-panel="habits">
+
+        <div class="habits-tracker">
+          <h3 class="calc-section-title">✅ Трекер привычек</h3>
+
+          <div class="streak-display">
+            <div class="streak-flame">🔥</div>
+            <div class="streak-count" id="streakCount">0</div>
+            <div class="streak-label">дней подряд</div>
+          </div>
+
+          <!-- Неделя -->
+          <div class="week-grid" id="weekGrid">
+            <!-- Заполняется из JS -->
+          </div>
+
+          <!-- Привычки на сегодня -->
+          <div class="habits-today">
+            <h4 class="habits-today-title">Сегодня</h4>
+            <div class="habits-list" id="habitsList">
+              <!-- Заполняется из JS -->
+            </div>
+          </div>
+
+          <!-- Добавить привычку -->
+          <div class="habit-add">
+            <input type="text" class="input" id="newHabitInput"
+                   placeholder="Новая привычка..." maxlength="50">
+            <button class="btn btn-sm btn-primary" id="addHabitBtn">
+              +
+            </button>
+          </div>
+
+          <!-- Статистика привычек -->
+          <div class="habits-stats">
+            <div class="habit-stat">
+              <div class="habit-stat-value" id="habitsCompleted">0</div>
+              <div class="habit-stat-label">Выполнено сегодня</div>
+            </div>
+            <div class="habit-stat">
+              <div class="habit-stat-value" id="habitsTotal">0</div>
+              <div class="habit-stat-label">Всего привычек</div>
+            </div>
+            <div class="habit-stat">
+              <div class="habit-stat-value" id="habitsRate">0%</div>
+              <div class="habit-stat-label">Выполнение</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Трекер воды -->
+        <div class="water-tracker">
+          <h3 class="calc-section-title">💧 Трекер воды</h3>
+          <div class="water-display">
+            <div class="water-glass" id="waterGlass">
+              <div class="water-level" id="waterLevel" style="height:0%"></div>
+            </div>
+            <div class="water-info">
+              <div class="water-current">
+                <span id="waterCurrent">0</span> / <span id="waterGoal">8</span>
+              </div>
+              <div class="water-label">стаканов</div>
+            </div>
+          </div>
+          <div class="water-controls">
+            <button class="btn btn-sm btn-ghost" id="waterMinus">−</button>
+            <button class="btn btn-sm btn-primary" id="waterPlus">
+              + Стакан
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ТАБ: ДОСТИЖЕНИЯ ===== -->
+      <div class="cab-panel" data-cab-panel="achievements">
+        <div class="achievements-section">
+          <h3 class="calc-section-title">🏆 Достижения</h3>
+
+          <div class="achievements-summary">
+            <div class="achievements-count">
+              <span id="earnedBadges">0</span> / <span id="totalBadges">0</span>
+            </div>
+            <div class="achievements-label">бейджей получено</div>
+            <div class="achievements-xp">
+              Очки: <strong id="totalXP">0</strong> XP
+            </div>
+          </div>
+
+          <!-- Уровень -->
+          <div class="level-display">
+            <div class="level-info">
+              <span class="level-label">Уровень</span>
+              <span class="level-number" id="userLevel">1</span>
+              <span class="level-name" id="levelName">Новичок</span>
+            </div>
+            <div class="level-bar">
+              <div class="level-fill" id="levelFill" style="width:0%"></div>
+            </div>
+            <div class="level-xp-text" id="levelXPText">0 / 100 XP</div>
+          </div>
+
+          <!-- Бейджи по категориям -->
+          <div class="badges-categories">
+
+            <div class="badge-category">
+              <h4 class="badge-cat-title">🏋️ Тренировки</h4>
+              <div class="badges-grid" id="trainingBadges">
+                <!-- Заполняется из JS -->
+              </div>
+            </div>
+
+            <div class="badge-category">
+              <h4 class="badge-cat-title">🥗 Питание</h4>
+              <div class="badges-grid" id="nutritionBadges">
+                <!-- Заполняется из JS -->
+              </div>
+            </div>
+
+            <div class="badge-category">
+              <h4 class="badge-cat-title">📊 Прогресс</h4>
+              <div class="badges-grid" id="progressBadges">
+                <!-- Заполняется из JS -->
+              </div>
+            </div>
+
+            <div class="badge-category">
+              <h4 class="badge-cat-title">⭐ Особые</h4>
+              <div class="badges-grid" id="specialBadges">
+                <!-- Заполняется из JS -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /cabinet-content -->
+
+    <!-- Настройки (Bottom Sheet) -->
+    <div class="settings-sheet" id="settingsSheet">
+      <div class="settings-sheet-handle"></div>
+      <h3 class="settings-title">⚙️ Настройки</h3>
+
+      <div class="settings-list">
+        <div class="settings-item">
+          <span class="settings-label">Уведомления о тренировках</span>
+          <label class="toggle">
+            <input type="checkbox" id="notifyWorkouts" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-item">
+          <span class="settings-label">Напоминание пить воду</span>
+          <label class="toggle">
+            <input type="checkbox" id="notifyWater">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-item">
+          <span class="settings-label">Время тренировки</span>
+          <input type="time" class="input settings-time"
+                 id="workoutTime" value="08:00">
+        </div>
+        <div class="settings-item">
+          <span class="settings-label">Цель воды (стаканов)</span>
+          <input type="number" class="input settings-number"
+                 id="waterGoalInput" value="8" min="4" max="20">
+        </div>
+      </div>
+
+      <button class="btn btn-primary settings-save" id="saveSettings">
+        Сохранить
+      </button>
+      <button class="btn btn-ghost settings-logout" id="logoutBtn">
+        Выйти из кабинета
+      </button>
+    </div>
+
+  </div><!-- /cabinet -->
+</div><!-- /cabinet-overlay -->
+
+<!-- Кнопка входа в кабинет (FAB) — показывается для клиентов -->
+<button class="cabinet-fab" id="cabinetFab" style="display:none">
+  <span class="cabinet-fab-icon">👤</span>
+  <span class="cabinet-fab-badge" id="cabFabBadge" style="display:none">!</span>
+</button>
+
+<!-- Toast для бейджей -->
+<div class="badge-toast" id="badgeToast">
+  <div class="badge-toast-icon" id="badgeToastIcon">🏆</div>
+  <div class="badge-toast-content">
+    <div class="badge-toast-title">Новое достижение!</div>
+    <div class="badge-toast-name" id="badgeToastName"></div>
+  </div>
+</div>
 <body>
   <!-- Лоадер -->
   <div class="loader-overlay" id="loaderOverlay">
