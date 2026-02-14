@@ -418,3 +418,29 @@ select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
 
 /* --- SPACING BOTTOM (for sticky nav) --- */
 .page{padding-bottom:4rem}
+
+/* --- Case Real Photos --- */
+.case-photo {
+  position: relative;
+  overflow: hidden;
+}
+
+.case-photo img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  display: block;
+}
+
+.case-label {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 0.2rem 0.7rem;
+  border-radius: 2rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
