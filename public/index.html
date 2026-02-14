@@ -299,79 +299,168 @@
   </section>
 
   <!-- ========== QUIZ ========== -->
-  <section class="section section-dark" id="quiz">
-    <div class="container">
-      <h2 class="section-title reveal">Узнай свой план за 30 секунд</h2>
-      <p class="section-subtitle reveal">4 вопроса → персональная рекомендация</p>
-      <div class="quiz-wrapper" id="quizWrapper">
-        <div class="quiz-step active" data-step="1">
-          <div class="quiz-counter">1 из 4</div>
-          <div class="quiz-question">Какая у тебя цель?</div>
-          <div class="quiz-hint">Определит тип тренировок</div>
-          <div class="quiz-options">
-            <button class="quiz-option" data-value="loss" data-next="2"><span class="quiz-option-icon">🔥</span><span>Похудение</span></button>
-            <button class="quiz-option" data-value="gain" data-next="2"><span class="quiz-option-icon">💪</span><span>Набор массы</span></button>
-            <button class="quiz-option" data-value="tone" data-next="2"><span class="quiz-option-icon">⚡</span><span>Тонус</span></button>
-          </div>
-        </div>
-        <div class="quiz-step" data-step="2">
-          <div class="quiz-counter">2 из 4</div>
-          <div class="quiz-question">Где будешь тренироваться?</div>
-          <div class="quiz-hint">Подберём упражнения</div>
-          <div class="quiz-options">
-            <button class="quiz-option" data-value="home" data-next="3"><span class="quiz-option-icon">🏠</span><span>Дома</span></button>
-            <button class="quiz-option" data-value="gym" data-next="3"><span class="quiz-option-icon">🏋️</span><span>В зале</span></button>
-            <button class="quiz-option" data-value="both" data-next="3"><span class="quiz-option-icon">🔄</span><span>Везде</span></button>
-          </div>
-        </div>
-        <div class="quiz-step" data-step="3">
-          <div class="quiz-counter">3 из 4</div>
-          <div class="quiz-question">Сколько раз в неделю?</div>
-          <div class="quiz-hint">Оптимально 3-4</div>
-          <div class="quiz-options">
-            <button class="quiz-option" data-value="3" data-next="4"><span class="quiz-option-icon">3️⃣</span><span>3 раза</span></button>
-            <button class="quiz-option" data-value="4" data-next="4"><span class="quiz-option-icon">4️⃣</span><span>4 раза</span></button>
-            <button class="quiz-option" data-value="5" data-next="4"><span class="quiz-option-icon">5️⃣</span><span>5+ раз</span></button>
-          </div>
-        </div>
-        <div class="quiz-step" data-step="4">
-          <div class="quiz-counter">4 из 4</div>
-          <div class="quiz-question">Твой уровень?</div>
-          <div class="quiz-hint">Влияет на сложность</div>
-          <div class="quiz-options">
-            <button class="quiz-option" data-value="beginner" data-next="result"><span class="quiz-option-icon">🌱</span><span>Новичок</span></button>
-            <button class="quiz-option" data-value="middle" data-next="result"><span class="quiz-option-icon">🔥</span><span>Средний</span></button>
-            <button class="quiz-option" data-value="advanced" data-next="result"><span class="quiz-option-icon">💎</span><span>Уверенный</span></button>
-          </div>
-        </div>
-        <div class="quiz-step" data-step="result">
-          <div class="quiz-result-icon">✅</div>
-          <div class="quiz-result-title">Вот что тебе подходит:</div>
-          <div id="quizResultText"></div>
-          <div id="quizWeekPlan"></div>
-          <div class="quiz-bonus">
-            <div class="quiz-bonus-icon">🎁</div>
-            <div class="quiz-bonus-title">Бонус:</div>
-            <ul class="quiz-bonus-list">
-              <li><strong>PDF</strong> «Первая неделя»</li>
-              <li><strong>Чек-лист</strong> питания</li>
-              <li><strong>Калькулятор КБЖУ</strong></li>
-            </ul>
-            <button class="btn btn-primary" id="downloadBonus">Скачать</button>
-          </div>
-          <div class="quiz-result-actions">
-            <button class="btn btn-primary" data-scroll="#ctaFinal">Получить план</button>
-            <button class="btn btn-ghost" id="shareQuiz">📤 Поделиться</button>
-            <button class="btn btn-ghost" id="quizRestart">↻ Заново</button>
-          </div>
-        </div>
-        <div class="quiz-controls">
-          <button class="quiz-back" id="quizBack" style="display:none">← Назад</button>
-          <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgress"></div></div>
+<section class="section section-dark" id="quiz">
+  <div class="container">
+    <h2 class="section-title reveal">Узнай свой план за 60 секунд</h2>
+    <p class="section-subtitle reveal">6 вопросов → персональный расчёт + рекомендация</p>
+    <div class="quiz-wrapper" id="quizWrapper">
+
+      <!-- Шаг 1: Цель -->
+      <div class="quiz-step active" data-step="1">
+        <div class="quiz-counter">1 из 6</div>
+        <div class="quiz-question">Какая у тебя цель?</div>
+        <div class="quiz-hint">Определит тип тренировок и питания</div>
+        <div class="quiz-options">
+          <button class="quiz-option" data-value="loss" data-next="2"><span class="quiz-option-icon">🔥</span><span>Похудение</span></button>
+          <button class="quiz-option" data-value="gain" data-next="2"><span class="quiz-option-icon">💪</span><span>Набор массы</span></button>
+          <button class="quiz-option" data-value="tone" data-next="2"><span class="quiz-option-icon">⚡</span><span>Тонус и здоровье</span></button>
         </div>
       </div>
+
+      <!-- Шаг 2: Пол -->
+      <div class="quiz-step" data-step="2">
+        <div class="quiz-counter">2 из 6</div>
+        <div class="quiz-question">Твой пол</div>
+        <div class="quiz-hint">Влияет на расчёт калорий и программу</div>
+        <div class="quiz-options">
+          <button class="quiz-option" data-value="male" data-next="3"><span class="quiz-option-icon">♂️</span><span>Мужской</span></button>
+          <button class="quiz-option" data-value="female" data-next="3"><span class="quiz-option-icon">♀️</span><span>Женский</span></button>
+        </div>
+      </div>
+
+      <!-- Шаг 3: Параметры тела -->
+      <div class="quiz-step" data-step="3">
+        <div class="quiz-counter">3 из 6</div>
+        <div class="quiz-question">Твои параметры</div>
+        <div class="quiz-hint">Для точного расчёта калорий</div>
+        <div class="quiz-body-inputs">
+          <div class="quiz-input-row">
+            <div class="form-field">
+              <label class="form-label">Возраст</label>
+              <input type="number" class="input" id="quizAge" placeholder="25" min="14" max="80">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Рост (см)</label>
+              <input type="number" class="input" id="quizHeight" placeholder="175" min="100" max="250">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Вес (кг)</label>
+              <input type="number" class="input" id="quizWeight" placeholder="80" min="30" max="300">
+            </div>
+          </div>
+          <button class="btn btn-primary quiz-next-btn" id="quizStep3Next">Далее →</button>
+        </div>
+      </div>
+
+      <!-- Шаг 4: Где тренируешься -->
+      <div class="quiz-step" data-step="4">
+        <div class="quiz-counter">4 из 6</div>
+        <div class="quiz-question">Где будешь тренироваться?</div>
+        <div class="quiz-hint">Подберём упражнения под инвентарь</div>
+        <div class="quiz-options">
+          <button class="quiz-option" data-value="home" data-next="5"><span class="quiz-option-icon">🏠</span><span>Дома</span></button>
+          <button class="quiz-option" data-value="gym" data-next="5"><span class="quiz-option-icon">🏋️</span><span>В зале</span></button>
+          <button class="quiz-option" data-value="both" data-next="5"><span class="quiz-option-icon">🔄</span><span>Дома и в зале</span></button>
+        </div>
+      </div>
+
+      <!-- Шаг 5: Частота -->
+      <div class="quiz-step" data-step="5">
+        <div class="quiz-counter">5 из 6</div>
+        <div class="quiz-question">Сколько раз в неделю готов тренироваться?</div>
+        <div class="quiz-hint">Оптимально 3-4 для большинства целей</div>
+        <div class="quiz-options">
+          <button class="quiz-option" data-value="2" data-next="6"><span class="quiz-option-icon">2️⃣</span><span>2 раза</span></button>
+          <button class="quiz-option" data-value="3" data-next="6"><span class="quiz-option-icon">3️⃣</span><span>3 раза</span></button>
+          <button class="quiz-option" data-value="4" data-next="6"><span class="quiz-option-icon">4️⃣</span><span>4 раза</span></button>
+          <button class="quiz-option" data-value="5" data-next="6"><span class="quiz-option-icon">5️⃣</span><span>5+ раз</span></button>
+        </div>
+      </div>
+
+      <!-- Шаг 6: Уровень -->
+      <div class="quiz-step" data-step="6">
+        <div class="quiz-counter">6 из 6</div>
+        <div class="quiz-question">Твой уровень подготовки?</div>
+        <div class="quiz-hint">Влияет на сложность программы</div>
+        <div class="quiz-options">
+          <button class="quiz-option" data-value="beginner" data-next="result"><span class="quiz-option-icon">🌱</span><span>Новичок</span></button>
+          <button class="quiz-option" data-value="middle" data-next="result"><span class="quiz-option-icon">🔥</span><span>Средний</span></button>
+          <button class="quiz-option" data-value="advanced" data-next="result"><span class="quiz-option-icon">💎</span><span>Продвинутый</span></button>
+        </div>
+      </div>
+
+      <!-- Результат -->
+      <div class="quiz-step" data-step="result">
+        <div class="quiz-result-icon">✅</div>
+        <div class="quiz-result-title">Твой персональный расчёт:</div>
+
+        <!-- Блок КБЖУ -->
+        <div class="quiz-calc-result" id="quizCalcResult">
+          <div class="quiz-calc-grid">
+            <div class="quiz-calc-item quiz-calc-main">
+              <div class="quiz-calc-value" id="qCalories">0</div>
+              <div class="quiz-calc-label">ккал/день</div>
+            </div>
+            <div class="quiz-calc-item">
+              <div class="quiz-calc-value" id="qProtein">0</div>
+              <div class="quiz-calc-label">белки (г)</div>
+            </div>
+            <div class="quiz-calc-item">
+              <div class="quiz-calc-value" id="qFat">0</div>
+              <div class="quiz-calc-label">жиры (г)</div>
+            </div>
+            <div class="quiz-calc-item">
+              <div class="quiz-calc-value" id="qCarbs">0</div>
+              <div class="quiz-calc-label">углеводы (г)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Рекомендации -->
+        <div id="quizResultText"></div>
+
+        <!-- План на неделю -->
+        <div id="quizWeekPlan"></div>
+
+        <!-- Что входит в программу -->
+        <div class="quiz-upsell">
+          <div class="quiz-upsell-title">Это бесплатный расчёт. В полной программе:</div>
+          <ul class="quiz-upsell-list">
+            <li>✅ Детальный план тренировок на каждый день</li>
+            <li>✅ Меню и рецепты под твой калораж</li>
+            <li>✅ Корректировки программы каждую неделю</li>
+            <li>✅ Разбор техники упражнений</li>
+            <li>✅ Поддержка в чате</li>
+          </ul>
+        </div>
+
+        <!-- Бонус -->
+        <div class="quiz-bonus">
+          <div class="quiz-bonus-icon">🎁</div>
+          <div class="quiz-bonus-title">Бонус за прохождение:</div>
+          <ul class="quiz-bonus-list">
+            <li><strong>PDF</strong> «Первая неделя тренировок»</li>
+            <li><strong>Чек-лист</strong> «7 ошибок в питании»</li>
+          </ul>
+          <button class="btn btn-primary" id="downloadBonus">Скачать бонус</button>
+        </div>
+
+        <!-- CTA -->
+        <div class="quiz-result-actions">
+          <button class="btn btn-primary" data-scroll="#ctaFinal">Получить полную программу</button>
+          <button class="btn btn-ghost" id="shareQuiz">📤 Поделиться результатом</button>
+          <button class="btn btn-ghost" id="quizRestart">↻ Пройти заново</button>
+        </div>
+      </div>
+
+      <!-- Прогресс -->
+      <div class="quiz-controls">
+        <button class="quiz-back" id="quizBack" style="display:none">← Назад</button>
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgress"></div></div>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- ========== PROBLEMS ========== -->
   <section class="section" id="problems">
