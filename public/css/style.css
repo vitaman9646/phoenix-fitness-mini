@@ -453,3 +453,9 @@ select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
   border-radius: var(--r-lg);
   display: block;
 }
+
+/* --- Neon glow effect on logo --- */
+.logo-img {
+  filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.4))
+          drop-shadow(0 0 20px rgba(0, 229, 255, 0.2));
+}
