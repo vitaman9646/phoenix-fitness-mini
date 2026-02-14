@@ -356,7 +356,8 @@ var Quiz={
   history:[],
   init:function(){
     var self=this;
-    // Options
+
+    // Кнопки выбора
     $$('.quiz-option').forEach(function(opt){
       opt.addEventListener('click',function(){
         var stepEl=opt.closest('.quiz-step');
@@ -373,32 +374,65 @@ var Quiz={
       });
     });
 
-    // Back
+    // Кнопка "Далее" на шаге 3 (параметры тела)
+    var step3btn=document.getElementById('quizStep3Next');
+    if(step3btn)step3btn.addEventListener('click',function(){
+      var age=document.getElementById('quizAge').value;
+      var height=document.getElementById('quizHeight').value;
+      var weight=document.getElementById('quizWeight').value;
+
+      if(!age||!height||!weight){
+        Notify.show('Заполни все поля','warning');
+        return;
+      }
+      if(parseInt(age)<14||parseInt(age)>80){
+        Notify.show('Укажи реальный возраст','warning');
+        return;
+      }
+      if(parseInt(weight)<30||parseInt(weight)>300){
+        Notify.show('Укажи реальный вес','warning');
+        return;
+      }
+
+      self.answers.age=parseInt(age);
+      self.answers.height=parseInt(height);
+      self.answers.weight=parseInt(weight);
+      self.history.push('3');
+      haptic('medium');
+      self.goTo('4');
+    });
+
+    // Назад
     var back=document.getElementById('quizBack');
     if(back)back.addEventListener('click',function(){
       if(self.history.length){self.goTo(self.history.pop());haptic()}
     });
 
-    // Restart
+    // Рестарт
     var restart=document.getElementById('quizRestart');
     if(restart)restart.addEventListener('click',function(){
-      self.answers={};self.history=[];self.goTo('1');haptic();
+      self.answers={};self.history=[];
+      document.getElementById('quizAge').value='';
+      document.getElementById('quizHeight').value='';
+      document.getElementById('quizWeight').value='';
+      self.goTo('1');haptic();
     });
 
-    // Share
+    // Поделиться
     var share=document.getElementById('shareQuiz');
     if(share)share.addEventListener('click',function(){
-      var text='Прошёл квиз у фитнес-тренера! 💪';
+      var cal=self.answers.calories||'';
+      var text='Прошёл фитнес-квиз! Мой калораж: '+cal+' ккал. Попробуй тоже 💪';
       if(isTG)tg.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent('https://t.me/your_bot/app')+'&text='+encodeURIComponent(text));
-      else if(navigator.share)navigator.share({title:'Квиз',text:text});
+      else if(navigator.share)navigator.share({title:'Фитнес квиз',text:text});
       else{navigator.clipboard.writeText(text);Notify.show('Скопировано!','success')}
       hapticN('success');
     });
 
-    // Download
+    // Бонус
     var dl=document.getElementById('downloadBonus');
     if(dl)dl.addEventListener('click',function(){
-      Notify.show('Бонус отправлен! 📩','success');
+      Notify.show('Бонус отправлен в Telegram! 📩','success');
       hapticN('success');
     });
   },
@@ -410,7 +444,7 @@ var Quiz={
 
     var prog=document.getElementById('quizProgress');
     if(prog){
-      var widths={'1':25,'2':50,'3':75,'4':100,'result':100};
+      var widths={'1':16,'2':32,'3':48,'4':64,'5':80,'6':100,'result':100};
       prog.style.width=(widths[step]||0)+'%';
     }
 
@@ -421,16 +455,79 @@ var Quiz={
   },
 
   showResult:function(){
-    var gt={loss:'похудение',gain:'набор массы',tone:'тонус'};
-    var pt={home:'дома',gym:'в зале',both:'везде'};
+    // Расчёт КБЖУ
+    var gender=this.answers.step_2;
+    var age=this.answers.age||25;
+    var weight=this.answers.weight||75;
+    var height=this.answers.height||175;
+    var goal=this.answers.step_1;
+    var freq=parseInt(this.answers.step_5)||3;
+
+    // Mifflin-St Jeor
+    var bmr;
+    if(gender==='male'){
+      bmr=10*weight+6.25*height-5*age+5;
+    }else{
+      bmr=10*weight+6.25*height-5*age-161;
+    }
+
+    // Коэффициент активности
+    var activityMap={2:1.375,3:1.55,4:1.55,5:1.725};
+    var tdee=Math.round(bmr*(activityMap[freq]||1.55));
+
+    // Корректировка под цель
+    var goalMult={loss:0.8,gain:1.15,tone:1.0};
+    var calories=Math.round(tdee*(goalMult[goal]||1));
+
+    // Макросы
+    var protPerKg=goal==='gain'?2.2:goal==='loss'?2.0:1.8;
+    var protein=Math.round(weight*protPerKg);
+    var fat=Math.round((calories*0.25)/9);
+    var carbs=Math.max(0,Math.round((calories-protein*4-fat*9)/4));
+
+    this.answers.calories=calories;
+    this.answers.protein=protein;
+    this.answers.fat=fat;
+    this.answers.carbs=carbs;
+
+    // Анимация чисел
+    this.animVal('qCalories',calories);
+    this.animVal('qProtein',protein);
+    this.animVal('qFat',fat);
+    this.animVal('qCarbs',carbs);
+
+    // Текст рекомендации
+    var goalText={loss:'похудение',gain:'набор массы',tone:'тонус и здоровье'};
+    var placeText={home:'дома',gym:'в зале',both:'дома и в зале'};
+    var levelText={beginner:'новичок',middle:'средний',advanced:'продвинутый'};
+    var place=this.answers.step_4;
+    var level=this.answers.step_6;
+
+    var splitRecommend='';
+    if(freq<=3){
+      splitRecommend='Фулбади (всё тело) — '+freq+' раза в неделю';
+    }else if(freq===4){
+      splitRecommend='Верх/низ — 4 раза в неделю';
+    }else{
+      splitRecommend='Сплит по группам мышц — '+freq+' раз в неделю';
+    }
+
     var el=document.getElementById('quizResultText');
     if(el){
-      el.innerHTML='<p><strong>Цель:</strong> '+(gt[this.answers.step_1]||'—')+
-        ' | <strong>Место:</strong> '+(pt[this.answers.step_2]||'—')+
-        ' | <strong>'+(this.answers.step_3||3)+'×/нед</strong></p>'+
-        '<p>Рекомендация: тариф <strong>«Оптимальный»</strong></p>';
+      el.innerHTML=
+        '<div class="quiz-recommendation">'+
+        '<div class="quiz-rec-item"><span class="quiz-rec-icon">🎯</span><span><strong>Цель:</strong> '+(goalText[goal]||'—')+'</span></div>'+
+        '<div class="quiz-rec-item"><span class="quiz-rec-icon">📍</span><span><strong>Место:</strong> '+(placeText[place]||'—')+'</span></div>'+
+        '<div class="quiz-rec-item"><span class="quiz-rec-icon">📊</span><span><strong>Уровень:</strong> '+(levelText[level]||'—')+'</span></div>'+
+        '<div class="quiz-rec-item"><span class="quiz-rec-icon">🔄</span><span><strong>Сплит:</strong> '+splitRecommend+'</span></div>'+
+        '<div class="quiz-rec-item"><span class="quiz-rec-icon">⚖️</span><span><strong>Твой вес:</strong> '+weight+' кг</span></div>'+
+        '</div>';
     }
+
+    // План на неделю
     this.buildWeekPlan();
+
+    // Заполнить форму
     this.prefillForm();
   },
 
@@ -438,21 +535,58 @@ var Quiz={
     var el=document.getElementById('quizWeekPlan');
     if(!el)return;
     var days=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
-    var freq=parseInt(this.answers.step_3)||3;
-    var html='<div class="week-plan-title">📅 Примерный план:</div>';
-    for(var i=0;i<days.length;i++){
-      if(i<freq){
-        html+='<div class="week-plan-day"><span class="week-plan-name">'+days[i]+'</span><span class="week-plan-workout">Тренировка '+(i+1)+'</span></div>';
+    var freq=parseInt(this.answers.step_5)||3;
+    var goal=this.answers.step_1;
+    var place=this.answers.step_4;
+
+    // Тренировки в зависимости от цели и места
+    var workouts;
+    if(goal==='loss'){
+      if(place==='home'){
+        workouts=['HIIT 25 мин','Силовая: верх','Кардио 30 мин','Силовая: низ','HIIT 25 мин','Функционалка'];
+      }else{
+        workouts=['Силовая + кардио','Ноги и ягодицы','Кардио 40 мин','Спина и руки','Full body','Кардио'];
+      }
+    }else if(goal==='gain'){
+      if(place==='home'){
+        workouts=['Отжимания и брусья','Ноги и прыжки','Подтягивания','Плечи и руки','Full body','Кор'];
+      }else{
+        workouts=['Грудь и трицепс','Спина и бицепс','Ноги','Плечи и руки','Full body','Слабые группы'];
+      }
+    }else{
+      workouts=['Функционалка','Силовая лёгкая','Кардио','Йога/растяжка','Full body','Подвижность'];
+    }
+
+    var html='<div class="quiz-week-plan"><div class="week-plan-title">📅 Примерный план на неделю:</div>';
+    var workoutIdx=0;
+    for(var i=0;i<7;i++){
+      if(workoutIdx<freq&&i<6){
+        html+='<div class="week-plan-day"><span class="week-plan-name">'+days[i]+'</span><span class="week-plan-workout">'+workouts[workoutIdx%workouts.length]+'</span></div>';
+        workoutIdx++;
       }else{
         html+='<div class="week-plan-day"><span class="week-plan-name">'+days[i]+'</span><span class="week-plan-rest">Отдых</span></div>';
       }
     }
+    html+='</div>';
     el.innerHTML=html;
   },
 
   prefillForm:function(){
     var sel=document.getElementById('inputGoal');
     if(sel&&this.answers.step_1)sel.value=this.answers.step_1;
+  },
+
+  animVal:function(id,target){
+    var el=document.getElementById(id);
+    if(!el)return;
+    var start=performance.now();
+    function up(now){
+      var p=Math.min((now-start)/1000,1);
+      var eased=1-Math.pow(1-p,3);
+      el.textContent=Math.round(target*eased);
+      if(p<1)requestAnimationFrame(up);
+    }
+    requestAnimationFrame(up);
   }
 };
 
