@@ -274,7 +274,6 @@ function initCases() {
     haptic('light');
   });
 
-  // Фильтры
   var filterBtns = document.querySelectorAll('.cases-filters .filter-btn');
   filterBtns.forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -299,7 +298,6 @@ function initCases() {
     });
   });
 
-  // Свайп
   var startX = 0;
   track.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
   track.addEventListener('touchend', function(e) {
@@ -401,6 +399,18 @@ function initLeaveReview() {
   });
 }
 
+// ========== TRAINING SCHEDULE ==========
+function getTrainingSchedule(freq) {
+  switch (freq) {
+    case 2: return [0, 3];           // Пн, Чт
+    case 3: return [0, 2, 4];       // Пн, Ср, Пт
+    case 4: return [0, 1, 3, 5];    // Пн, Вт, Чт, Сб
+    case 5: return [0, 1, 2, 4, 5]; // Пн, Вт, Ср, Пт, Сб
+    case 6: return [0, 1, 2, 3, 4, 5]; // Пн-Сб
+    default: return [0, 2, 4];      // Пн, Ср, Пт
+  }
+}
+
 // ========== QUIZ ==========
 function initQuiz() {
   var wrapper = document.getElementById('quizWrapper');
@@ -418,7 +428,6 @@ function initQuiz() {
     var target = wrapper.querySelector('[data-step="' + stepId + '"]');
     if (target) target.classList.add('active');
 
-    // Прогресс
     if (stepId === 'result') {
       progress.style.width = '100%';
     } else {
@@ -426,7 +435,6 @@ function initQuiz() {
       progress.style.width = ((num / totalSteps) * 100) + '%';
     }
 
-    // Кнопка назад
     if (backBtn) {
       backBtn.style.display = (history.length > 0 && stepId !== 'result') ? '' : 'none';
     }
@@ -437,7 +445,6 @@ function initQuiz() {
     }
   }
 
-  // Клик по опции
   wrapper.addEventListener('click', function(e) {
     var option = e.target.closest('.quiz-option');
     if (!option) return;
@@ -464,7 +471,6 @@ function initQuiz() {
     setTimeout(function() { showStep(nextStep); }, 300);
   });
 
-  // Шаг 3
   var step3Btn = document.getElementById('quizStep3Next');
   if (step3Btn) {
     step3Btn.addEventListener('click', function() {
@@ -491,7 +497,6 @@ function initQuiz() {
     });
   }
 
-  // Назад
   if (backBtn) {
     backBtn.addEventListener('click', function() {
       if (history.length === 0) return;
@@ -501,7 +506,6 @@ function initQuiz() {
     });
   }
 
-  // Рестарт
   var restartBtn = document.getElementById('quizRestart');
   if (restartBtn) {
     restartBtn.addEventListener('click', function() {
@@ -512,7 +516,6 @@ function initQuiz() {
     });
   }
 
-  // Шеринг
   var shareBtn = document.getElementById('shareQuiz');
   if (shareBtn) {
     shareBtn.addEventListener('click', function() {
@@ -528,7 +531,6 @@ function initQuiz() {
     });
   }
 
-  // Расчёт результата
   function calculateQuizResult() {
     var age = answers.age;
     var height = answers.height;
@@ -542,7 +544,6 @@ function initQuiz() {
       return;
     }
 
-    // BMR Миффлина-Сан Жеора
     var bmr;
     if (gender === 'male') {
       bmr = 10 * weight + 6.25 * height - 5 * age + 5;
@@ -576,7 +577,6 @@ function initQuiz() {
     var carbs = Math.round(carbsCal / 4);
     if (carbs < 0) carbs = 50;
 
-    // Верификация
     var check = protein * 4 + fat * 9 + carbs * 4;
     console.log('Quiz КБЖУ:', calories, 'ккал | Проверка:', check);
 
@@ -585,7 +585,6 @@ function initQuiz() {
     document.getElementById('qFat').textContent = fat + 'г';
     document.getElementById('qCarbs').textContent = carbs + 'г';
 
-    // Рекомендации
     var goalNames = { loss: 'Похудение', gain: 'Набор массы', tone: 'Тонус и здоровье' };
     var placeNames = { home: 'дома', gym: 'в зале', both: 'дома и в зале' };
     var levelNames = { beginner: 'новичок', middle: 'средний', advanced: 'продвинутый' };
@@ -608,14 +607,16 @@ function initQuiz() {
       + '<p><strong>Рекомендованный тариф:</strong> ' + recTariff + '</p>'
       + '</div>';
 
-    // План на неделю
+    // План на неделю с правильным распределением
     var weekEl = document.getElementById('quizWeekPlan');
-    var days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    var dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    var trainingDays = getTrainingSchedule(freq);
+
     var weekHtml = '<div class="quiz-week"><h3>План на неделю:</h3><div class="quiz-week-grid">';
     for (var i = 0; i < 7; i++) {
-      var isTraining = i < freq;
+      var isTraining = trainingDays.indexOf(i) !== -1;
       weekHtml += '<div class="quiz-week-day ' + (isTraining ? 'training' : 'rest') + '">'
-        + '<span class="quiz-week-day-name">' + days[i] + '</span>'
+        + '<span class="quiz-week-day-name">' + dayNames[i] + '</span>'
         + '<span class="quiz-week-day-type">' + (isTraining ? '💪' : '😴') + '</span>'
         + '</div>';
     }
@@ -724,7 +725,6 @@ function initKBJU() {
     if (weight < 30 || weight > 300) { Notify.show('Вес: 30–300 кг', 'error'); return; }
     if (height < 100 || height > 250) { Notify.show('Рост: 100–250 см', 'error'); return; }
 
-    // Миффлин-Сан Жеора
     var bmr;
     if (selectedGender === 'male') {
       bmr = 10 * weight + 6.25 * height - 5 * age + 5;
@@ -768,7 +768,6 @@ function initKBJU() {
       Notify.show('Калораж низкий — белки скорректированы', 'warning');
     }
 
-    // Верификация
     var check = protein * 4 + fat * 9 + carbs * 4;
     console.log('КБЖУ:', calories, '| Проверка:', check);
 
@@ -910,7 +909,6 @@ function initHabits() {
       list.appendChild(div);
     });
 
-    // Серия
     var allDone = habits.length > 0 && habits.every(function(h) { return h.done; });
     var streak = parseInt(localStorage.getItem(STREAK_KEY) || '0');
     if (allDone) {
@@ -1117,7 +1115,7 @@ function initChatFab() {
   if (!fab) return;
 
   fab.addEventListener('click', function() {
-    var url = 'https://t.me/vitaman777'; // ← ЗАМЕНИ
+    var url = 'https://t.me/your_username'; // ← ЗАМЕНИ НА СВОЙ
     if (isTG) {
       try { tg.openTelegramLink(url); } catch(e) { window.open(url, '_blank'); }
     } else {
@@ -1131,7 +1129,7 @@ function initAsk() {
   var btn = document.getElementById('askBtn');
   if (!btn) return;
   btn.addEventListener('click', function() {
-    var url = 'https://t.me/vitaman777'; // ← ЗАМЕНИ
+    var url = 'https://t.me/your_username'; // ← ЗАМЕНИ НА СВОЙ
     if (isTG) {
       try { tg.openTelegramLink(url); } catch(e) { window.open(url, '_blank'); }
     } else {
@@ -1139,32 +1137,35 @@ function initAsk() {
     }
   });
 }
-    
-// ========== BONUS через Telegram бота ==========
+
+// ========== BONUS PDF через Telegram бота ==========
 function initBonus() {
   var btn = document.getElementById('downloadBonus');
   if (!btn) return;
 
-  // ═══ ЗАМЕНИ на URL своего Worker ═══
-  var WORKER_URL = 'https://fitness-bot-worker.pages.dev';
+  // ═══ ЗАМЕНИ на URL своего Cloudflare Worker ═══
+  var WORKER_URL = 'https://fitness-bot-worker.ТВОЙ-АККАУНТ.workers.dev';
+
+  // ═══ ЗАМЕНИ на юзернейм своего бота ═══
+  var BOT_USERNAME = 'your_bot_username';
 
   btn.addEventListener('click', function() {
     btn.disabled = true;
-    btn.textContent = '⏳ Отправляю в Telegram...';
+    btn.textContent = '⏳ Отправляю...';
 
     var quizCalories = document.getElementById('qCalories');
     var quizProtein = document.getElementById('qProtein');
     var calories = quizCalories ? quizCalories.textContent : '2000';
     var protein = quizProtein ? quizProtein.textContent : '150г';
 
-    // Получаем user_id из Telegram WebApp
+    // Получаем user_id из Telegram
     var userId = null;
     if (isTG && tg.initDataUnsafe && tg.initDataUnsafe.user) {
       userId = tg.initDataUnsafe.user.id;
     }
 
     if (!userId) {
-      // Не в Telegram — fallback на скачивание PDF
+      // Не в Telegram — генерируем PDF в браузере
       btn.textContent = '⏳ Генерация PDF...';
       var userData = { calories: calories, protein: protein };
 
@@ -1177,7 +1178,7 @@ function initBonus() {
         })
         .then(function() {
           btn.textContent = '✅ PDF скачаны';
-          Notify.show('PDF скачаны! 📥', 'success');
+          Notify.show('PDF скачаны! Проверь загрузки 📥', 'success');
           hapticN('success');
           localStorage.setItem('bonus_downloaded', 'true');
         })
@@ -1204,7 +1205,7 @@ function initBonus() {
     .then(function(data) {
       if (data.success) {
         btn.textContent = '✅ Отправлено в Telegram';
-        Notify.show('Бонус отправлен в чат бота! 📩', 'success');
+        Notify.show('Бонус отправлен в чат бота! 📩 Проверь Telegram', 'success', 6000);
         hapticN('success');
         localStorage.setItem('bonus_downloaded', 'true');
       } else {
@@ -1215,24 +1216,18 @@ function initBonus() {
       console.error('Bonus error:', err);
       btn.disabled = false;
 
-      // Проверяем — может пользователь не начал чат с ботом
-      if (err.message && err.message.indexOf('403') !== -1) {
+      if (err.message && (err.message.indexOf('403') !== -1 || err.message.indexOf('chat not found') !== -1)) {
         btn.textContent = 'Скачать бонус';
-        Notify.show('Сначала напиши боту /start', 'warning', 6000);
-
-        // Открываем чат с ботом
+        Notify.show('Сначала напиши боту /start, потом нажми ещё раз', 'warning', 6000);
         setTimeout(function() {
           if (isTG) {
-            try {
-              tg.openTelegramLink('https://t.me/Victorclark_bot');
-            } catch(e) {
-              window.open('https://t.me/Victorclark_bot', '_blank');
-            }
+            try { tg.openTelegramLink('https://t.me/' + BOT_USERNAME); }
+            catch(e) { window.open('https://t.me/' + BOT_USERNAME, '_blank'); }
           }
         }, 1000);
       } else {
         btn.textContent = 'Попробовать ещё';
-        Notify.show('Ошибка. Попробуй ещё раз', 'error');
+        Notify.show('Ошибка отправки. Попробуй ещё раз', 'error');
       }
     });
   });
@@ -1243,112 +1238,7 @@ function initBonus() {
   }
 }
 
-  // Советы
-  html += '<div style="margin:0 20px 25px;background:#0f172a;color:#fff;border-radius:12px;padding:20px 25px;page-break-inside:avoid">'
-    + '<div style="font-size:15px;font-weight:700;margin-bottom:12px;color:#00e5ff">💡 7 советов для результата</div>'
-    + '<div style="font-size:12px;margin-bottom:6px">1. Не пропускай разминку и заминку</div>'
-    + '<div style="font-size:12px;margin-bottom:6px">2. Пей воду до, во время и после</div>'
-    + '<div style="font-size:12px;margin-bottom:6px">3. Спи 7-8 часов</div>'
-    + '<div style="font-size:12px;margin-bottom:6px">4. Записывай повторения</div>'
-    + '<div style="font-size:12px;margin-bottom:6px">5. Увеличивай нагрузку на 2-й неделе</div>'
-    + '<div style="font-size:12px;margin-bottom:6px">6. Фото: день 1 и день 7</div>'
-    + '<div style="font-size:12px">7. Отправляй видео мне — проверю технику!</div>'
-    + '</div>';
-
-  // CTA
-  html += '<div style="margin:0 20px 20px;background:linear-gradient(135deg,#00e5ff,#06b6d4);border-radius:12px;padding:20px 25px;text-align:center;page-break-inside:avoid">'
-    + '<div style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">Хочешь полную программу на 4-12 недель?</div>'
-    + '<div style="font-size:13px;color:#0f172a;margin-bottom:10px">С контролем техники и планом питания</div>'
-    + '<div style="font-size:14px;font-weight:700;color:#0f172a">👉 t.me/vitaman777</div>'
-    + '</div>'
-
-    + '<div style="text-align:center;padding:15px;font-size:10px;color:#94a3b8;border-top:1px solid #e2e8f0;margin:0 20px">'
-    + '© Fitness Coach Vitaliy</div></div>';
-
-  return renderPDF(html, 'Первая_неделя_тренировок.pdf');
-}
-
-// --- PDF 2: 7 ошибок ---
-function generateChecklistPDF(userData) {
-  var html = '<div style="font-family:Arial,Helvetica,sans-serif;color:#1e293b;line-height:1.5">'
-
-    + '<div style="background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:40px 30px;border-radius:0 0 20px 20px;margin-bottom:30px">'
-    + '<div style="font-size:12px;color:#ef4444;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Чек-лист</div>'
-    + '<div style="font-size:28px;font-weight:800;margin-bottom:6px">❌ 7 ошибок в питании</div>'
-    + '<div style="font-size:18px;font-weight:600;color:#94a3b8;margin-bottom:15px">Которые мешают прогрессу</div>'
-    + '<div style="margin-top:15px;padding:10px 15px;background:rgba(0,229,255,0.15);border-radius:10px;font-size:12px;color:#00e5ff">'
-    + 'Твоя норма: ' + userData.calories + ' ккал/день | Белок: ' + userData.protein + '</div>'
-    + '</div>';
-
-  var mistakes = [
-    { title: 'Пропуск завтрака',
-      problem: 'Метаболизм замедляется на 10-15%. К обеду переедаешь.',
-      fix: 'Завтракай в течение 1 часа после пробуждения.',
-      tip: 'Овсянка + яйцо + банан = 350 ккал' },
-    { title: 'Слишком мало белка',
-      problem: 'Мышцы не восстанавливаются. Тело теряет мышцы вместо жира.',
-      fix: 'Норма: 1.6-2.0 г белка на кг веса. Белок в каждом приёме.',
-      tip: 'Куриная грудь, творог 5%, рыба, яйца, бобовые' },
-    { title: 'Страх перед жирами',
-      problem: 'Гормональный сбой, сухая кожа, выпадение волос.',
-      fix: 'Полезные жиры: авокадо, орехи, оливковое масло. 0.8-1.0 г/кг.',
-      tip: '1 ст.л. оливкового масла = 14г жиров = 120 ккал' },
-    { title: 'Жидкие калории',
-      problem: 'Соки, лимонады, кофе с сиропом — 300-500 невидимых ккал.',
-      fix: 'Замени на воду, чай без сахара, чёрный кофе.',
-      tip: 'Стакан сока = 110 ккал. Целый апельсин = 60 ккал + клетчатка' },
-    { title: 'Еда «на глазок»',
-      problem: 'Переедание на 20-40% без осознания.',
-      fix: 'Взвешивай еду первые 2-3 недели.',
-      tip: 'Приложения: FatSecret, MyFitnessPal — бесплатные' },
-    { title: 'Резкий дефицит калорий',
-      problem: 'Метаболизм замедляется. Срывы неизбежны. Потеря мышц.',
-      fix: 'Дефицит не более 15-20%. Снижение 0.5-1 кг/нед.',
-      tip: 'Минимум: 1500 (муж), 1200 (жен). Твоя норма: ' + userData.calories + ' ккал' },
-    { title: 'Нет режима питания',
-      problem: 'Хаотичный приём → перекусы → переедание.',
-      fix: '3 основных + 1-2 перекуса в одно время каждый день.',
-      tip: 'Режим: 8:00 / 12:00 / 15:00 / 19:00' }
-  ];
-
-  mistakes.forEach(function(m, i) {
-    html += '<div style="margin:0 20px 20px;page-break-inside:avoid">'
-      + '<div style="display:flex;align-items:center;margin-bottom:10px">'
-      + '<div style="background:#ef4444;color:#fff;width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-right:12px;flex-shrink:0;line-height:30px;text-align:center">' + (i + 1) + '</div>'
-      + '<div style="font-size:16px;font-weight:700">' + m.title + '</div></div>'
-      + '<div style="background:#fef2f2;border-radius:10px;padding:15px 18px;margin-bottom:8px">'
-      + '<div style="font-size:12px;color:#ef4444;font-weight:600;margin-bottom:4px">❌ Проблема:</div>'
-      + '<div style="font-size:12px;color:#475569">' + m.problem + '</div></div>'
-      + '<div style="background:#f0fdf4;border-radius:10px;padding:15px 18px">'
-      + '<div style="font-size:12px;color:#22c55e;font-weight:600;margin-bottom:4px">✅ Решение:</div>'
-      + '<div style="font-size:12px;color:#475569">' + m.fix + '</div>'
-      + '<div style="font-size:11px;color:#94a3b8;margin-top:6px">💡 ' + m.tip + '</div></div></div>';
-  });
-
-  // План действий
-  html += '<div style="margin:0 20px 25px;background:#0f172a;color:#fff;border-radius:12px;padding:20px 25px;page-break-inside:avoid">'
-    + '<div style="font-size:15px;font-weight:700;margin-bottom:15px;color:#00e5ff">📋 План действий на эту неделю</div>'
-    + '<div style="font-size:12px;margin-bottom:8px">☐ Посчитать норму калорий (✅ уже: ' + userData.calories + ' ккал)</div>'
-    + '<div style="font-size:12px;margin-bottom:8px">☐ Купить кухонные весы</div>'
-    + '<div style="font-size:12px;margin-bottom:8px">☐ Установить FatSecret / MyFitnessPal</div>'
-    + '<div style="font-size:12px;margin-bottom:8px">☐ Запланировать меню на 3 дня</div>'
-    + '<div style="font-size:12px;margin-bottom:8px">☐ Убрать вредные перекусы из дома</div>'
-    + '<div style="font-size:12px;margin-bottom:8px">☐ Поставить напоминание пить воду</div>'
-    + '<div style="font-size:12px">☐ Сфотографировать всю еду за 1 день</div></div>';
-
-  // CTA
-  html += '<div style="margin:0 20px 20px;background:linear-gradient(135deg,#00e5ff,#06b6d4);border-radius:12px;padding:20px 25px;text-align:center;page-break-inside:avoid">'
-    + '<div style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">Хочешь персональный план питания?</div>'
-    + '<div style="font-size:13px;color:#0f172a;margin-bottom:10px">С рецептами и меню на каждый день</div>'
-    + '<div style="font-size:14px;font-weight:700;color:#0f172a">👉 t.me/vitaman777</div></div>'
-
-    + '<div style="text-align:center;padding:15px;font-size:10px;color:#94a3b8;border-top:1px solid #e2e8f0;margin:0 20px">'
-    + '© Fitness Coach Vitaliy</div></div>';
-
-  return renderPDF(html, '7_ошибок_в_питании.pdf');
-}
-
-// --- Общая функция рендера PDF ---
+// ========== PDF GENERATION (fallback для браузера) ==========
 function renderPDF(html, filename) {
   var container = document.createElement('div');
   container.innerHTML = html;
@@ -1370,6 +1260,110 @@ function renderPDF(html, filename) {
   return html2pdf().set(opt).from(container).save().then(function() {
     document.body.removeChild(container);
   });
+}
+
+function generateWorkoutPDF(userData) {
+  var schedule = getTrainingSchedule(3);
+  var dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+
+  var workoutTypes = [
+    { title: 'Всё тело', icon: '💪', color: '#00e5ff', textColor: '#0f172a', time: '25',
+      exercises: [['Приседания', '3 × 15'], ['Отжимания', '3 × 10'], ['Выпады', '3 × 12 (каждая)'], ['Планка', '3 × 30 сек'], ['Скручивания', '3 × 15'], ['Ягодичный мостик', '3 × 15']]},
+    { title: 'Кардио', icon: '🏃', color: '#06b6d4', textColor: '#0f172a', time: '30',
+      exercises: [['Быстрая ходьба / бег', '20 мин'], ['Прыжки на месте', '5 × 1 мин'], ['Растяжка', '10 мин']]},
+    { title: 'Верх + Кор', icon: '💪', color: '#00e5ff', textColor: '#0f172a', time: '25',
+      exercises: [['Отжимания', '3 × 12'], ['Обратные отжимания', '3 × 10'], ['Боковая планка', '3 × 20 сек'], ['Супермен', '3 × 12'], ['Скалолаз', '3 × 20'], ['Велосипед', '3 × 20']]},
+    { title: 'Низ + Ягодицы', icon: '🦵', color: '#00e5ff', textColor: '#0f172a', time: '30',
+      exercises: [['Приседания сумо', '3 × 15'], ['Выпады назад', '3 × 12'], ['Мостик одной ногой', '3 × 10'], ['Подъём на носки', '3 × 20'], ['Приседания с паузой', '3 × 10'], ['Стульчик у стены', '3 × 30 сек']]},
+    { title: 'HIIT', icon: '🔥', color: '#ef4444', textColor: '#fff', time: '20', isHIIT: true,
+      exercises: [['Берпи', '30 сек'], ['Приседания с прыжком', '30 сек'], ['Отжимания', '30 сек'], ['Бег с коленом', '30 сек'], ['Джампинг Джек', '30 сек']]}
+  ];
+
+  var restDay = { title: 'Отдых', icon: '😴', color: '#94a3b8', textColor: '#fff', time: null,
+    exercises: [['Растяжка или йога', '15 мин'], ['Прогулка', '30 мин'], ['Вода', 'минимум 2л']]};
+
+  var weekDays = [];
+  var wi = 0;
+  for (var d = 0; d < 7; d++) {
+    if (schedule.indexOf(d) !== -1) {
+      weekDays.push({ dayName: dayNames[d], dayNum: d + 1, type: 'training', workout: workoutTypes[wi % workoutTypes.length] });
+      wi++;
+    } else {
+      weekDays.push({ dayName: dayNames[d], dayNum: d + 1, type: 'rest', workout: restDay });
+    }
+  }
+
+  var html = '<div style="font-family:Arial,Helvetica,sans-serif;color:#1e293b;line-height:1.5">'
+    + '<div style="background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:40px 30px;border-radius:0 0 20px 20px;margin-bottom:30px">'
+    + '<div style="font-size:12px;color:#00e5ff;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Бонус</div>'
+    + '<div style="font-size:28px;font-weight:800;margin-bottom:6px">📋 Первая неделя</div>'
+    + '<div style="font-size:20px;font-weight:600;color:#00e5ff;margin-bottom:15px">Программа тренировок</div>'
+    + '<div style="margin-top:15px;padding:10px 15px;background:rgba(0,229,255,0.15);border-radius:10px;font-size:12px;color:#00e5ff">'
+    + 'Норма: ' + userData.calories + ' ккал | Белок: ' + userData.protein + '</div></div>'
+    + '<div style="background:#f8fafc;border-radius:12px;padding:20px 25px;margin:0 20px 25px;border-left:4px solid #00e5ff">'
+    + '<div style="font-size:15px;font-weight:700;margin-bottom:10px">⚡ Правила</div>'
+    + '<div style="font-size:12px;color:#475569;margin-bottom:5px">✓ Разминка 5 мин</div>'
+    + '<div style="font-size:12px;color:#475569;margin-bottom:5px">✓ Растяжка 5 мин после</div>'
+    + '<div style="font-size:12px;color:#475569;margin-bottom:5px">✓ Отдых между подходами: 45-60 сек</div>'
+    + '<div style="font-size:12px;color:#475569">✓ Вода: 2л в день</div></div>';
+
+  weekDays.forEach(function(day) {
+    var w = day.workout;
+    html += '<div style="margin:0 20px 20px;page-break-inside:avoid">'
+      + '<div style="background:' + w.color + ';color:' + w.textColor + ';padding:10px 18px;border-radius:10px 10px 0 0;font-weight:700;font-size:14px">'
+      + w.icon + ' ДЕНЬ ' + day.dayNum + ' — ' + day.dayName + ' • ' + w.title + '</div>'
+      + '<div style="background:#f8fafc;padding:15px 18px;border-radius:0 0 10px 10px;border:1px solid #e2e8f0">'
+      + '<table style="width:100%;font-size:12px;border-collapse:collapse">';
+    w.exercises.forEach(function(ex, idx) {
+      var border = idx < w.exercises.length - 1 ? 'border-bottom:1px solid #e2e8f0;' : '';
+      html += '<tr style="' + border + '"><td style="padding:6px 0;font-weight:600">' + ex[0] + '</td>'
+        + '<td style="padding:6px 0;text-align:right;color:#00b4d8">' + ex[1] + '</td></tr>';
+    });
+    html += '</table>';
+    if (w.time) html += '<div style="margin-top:10px;font-size:11px;color:#64748b">⏱ ~' + w.time + ' мин</div>';
+    if (w.isHIIT) html += '<div style="margin-top:8px;font-size:11px;color:#ef4444;font-weight:600">30 сек работа / 15 сек отдых • 4 круга</div>';
+    html += '</div></div>';
+  });
+
+  html += '<div style="margin:0 20px 20px;background:linear-gradient(135deg,#00e5ff,#06b6d4);border-radius:12px;padding:20px 25px;text-align:center">'
+    + '<div style="font-size:16px;font-weight:700;color:#0f172a">Полная программа → t.me/your_username</div></div></div>';
+
+  return renderPDF(html, 'Первая_неделя_тренировок.pdf');
+}
+
+function generateChecklistPDF(userData) {
+  var mistakes = [
+    { t: 'Пропуск завтрака', p: 'Метаболизм замедляется на 10-15%', f: 'Завтракай в течение 1 часа', tip: 'Овсянка + яйцо + банан = 350 ккал' },
+    { t: 'Мало белка', p: 'Мышцы не восстанавливаются', f: 'Норма: 1.6-2.0 г на кг веса', tip: 'Курица, творог, рыба, яйца' },
+    { t: 'Страх перед жирами', p: 'Гормональный сбой, сухая кожа', f: 'Авокадо, орехи, оливковое масло', tip: '0.8-1.0 г на кг веса' },
+    { t: 'Жидкие калории', p: 'Соки, лимонады = 300-500 ккал', f: 'Вода, чай, чёрный кофе', tip: 'Экономия до 500 ккал/день' },
+    { t: 'Еда на глазок', p: 'Переедание на 20-40%', f: 'Взвешивай еду 2-3 недели', tip: 'FatSecret, MyFitnessPal' },
+    { t: 'Резкий дефицит', p: 'Метаболизм падает, срывы', f: 'Дефицит не более 20%', tip: 'Твоя норма: ' + userData.calories + ' ккал' },
+    { t: 'Нет режима', p: 'Хаос → перекусы → переедание', f: '3 приёма + 1-2 перекуса', tip: '8:00 / 12:00 / 15:00 / 19:00' }
+  ];
+
+  var html = '<div style="font-family:Arial,Helvetica,sans-serif;color:#1e293b;line-height:1.5">'
+    + '<div style="background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:40px 30px;border-radius:0 0 20px 20px;margin-bottom:30px">'
+    + '<div style="font-size:12px;color:#ef4444;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Чек-лист</div>'
+    + '<div style="font-size:28px;font-weight:800;margin-bottom:6px">❌ 7 ошибок в питании</div>'
+    + '<div style="margin-top:15px;padding:10px 15px;background:rgba(0,229,255,0.15);border-radius:10px;font-size:12px;color:#00e5ff">'
+    + 'Норма: ' + userData.calories + ' ккал | Белок: ' + userData.protein + '</div></div>';
+
+  mistakes.forEach(function(m, i) {
+    html += '<div style="margin:0 20px 20px;page-break-inside:avoid">'
+      + '<div style="margin-bottom:10px"><span style="background:#ef4444;color:#fff;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-right:10px">' + (i + 1) + '</span>'
+      + '<strong style="font-size:16px">' + m.t + '</strong></div>'
+      + '<div style="background:#fef2f2;border-radius:10px;padding:12px 15px;margin-bottom:6px">'
+      + '<div style="font-size:12px;color:#ef4444;font-weight:600">❌ ' + m.p + '</div></div>'
+      + '<div style="background:#f0fdf4;border-radius:10px;padding:12px 15px">'
+      + '<div style="font-size:12px;color:#22c55e;font-weight:600">✅ ' + m.f + '</div>'
+      + '<div style="font-size:11px;color:#94a3b8;margin-top:4px">💡 ' + m.tip + '</div></div></div>';
+  });
+
+  html += '<div style="margin:0 20px 20px;background:linear-gradient(135deg,#00e5ff,#06b6d4);border-radius:12px;padding:20px 25px;text-align:center">'
+    + '<div style="font-size:16px;font-weight:700;color:#0f172a">План питания → t.me/your_username</div></div></div>';
+
+  return renderPDF(html, '7_ошибок_в_питании.pdf');
 }
 
 // ========== YEAR ==========
