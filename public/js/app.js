@@ -1146,7 +1146,7 @@ function initBonus() {
   if (!btn) return;
 
   // ═══ ЗАМЕНИ на URL своего Worker ═══
-  var WORKER_URL = 'https://fitness-bot-worker.ТВОЙ-АККАУНТ.workers.dev';
+  var WORKER_URL = 'https://fitness-bot-worker.pages.dev';
 
   btn.addEventListener('click', function() {
     btn.disabled = true;
