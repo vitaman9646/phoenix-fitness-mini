@@ -1139,139 +1139,109 @@ function initAsk() {
     }
   });
 }
-
-// ========== BONUS PDF ==========
+    
+// ========== BONUS через Telegram бота ==========
 function initBonus() {
   var btn = document.getElementById('downloadBonus');
   if (!btn) return;
 
+  // ═══ ЗАМЕНИ на URL своего Worker ═══
+  var WORKER_URL = 'https://fitness-bot-worker.ТВОЙ-АККАУНТ.workers.dev';
+
   btn.addEventListener('click', function() {
     btn.disabled = true;
-    btn.textContent = '⏳ Генерация PDF...';
+    btn.textContent = '⏳ Отправляю в Telegram...';
 
     var quizCalories = document.getElementById('qCalories');
     var quizProtein = document.getElementById('qProtein');
-    var userData = {
-      calories: quizCalories ? quizCalories.textContent : '2000',
-      protein: quizProtein ? quizProtein.textContent : '150г'
-    };
+    var calories = quizCalories ? quizCalories.textContent : '2000';
+    var protein = quizProtein ? quizProtein.textContent : '150г';
 
-    generateWorkoutPDF(userData)
-      .then(function() {
-        return new Promise(function(resolve) { setTimeout(resolve, 800); });
+    // Получаем user_id из Telegram WebApp
+    var userId = null;
+    if (isTG && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      userId = tg.initDataUnsafe.user.id;
+    }
+
+    if (!userId) {
+      // Не в Telegram — fallback на скачивание PDF
+      btn.textContent = '⏳ Генерация PDF...';
+      var userData = { calories: calories, protein: protein };
+
+      generateWorkoutPDF(userData)
+        .then(function() {
+          return new Promise(function(r) { setTimeout(r, 800); });
+        })
+        .then(function() {
+          return generateChecklistPDF(userData);
+        })
+        .then(function() {
+          btn.textContent = '✅ PDF скачаны';
+          Notify.show('PDF скачаны! 📥', 'success');
+          hapticN('success');
+          localStorage.setItem('bonus_downloaded', 'true');
+        })
+        .catch(function(err) {
+          console.error('PDF error:', err);
+          btn.textContent = 'Скачать бонус';
+          btn.disabled = false;
+          Notify.show('Ошибка генерации', 'error');
+        });
+      return;
+    }
+
+    // В Telegram — отправляем через бота
+    fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        calories: calories,
+        protein: protein
       })
-      .then(function() {
-        return generateChecklistPDF(userData);
-      })
-      .then(function() {
-        btn.textContent = '✅ 2 файла скачаны';
-        Notify.show('PDF скачаны! Проверь загрузки 📥', 'success');
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.success) {
+        btn.textContent = '✅ Отправлено в Telegram';
+        Notify.show('Бонус отправлен в чат бота! 📩', 'success');
         hapticN('success');
         localStorage.setItem('bonus_downloaded', 'true');
-      })
-      .catch(function(err) {
-        console.error('PDF error:', err);
+      } else {
+        throw new Error(data.error || 'Ошибка отправки');
+      }
+    })
+    .catch(function(err) {
+      console.error('Bonus error:', err);
+      btn.disabled = false;
+
+      // Проверяем — может пользователь не начал чат с ботом
+      if (err.message && err.message.indexOf('403') !== -1) {
         btn.textContent = 'Скачать бонус';
-        btn.disabled = false;
-        Notify.show('Ошибка генерации PDF', 'error');
-      });
+        Notify.show('Сначала напиши боту /start', 'warning', 6000);
+
+        // Открываем чат с ботом
+        setTimeout(function() {
+          if (isTG) {
+            try {
+              tg.openTelegramLink('https://t.me/ТВОЙ_БОТ_USERNAME');
+            } catch(e) {
+              window.open('https://t.me/ТВОЙ_БОТ_USERNAME', '_blank');
+            }
+          }
+        }, 1000);
+      } else {
+        btn.textContent = 'Попробовать ещё';
+        Notify.show('Ошибка. Попробуй ещё раз', 'error');
+      }
+    });
   });
 
   if (localStorage.getItem('bonus_downloaded')) {
-    btn.textContent = '📥 Скачать ещё раз';
+    btn.textContent = '📥 Получить ещё раз';
+    btn.disabled = false;
   }
 }
-
-// --- PDF 1: Тренировки ---
-function generateWorkoutPDF(userData) {
-  var html = '<div style="font-family:Arial,Helvetica,sans-serif;color:#1e293b;line-height:1.5">'
-
-    // Обложка
-    + '<div style="background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:40px 30px;border-radius:0 0 20px 20px;margin-bottom:30px">'
-    + '<div style="font-size:12px;color:#00e5ff;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Бонус за прохождение квиза</div>'
-    + '<div style="font-size:28px;font-weight:800;margin-bottom:6px">📋 Первая неделя</div>'
-    + '<div style="font-size:20px;font-weight:600;color:#00e5ff;margin-bottom:15px">Программа тренировок</div>'
-    + '<div style="font-size:13px;color:#94a3b8">7 дней • Без оборудования • 25-30 мин</div>'
-    + '<div style="margin-top:15px;padding:10px 15px;background:rgba(0,229,255,0.15);border-radius:10px;font-size:12px;color:#00e5ff">'
-    + 'Твоя норма: ' + userData.calories + ' ккал/день | Белок: ' + userData.protein + '</div>'
-    + '</div>'
-
-    // Правила
-    + '<div style="background:#f8fafc;border-radius:12px;padding:20px 25px;margin:0 20px 25px;border-left:4px solid #00e5ff">'
-    + '<div style="font-size:15px;font-weight:700;margin-bottom:10px">⚡ Правила программы</div>'
-    + '<div style="font-size:12px;color:#475569;margin-bottom:5px">✓ Разминка 5 минут перед каждой тренировкой</div>'
-    + '<div style="font-size:12px;color:#475569;margin-bottom:5px">✓ Растяжка 5 минут после тренировки</div>'
-    + '<div style="font-size:12px;color:#475569;margin-bottom:5px">✓ Отдых между подходами: 45-60 секунд</div>'
-    + '<div style="font-size:12px;color:#475569;margin-bottom:5px">✓ Пей воду: минимум 2 литра в день</div>'
-    + '<div style="font-size:12px;color:#475569">✓ Боль = стоп. Дискомфорт = нормально</div>'
-    + '</div>';
-
-  // Дни тренировок
-  var days = [
-    { title: '💪 ДЕНЬ 1 — Понедельник • Всё тело', color: '#00e5ff', textColor: '#0f172a', time: '25',
-      exercises: [
-        ['Приседания', '3 × 15'], ['Отжимания (с колен если нужно)', '3 × 10'],
-        ['Выпады на месте', '3 × 12 (каждая)'], ['Планка', '3 × 30 сек'],
-        ['Скручивания', '3 × 15'], ['Ягодичный мостик', '3 × 15']
-      ]},
-    { title: '🏃 ДЕНЬ 2 — Вторник • Кардио', color: '#06b6d4', textColor: '#0f172a', time: '30',
-      exercises: [
-        ['Быстрая ходьба / лёгкий бег', '20 мин'], ['Или: прыжки на месте', '5 × 1 мин'],
-        ['Растяжка всего тела', '10 мин']
-      ]},
-    { title: '😴 ДЕНЬ 3 — Среда • Отдых', color: '#94a3b8', textColor: '#fff', time: null,
-      exercises: [
-        ['Лёгкая растяжка или йога', '15 мин'], ['Прогулка на воздухе', '30 мин'],
-        ['Вода', 'минимум 2л']
-      ]},
-    { title: '💪 ДЕНЬ 4 — Четверг • Верх + Кор', color: '#00e5ff', textColor: '#0f172a', time: '25',
-      exercises: [
-        ['Отжимания', '3 × 12'], ['Обратные отжимания от стула', '3 × 10'],
-        ['Боковая планка', '3 × 20 сек (каждая)'], ['Супермен', '3 × 12'],
-        ['Скалолаз', '3 × 20'], ['Велосипед (пресс)', '3 × 20']
-      ]},
-    { title: '🦵 ДЕНЬ 5 — Пятница • Низ + Ягодицы', color: '#00e5ff', textColor: '#0f172a', time: '30',
-      exercises: [
-        ['Приседания сумо', '3 × 15'], ['Выпады назад', '3 × 12 (каждая)'],
-        ['Ягодичный мостик одной ногой', '3 × 10 (каждая)'], ['Подъём на носки', '3 × 20'],
-        ['Приседания с паузой', '3 × 10'], ['Стульчик у стены', '3 × 30 сек']
-      ]},
-    { title: '🔥 ДЕНЬ 6 — Суббота • HIIT', color: '#ef4444', textColor: '#fff', time: '20',
-      exercises: [
-        ['Берпи (упрощённые)', '30 сек'], ['Приседания с прыжком', '30 сек'],
-        ['Отжимания', '30 сек'], ['Бег с высоким коленом', '30 сек'],
-        ['Джампинг Джек', '30 сек']
-      ]},
-    { title: '🧘 ДЕНЬ 7 — Воскресенье • Восстановление', color: '#94a3b8', textColor: '#fff', time: null,
-      exercises: [
-        ['Растяжка всего тела', '20 мин'], ['Дыхательные упражнения', '5 мин'],
-        ['Прогулка', '30-40 мин'], ['📸 Замеры и фото прогресса', 'обязательно!']
-      ]}
-  ];
-
-  days.forEach(function(day) {
-    html += '<div style="margin:0 20px 20px;page-break-inside:avoid">'
-      + '<div style="background:' + day.color + ';color:' + day.textColor + ';padding:10px 18px;border-radius:10px 10px 0 0;font-weight:700;font-size:14px">'
-      + day.title + '</div>'
-      + '<div style="background:#f8fafc;padding:15px 18px;border-radius:0 0 10px 10px;border:1px solid #e2e8f0">'
-      + '<table style="width:100%;font-size:12px;border-collapse:collapse">';
-
-    day.exercises.forEach(function(ex, idx) {
-      var border = idx < day.exercises.length - 1 ? 'border-bottom:1px solid #e2e8f0;' : '';
-      html += '<tr style="' + border + '">'
-        + '<td style="padding:6px 0;font-weight:600">' + ex[0] + '</td>'
-        + '<td style="padding:6px 0;text-align:right;color:#00b4d8">' + ex[1] + '</td></tr>';
-    });
-
-    html += '</table>';
-    if (day.time) {
-      html += '<div style="margin-top:10px;font-size:11px;color:#64748b">⏱ Время: ~' + day.time + ' минут</div>';
-    }
-    if (day.title.indexOf('HIIT') !== -1) {
-      html += '<div style="margin-top:8px;font-size:11px;color:#ef4444;font-weight:600">30 сек работа / 15 сек отдых • 4 круга • Отдых между кругами: 1 мин</div>';
-    }
-    html += '</div></div>';
-  });
 
   // Советы
   html += '<div style="margin:0 20px 25px;background:#0f172a;color:#fff;border-radius:12px;padding:20px 25px;page-break-inside:avoid">'
