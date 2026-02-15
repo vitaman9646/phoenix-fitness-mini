@@ -1144,7 +1144,7 @@ function initBonus() {
   if (!btn) return;
 
   // ═══ ЗАМЕНИ на URL своего Cloudflare Worker ═══
-  var WORKER_URL = 'https://fitness-bot-worker.pages.de';
+  var WORKER_URL = 'https://fitness-bonus-bot.mrvit9646.workers.dev';
 
   // ═══ ЗАМЕНИ на юзернейм своего бота ═══
   var BOT_USERNAME = 'your_bot_username';
