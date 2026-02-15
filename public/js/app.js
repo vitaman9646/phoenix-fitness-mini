@@ -1115,7 +1115,7 @@ function initChatFab() {
   if (!fab) return;
 
   fab.addEventListener('click', function() {
-    var url = 'https://t.me/your_username'; // ← ЗАМЕНИ НА СВОЙ
+    var url = 'https://t.me/vitaman777'; // ← ЗАМЕНИ НА СВОЙ
     if (isTG) {
       try { tg.openTelegramLink(url); } catch(e) { window.open(url, '_blank'); }
     } else {
@@ -1129,7 +1129,7 @@ function initAsk() {
   var btn = document.getElementById('askBtn');
   if (!btn) return;
   btn.addEventListener('click', function() {
-    var url = 'https://t.me/your_username'; // ← ЗАМЕНИ НА СВОЙ
+    var url = 'https://t.me/vitaman777'; // ← ЗАМЕНИ НА СВОЙ
     if (isTG) {
       try { tg.openTelegramLink(url); } catch(e) { window.open(url, '_blank'); }
     } else {
@@ -1326,7 +1326,7 @@ function generateWorkoutPDF(userData) {
   });
 
   html += '<div style="margin:0 20px 20px;background:linear-gradient(135deg,#00e5ff,#06b6d4);border-radius:12px;padding:20px 25px;text-align:center">'
-    + '<div style="font-size:16px;font-weight:700;color:#0f172a">Полная программа → t.me/your_username</div></div></div>';
+    + '<div style="font-size:16px;font-weight:700;color:#0f172a">Полная программа → t.me/vitaman777</div></div></div>';
 
   return renderPDF(html, 'Первая_неделя_тренировок.pdf');
 }
@@ -1361,7 +1361,7 @@ function generateChecklistPDF(userData) {
   });
 
   html += '<div style="margin:0 20px 20px;background:linear-gradient(135deg,#00e5ff,#06b6d4);border-radius:12px;padding:20px 25px;text-align:center">'
-    + '<div style="font-size:16px;font-weight:700;color:#0f172a">План питания → t.me/your_username</div></div></div>';
+    + '<div style="font-size:16px;font-weight:700;color:#0f172a">План питания → t.me/vitaman777</div></div></div>';
 
   return renderPDF(html, '7_ошибок_в_питании.pdf');
 }
