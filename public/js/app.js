@@ -1224,9 +1224,9 @@ function initBonus() {
         setTimeout(function() {
           if (isTG) {
             try {
-              tg.openTelegramLink('https://t.me/ТВОЙ_БОТ_USERNAME');
+              tg.openTelegramLink('https://t.me/Victorclark_bot');
             } catch(e) {
-              window.open('https://t.me/ТВОЙ_БОТ_USERNAME', '_blank');
+              window.open('https://t.me/Victorclark_bot', '_blank');
             }
           }
         }, 1000);
