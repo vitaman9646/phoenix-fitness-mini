@@ -1208,14 +1208,63 @@ function initBonus() {
           hapticN('success');
           localStorage.setItem('bonus_downloaded', 'true');
         })
-        .catch(function(err) {
-          console.error('PDF error:', err);
+            .catch(function(err) {
+      console.error('Bonus error:', err);
+      btn.disabled = false;
+
+      if (err.message && (err.message.indexOf('403') !== -1 || err.message.indexOf('chat not found') !== -1)) {
+        // Пробуем зарегистрировать и отправить снова
+        btn.textContent = '⏳ Подключаюсь к боту...';
+
+        fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'register',
+            user_id: tg.initDataUnsafe.user.id,
+            username: tg.initDataUnsafe.user.username || '',
+            first_name: tg.initDataUnsafe.user.first_name || ''
+          })
+        })
+        .then(function() {
+          // Пробуем отправить бонус ещё раз
+          return fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'bonus',
+              user_id: tg.initDataUnsafe.user.id,
+              calories: calories,
+              protein: protein
+            })
+          });
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.success) {
+            btn.textContent = '✅ Отправлено в Telegram';
+            Notify.show('Бонус отправлен! Проверь Telegram 📩', 'success', 6000);
+            hapticN('success');
+            localStorage.setItem('bonus_downloaded', 'true');
+          } else {
+            throw new Error('retry failed');
+          }
+        })
+        .catch(function() {
           btn.textContent = 'Скачать бонус';
           btn.disabled = false;
-          Notify.show('Ошибка генерации', 'error');
+          Notify.show('Напиши боту /start и попробуй снова', 'warning', 6000);
+
+          setTimeout(function() {
+            try { tg.openTelegramLink('https://t.me/' + BOT_USERNAME); }
+            catch(e) {}
+          }, 2000);
         });
-      return;
-    }
+      } else {
+        btn.textContent = 'Попробовать ещё';
+        Notify.show('Ошибка отправки. Попробуй ещё раз', 'error');
+      }
+    });
 
     // В Telegram — отправляем через бота
     fetch(WORKER_URL, {
