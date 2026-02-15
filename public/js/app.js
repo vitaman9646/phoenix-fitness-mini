@@ -1117,7 +1117,7 @@ function initChatFab() {
   if (!fab) return;
 
   fab.addEventListener('click', function() {
-    var url = 'https://t.me/your_username'; // ← ЗАМЕНИ
+    var url = 'https://t.me/vitaman777'; // ← ЗАМЕНИ
     if (isTG) {
       try { tg.openTelegramLink(url); } catch(e) { window.open(url, '_blank'); }
     } else {
@@ -1131,7 +1131,7 @@ function initAsk() {
   var btn = document.getElementById('askBtn');
   if (!btn) return;
   btn.addEventListener('click', function() {
-    var url = 'https://t.me/your_username'; // ← ЗАМЕНИ
+    var url = 'https://t.me/vitaman777'; // ← ЗАМЕНИ
     if (isTG) {
       try { tg.openTelegramLink(url); } catch(e) { window.open(url, '_blank'); }
     } else {
@@ -1289,7 +1289,7 @@ function generateWorkoutPDF(userData) {
   html += '<div style="margin:0 20px 20px;background:linear-gradient(135deg,#00e5ff,#06b6d4);border-radius:12px;padding:20px 25px;text-align:center;page-break-inside:avoid">'
     + '<div style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">Хочешь полную программу на 4-12 недель?</div>'
     + '<div style="font-size:13px;color:#0f172a;margin-bottom:10px">С контролем техники и планом питания</div>'
-    + '<div style="font-size:14px;font-weight:700;color:#0f172a">👉 t.me/your_username</div>'
+    + '<div style="font-size:14px;font-weight:700;color:#0f172a">👉 t.me/vitaman777</div>'
     + '</div>'
 
     + '<div style="text-align:center;padding:15px;font-size:10px;color:#94a3b8;border-top:1px solid #e2e8f0;margin:0 20px">'
@@ -1370,7 +1370,7 @@ function generateChecklistPDF(userData) {
   html += '<div style="margin:0 20px 20px;background:linear-gradient(135deg,#00e5ff,#06b6d4);border-radius:12px;padding:20px 25px;text-align:center;page-break-inside:avoid">'
     + '<div style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">Хочешь персональный план питания?</div>'
     + '<div style="font-size:13px;color:#0f172a;margin-bottom:10px">С рецептами и меню на каждый день</div>'
-    + '<div style="font-size:14px;font-weight:700;color:#0f172a">👉 t.me/your_username</div></div>'
+    + '<div style="font-size:14px;font-weight:700;color:#0f172a">👉 t.me/vitaman777</div></div>'
 
     + '<div style="text-align:center;padding:15px;font-size:10px;color:#94a3b8;border-top:1px solid #e2e8f0;margin:0 20px">'
     + '© Fitness Coach Vitaliy</div></div>';
