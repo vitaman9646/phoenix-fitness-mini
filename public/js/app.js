@@ -12,6 +12,11 @@ try {
   console.warn('Telegram WebApp недоступен');
 }
 
+// ========== CONFIG ==========
+var WORKER_URL = 'https://fitness-bonus-bot.mrvit9646.workers.dev';
+var BOT_USERNAME = 'Victorclark_bot';
+var TRAINER_USERNAME = 'vitaman777';
+
 // ========== HELPERS ==========
 function haptic(t) {
   try { if (isTG && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(t || 'light'); } catch(e) {}
@@ -402,12 +407,12 @@ function initLeaveReview() {
 // ========== TRAINING SCHEDULE ==========
 function getTrainingSchedule(freq) {
   switch (freq) {
-    case 2: return [0, 3];           // Пн, Чт
-    case 3: return [0, 2, 4];       // Пн, Ср, Пт
-    case 4: return [0, 1, 3, 5];    // Пн, Вт, Чт, Сб
-    case 5: return [0, 1, 2, 4, 5]; // Пн, Вт, Ср, Пт, Сб
-    case 6: return [0, 1, 2, 3, 4, 5]; // Пн-Сб
-    default: return [0, 2, 4];      // Пн, Ср, Пт
+    case 2: return [0, 3];
+    case 3: return [0, 2, 4];
+    case 4: return [0, 1, 3, 5];
+    case 5: return [0, 1, 2, 4, 5];
+    case 6: return [0, 1, 2, 3, 4, 5];
+    default: return [0, 2, 4];
   }
 }
 
@@ -442,6 +447,7 @@ function initQuiz() {
     if (stepId === 'result') {
       calculateQuizResult();
       localStorage.setItem('quiz_done', 'true');
+      sendQuizToAdmin();
     }
   }
 
@@ -577,9 +583,6 @@ function initQuiz() {
     var carbs = Math.round(carbsCal / 4);
     if (carbs < 0) carbs = 50;
 
-    var check = protein * 4 + fat * 9 + carbs * 4;
-    console.log('Quiz КБЖУ:', calories, 'ккал | Проверка:', check);
-
     document.getElementById('qCalories').textContent = calories;
     document.getElementById('qProtein').textContent = protein + 'г';
     document.getElementById('qFat').textContent = fat + 'г';
@@ -607,7 +610,6 @@ function initQuiz() {
       + '<p><strong>Рекомендованный тариф:</strong> ' + recTariff + '</p>'
       + '</div>';
 
-    // План на неделю с правильным распределением
     var weekEl = document.getElementById('quizWeekPlan');
     var dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     var trainingDays = getTrainingSchedule(freq);
@@ -622,6 +624,35 @@ function initQuiz() {
     }
     weekHtml += '</div></div>';
     weekEl.innerHTML = weekHtml;
+  }
+
+  function sendQuizToAdmin() {
+    var requestData = {
+      type: 'quiz',
+      goal: answers.goal || '',
+      gender: answers.gender || '',
+      age: answers.age || '',
+      weight: answers.weight || '',
+      height: answers.height || '',
+      place: answers.place || '',
+      frequency: answers.frequency || '',
+      level: answers.level || '',
+      calories: document.getElementById('qCalories').textContent || '',
+      protein: document.getElementById('qProtein').textContent || ''
+    };
+
+    if (isTG && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      requestData.user_id = tg.initDataUnsafe.user.id;
+      requestData.username = tg.initDataUnsafe.user.username || '';
+    }
+
+    fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestData)
+    }).catch(function(err) {
+      console.error('Quiz send error:', err);
+    });
   }
 }
 
@@ -767,9 +798,6 @@ function initKBJU() {
       carbs = 50;
       Notify.show('Калораж низкий — белки скорректированы', 'warning');
     }
-
-    var check = protein * 4 + fat * 9 + carbs * 4;
-    console.log('КБЖУ:', calories, '| Проверка:', check);
 
     document.getElementById('kbjuCal').textContent = calories;
     document.getElementById('kbjuP').textContent = protein + 'г';
@@ -1005,16 +1033,28 @@ function initForm() {
     if (btnLoader) btnLoader.style.display = '';
     if (submitBtn) submitBtn.disabled = true;
 
-    setTimeout(function() {
+    var requestData = {
+      type: 'lead',
+      name: name,
+      goal: goal,
+      tariff: tariff
+    };
+
+    if (isTG && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      requestData.user_id = tg.initDataUnsafe.user.id;
+      requestData.username = tg.initDataUnsafe.user.username || '';
+    }
+
+    fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestData)
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
       if (btnText) btnText.style.display = '';
       if (btnLoader) btnLoader.style.display = 'none';
       if (submitBtn) submitBtn.disabled = false;
-
-      if (isTG) {
-        try {
-          tg.sendData(JSON.stringify({ type: 'lead', name: name, goal: goal, tariff: tariff }));
-        } catch(err) { console.error('TG sendData:', err); }
-      }
 
       var ctaSection = document.getElementById('ctaFinal');
       var successSection = document.getElementById('successSection');
@@ -1023,7 +1063,21 @@ function initForm() {
 
       Notify.show('Заявка отправлена! 🎉', 'success');
       hapticN('success');
-    }, 1500);
+    })
+    .catch(function(err) {
+      console.error('Lead error:', err);
+      if (btnText) btnText.style.display = '';
+      if (btnLoader) btnLoader.style.display = 'none';
+      if (submitBtn) submitBtn.disabled = false;
+
+      var ctaSection = document.getElementById('ctaFinal');
+      var successSection = document.getElementById('successSection');
+      if (ctaSection) ctaSection.style.display = 'none';
+      if (successSection) successSection.style.display = '';
+
+      Notify.show('Заявка принята! Свяжусь скоро 🎉', 'success');
+      hapticN('success');
+    });
   });
 }
 
@@ -1036,11 +1090,8 @@ function initCabinet() {
     if (avatar) avatar.textContent = (user.first_name || '?')[0];
     if (name) name.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
 
-    // Автоматически регистрируем пользователя при открытии Web App
     var registered = localStorage.getItem('bot_registered');
     if (!registered) {
-      var WORKER_URL = 'https://fitness-bonus-bot.XXXXX.workers.dev'; // ← ТВОЙ URL
-
       fetch(WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1141,7 +1192,7 @@ function initChatFab() {
   if (!fab) return;
 
   fab.addEventListener('click', function() {
-    var url = 'https://t.me/vitaman777'; // ← ЗАМЕНИ НА СВОЙ
+    var url = 'https://t.me/vitaman777';
     if (isTG) {
       try { tg.openTelegramLink(url); } catch(e) { window.open(url, '_blank'); }
     } else {
@@ -1155,7 +1206,7 @@ function initAsk() {
   var btn = document.getElementById('askBtn');
   if (!btn) return;
   btn.addEventListener('click', function() {
-    var url = 'https://t.me/vitaman777'; // ← ЗАМЕНИ НА СВОЙ
+    var url = 'https://t.me/vitaman777';
     if (isTG) {
       try { tg.openTelegramLink(url); } catch(e) { window.open(url, '_blank'); }
     } else {
@@ -1169,12 +1220,6 @@ function initBonus() {
   var btn = document.getElementById('downloadBonus');
   if (!btn) return;
 
-  // ═══ ЗАМЕНИ на URL своего Cloudflare Worker ═══
-  var WORKER_URL = 'https://fitness-bonus-bot.mrvit9646.workers.dev';
-
-  // ═══ ЗАМЕНИ на юзернейм своего бота ═══
-  var BOT_USERNAME = 'your_bot_username';
-
   btn.addEventListener('click', function() {
     btn.disabled = true;
     btn.textContent = '⏳ Отправляю...';
@@ -1184,14 +1229,12 @@ function initBonus() {
     var calories = quizCalories ? quizCalories.textContent : '2000';
     var protein = quizProtein ? quizProtein.textContent : '150г';
 
-    // Получаем user_id из Telegram
     var userId = null;
     if (isTG && tg.initDataUnsafe && tg.initDataUnsafe.user) {
       userId = tg.initDataUnsafe.user.id;
     }
 
     if (!userId) {
-      // Не в Telegram — генерируем PDF в браузере
       btn.textContent = '⏳ Генерация PDF...';
       var userData = { calories: calories, protein: protein };
 
@@ -1208,12 +1251,41 @@ function initBonus() {
           hapticN('success');
           localStorage.setItem('bonus_downloaded', 'true');
         })
-            .catch(function(err) {
+        .catch(function(err) {
+          console.error('PDF error:', err);
+          btn.textContent = 'Скачать бонус';
+          btn.disabled = false;
+          Notify.show('Ошибка генерации', 'error');
+        });
+      return;
+    }
+
+    fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'bonus',
+        user_id: userId,
+        calories: calories,
+        protein: protein
+      })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.success) {
+        btn.textContent = '✅ Отправлено в Telegram';
+        Notify.show('Бонус отправлен в чат бота! 📩', 'success', 6000);
+        hapticN('success');
+        localStorage.setItem('bonus_downloaded', 'true');
+      } else {
+        throw new Error(data.error || 'Ошибка отправки');
+      }
+    })
+    .catch(function(err) {
       console.error('Bonus error:', err);
       btn.disabled = false;
 
       if (err.message && (err.message.indexOf('403') !== -1 || err.message.indexOf('chat not found') !== -1)) {
-        // Пробуем зарегистрировать и отправить снова
         btn.textContent = '⏳ Подключаюсь к боту...';
 
         fetch(WORKER_URL, {
@@ -1227,7 +1299,6 @@ function initBonus() {
           })
         })
         .then(function() {
-          // Пробуем отправить бонус ещё раз
           return fetch(WORKER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1254,52 +1325,11 @@ function initBonus() {
           btn.textContent = 'Скачать бонус';
           btn.disabled = false;
           Notify.show('Напиши боту /start и попробуй снова', 'warning', 6000);
-
           setTimeout(function() {
             try { tg.openTelegramLink('https://t.me/' + BOT_USERNAME); }
             catch(e) {}
           }, 2000);
         });
-      } else {
-        btn.textContent = 'Попробовать ещё';
-        Notify.show('Ошибка отправки. Попробуй ещё раз', 'error');
-      }
-    });
-
-    // В Telegram — отправляем через бота
-    fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: userId,
-        calories: calories,
-        protein: protein
-      })
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      if (data.success) {
-        btn.textContent = '✅ Отправлено в Telegram';
-        Notify.show('Бонус отправлен в чат бота! 📩 Проверь Telegram', 'success', 6000);
-        hapticN('success');
-        localStorage.setItem('bonus_downloaded', 'true');
-      } else {
-        throw new Error(data.error || 'Ошибка отправки');
-      }
-    })
-    .catch(function(err) {
-      console.error('Bonus error:', err);
-      btn.disabled = false;
-
-      if (err.message && (err.message.indexOf('403') !== -1 || err.message.indexOf('chat not found') !== -1)) {
-        btn.textContent = 'Скачать бонус';
-        Notify.show('Сначала напиши боту /start, потом нажми ещё раз', 'warning', 6000);
-        setTimeout(function() {
-          if (isTG) {
-            try { tg.openTelegramLink('https://t.me/' + Victorclark_bot); }
-            catch(e) { window.open('https://t.me/' + Victorclark_bot, '_blank'); }
-          }
-        }, 1000);
       } else {
         btn.textContent = 'Попробовать ещё';
         Notify.show('Ошибка отправки. Попробуй ещё раз', 'error');
@@ -1313,7 +1343,7 @@ function initBonus() {
   }
 }
 
-// ========== PDF GENERATION (fallback для браузера) ==========
+// ========== PDF GENERATION (fallback) ==========
 function renderPDF(html, filename) {
   var container = document.createElement('div');
   container.innerHTML = html;
@@ -1374,13 +1404,7 @@ function generateWorkoutPDF(userData) {
     + '<div style="font-size:28px;font-weight:800;margin-bottom:6px">📋 Первая неделя</div>'
     + '<div style="font-size:20px;font-weight:600;color:#00e5ff;margin-bottom:15px">Программа тренировок</div>'
     + '<div style="margin-top:15px;padding:10px 15px;background:rgba(0,229,255,0.15);border-radius:10px;font-size:12px;color:#00e5ff">'
-    + 'Норма: ' + userData.calories + ' ккал | Белок: ' + userData.protein + '</div></div>'
-    + '<div style="background:#f8fafc;border-radius:12px;padding:20px 25px;margin:0 20px 25px;border-left:4px solid #00e5ff">'
-    + '<div style="font-size:15px;font-weight:700;margin-bottom:10px">⚡ Правила</div>'
-    + '<div style="font-size:12px;color:#475569;margin-bottom:5px">✓ Разминка 5 мин</div>'
-    + '<div style="font-size:12px;color:#475569;margin-bottom:5px">✓ Растяжка 5 мин после</div>'
-    + '<div style="font-size:12px;color:#475569;margin-bottom:5px">✓ Отдых между подходами: 45-60 сек</div>'
-    + '<div style="font-size:12px;color:#475569">✓ Вода: 2л в день</div></div>';
+    + 'Норма: ' + userData.calories + ' ккал | Белок: ' + userData.protein + '</div></div>';
 
   weekDays.forEach(function(day) {
     var w = day.workout;
