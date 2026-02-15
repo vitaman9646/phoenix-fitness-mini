@@ -1035,6 +1035,32 @@ function initCabinet() {
     var name = document.getElementById('cabName');
     if (avatar) avatar.textContent = (user.first_name || '?')[0];
     if (name) name.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+
+    // Автоматически регистрируем пользователя при открытии Web App
+    var registered = localStorage.getItem('bot_registered');
+    if (!registered) {
+      var WORKER_URL = 'https://fitness-bonus-bot.XXXXX.workers.dev'; // ← ТВОЙ URL
+
+      fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'register',
+          user_id: user.id,
+          username: user.username || '',
+          first_name: user.first_name || ''
+        })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.success) {
+          localStorage.setItem('bot_registered', 'true');
+        }
+      })
+      .catch(function(err) {
+        console.error('Register error:', err);
+      });
+    }
   }
 }
 
