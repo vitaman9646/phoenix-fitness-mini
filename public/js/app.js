@@ -1144,7 +1144,7 @@ function initBonus() {
   if (!btn) return;
 
   // ═══ ЗАМЕНИ на URL своего Cloudflare Worker ═══
-  var WORKER_URL = 'https://fitness-bot-worker.ТВОЙ-АККАУНТ.workers.dev';
+  var WORKER_URL = 'https://fitness-bot-worker.pages.de';
 
   // ═══ ЗАМЕНИ на юзернейм своего бота ═══
   var BOT_USERNAME = 'your_bot_username';
@@ -1221,8 +1221,8 @@ function initBonus() {
         Notify.show('Сначала напиши боту /start, потом нажми ещё раз', 'warning', 6000);
         setTimeout(function() {
           if (isTG) {
-            try { tg.openTelegramLink('https://t.me/' + BOT_USERNAME); }
-            catch(e) { window.open('https://t.me/' + BOT_USERNAME, '_blank'); }
+            try { tg.openTelegramLink('https://t.me/' + Victorclark_bot); }
+            catch(e) { window.open('https://t.me/' + Victorclark_bot, '_blank'); }
           }
         }, 1000);
       } else {
