@@ -1632,6 +1632,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initBadges();
   initBonus();
   initAsk();
+  initAnketa();
   initYear();
   hideSkeleton();
 });
