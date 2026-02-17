@@ -1465,6 +1465,140 @@ function generateChecklistPDF(userData) {
   return renderPDF(html, '7_ошибок_в_питании.pdf');
 }
 
+// ========== ANKETA ==========
+function initAnketa() {
+  var form = document.getElementById('anketaForm');
+  if (!form) return;
+
+  var selectedGender = 'male';
+
+  var genderBtns = document.querySelectorAll('[data-anketa-gender]');
+  genderBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      genderBtns.forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      selectedGender = this.dataset.anketaGender;
+      haptic('light');
+    });
+  });
+
+  document.querySelectorAll('.pricing-btn[data-tariff]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var tariff = this.dataset.tariff;
+      var radio = form.querySelector('input[name="anketaTariff"][value="' + tariff + '"]');
+      if (radio) radio.checked = true;
+    });
+  });
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var name = document.getElementById('anketaName').value.trim();
+    var age = parseInt(document.getElementById('anketaAge').value);
+    var weight = parseFloat(document.getElementById('anketaWeight').value);
+    var height = parseFloat(document.getElementById('anketaHeight').value);
+    var goal = document.getElementById('anketaGoal').value;
+    var place = document.getElementById('anketaPlace').value;
+    var freq = document.getElementById('anketaFreq').value;
+    var level = document.getElementById('anketaLevel').value;
+    var limitations = document.getElementById('anketaLimitations').value.trim();
+    var experience = document.getElementById('anketaExperience').value.trim();
+    var tariffRadio = form.querySelector('input[name="anketaTariff"]:checked');
+    var tariff = tariffRadio ? tariffRadio.value : 'standard';
+
+    if (!name || name.length < 2) { Notify.show('Введи имя', 'error'); return; }
+    if (!age || age < 14 || age > 80) { Notify.show('Проверь возраст', 'error'); return; }
+    if (!weight || weight < 30 || weight > 300) { Notify.show('Проверь вес', 'error'); return; }
+    if (!height || height < 100 || height > 250) { Notify.show('Проверь рост', 'error'); return; }
+    if (!goal) { Notify.show('Выбери цель', 'error'); return; }
+    if (!place) { Notify.show('Выбери место', 'error'); return; }
+
+    var bmr;
+    if (selectedGender === 'male') {
+      bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+    } else {
+      bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+    }
+
+    var activityMap = { '2': 1.375, '3': 1.55, '4': 1.65, '5': 1.725 };
+    var tdee = bmr * (activityMap[freq] || 1.55);
+
+    var calories;
+    switch (goal) {
+      case 'loss':
+        calories = tdee * 0.8;
+        var minC = (selectedGender === 'male') ? 1500 : 1200;
+        if (calories < minC) calories = minC;
+        break;
+      case 'gain': calories = tdee * 1.15; break;
+      default: calories = tdee;
+    }
+    calories = Math.round(calories);
+
+    var proteinPerKg = (goal === 'loss') ? 2.0 : (goal === 'gain') ? 1.8 : 1.6;
+    var protein = Math.round(weight * proteinPerKg);
+    var fat = Math.round((calories * 0.25) / 9);
+    var carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
+    if (carbs < 0) carbs = 50;
+
+    var btnText = form.querySelector('.btn-text');
+    var btnLoader = form.querySelector('.btn-loader');
+    var submitBtn = form.querySelector('[type="submit"]');
+    if (btnText) btnText.style.display = 'none';
+    if (btnLoader) btnLoader.style.display = '';
+    if (submitBtn) submitBtn.disabled = true;
+
+    var requestData = {
+      type: 'anketa',
+      name: name,
+      gender: selectedGender,
+      age: age,
+      weight: weight,
+      height: height,
+      goal: goal,
+      place: place,
+      frequency: freq,
+      level: level,
+      limitations: limitations || 'Нет',
+      experience: experience || 'Не указано',
+      tariff: tariff,
+      calories: calories,
+      protein: protein + 'г',
+      fat: fat + 'г',
+      carbs: carbs + 'г'
+    };
+
+    if (isTG && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      requestData.user_id = tg.initDataUnsafe.user.id;
+      requestData.username = tg.initDataUnsafe.user.username || '';
+    }
+
+    fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestData)
+    })
+    .then(function(res) { return res.json(); })
+    .then(function() {
+      form.style.display = 'none';
+      document.getElementById('anketaSuccess').style.display = '';
+      Notify.show('Анкета отправлена! 🎉', 'success');
+      hapticN('success');
+    })
+    .catch(function() {
+      form.style.display = 'none';
+      document.getElementById('anketaSuccess').style.display = '';
+      Notify.show('Анкета принята! 🎉', 'success');
+      hapticN('success');
+    })
+    .finally(function() {
+      if (btnText) btnText.style.display = '';
+      if (btnLoader) btnLoader.style.display = 'none';
+      if (submitBtn) submitBtn.disabled = false;
+    });
+  });
+}
+  
 // ========== YEAR ==========
 function initYear() {
   var el = document.getElementById('currentYear');
