@@ -446,6 +446,68 @@
           <button class="btn btn-primary" id="downloadBonus">Скачать бонус</button>
         </div>
 
+          <!-- ========== ANKETA ========== -->
+  <section class="section section-dark" id="anketa">
+    <div class="container">
+      <h2 class="section-title reveal">Анкета для программы</h2>
+      <p class="section-subtitle reveal">Заполни — и получишь персональную программу</p>
+      <div class="calc-card reveal">
+        <form id="anketaForm">
+          <div class="form-field">
+            <label class="form-label">Имя</label>
+            <input type="text" class="input" id="anketaName" placeholder="Как тебя зовут?" required minlength="2">
+          </div>
+          <div class="toggle-row">
+            <button type="button" class="toggle-btn active" data-anketa-gender="male">♂ Муж</button>
+            <button type="button" class="toggle-btn" data-anketa-gender="female">♀ Жен</button>
+          </div>
+          <div class="calc-grid-3">
+            <div class="form-field"><label class="form-label">Возраст</label><input type="number" class="input" id="anketaAge" placeholder="25" min="14" max="80" required></div>
+            <div class="form-field"><label class="form-label">Вес (кг)</label><input type="number" class="input" id="anketaWeight" placeholder="75" min="30" max="300" required></div>
+            <div class="form-field"><label class="form-label">Рост (см)</label><input type="number" class="input" id="anketaHeight" placeholder="175" min="100" max="250" required></div>
+          </div>
+          <div class="form-field"><label class="form-label">Цель</label>
+            <select class="input" id="anketaGoal" required><option value="">Выбери цель</option><option value="loss">🔥 Похудение</option><option value="gain">💪 Набор массы</option><option value="tone">⚡ Тонус и здоровье</option></select>
+          </div>
+          <div class="form-field"><label class="form-label">Где тренируешься</label>
+            <select class="input" id="anketaPlace" required><option value="">Выбери</option><option value="home">🏠 Дома</option><option value="gym">🏋️ В зале</option><option value="both">🔄 Дома и в зале</option></select>
+          </div>
+          <div class="form-field"><label class="form-label">Сколько раз в неделю</label>
+            <select class="input" id="anketaFreq" required><option value="2">2 раза</option><option value="3" selected>3 раза</option><option value="4">4 раза</option><option value="5">5+ раз</option></select>
+          </div>
+          <div class="form-field"><label class="form-label">Уровень подготовки</label>
+            <select class="input" id="anketaLevel" required><option value="beginner">🌱 Новичок</option><option value="middle">🔥 Средний</option><option value="advanced">💎 Продвинутый</option></select>
+          </div>
+          <div class="form-field"><label class="form-label">Травмы и ограничения</label>
+            <textarea class="input" id="anketaLimitations" rows="2" placeholder="Болит спина, колени и т.д. Или 'нет'" maxlength="300"></textarea>
+          </div>
+          <div class="form-field"><label class="form-label">Опыт тренировок</label>
+            <textarea class="input" id="anketaExperience" rows="2" placeholder="Занимался ли раньше? Сколько?" maxlength="300"></textarea>
+          </div>
+          <div class="form-field"><label class="form-label">Выбери тариф</label>
+            <div class="anketa-tariffs">
+              <label class="anketa-tariff-option"><input type="radio" name="anketaTariff" value="basic"><div class="anketa-tariff-card"><div class="anketa-tariff-name">📦 Базовый</div><div class="anketa-tariff-price">890₽/мес</div><div class="anketa-tariff-desc">Шаблоны программ и питания</div></div></label>
+              <label class="anketa-tariff-option"><input type="radio" name="anketaTariff" value="standard" checked><div class="anketa-tariff-card featured"><div class="anketa-tariff-badge">Популярный</div><div class="anketa-tariff-name">⭐ Оптимальный</div><div class="anketa-tariff-price">1 490₽/мес</div><div class="anketa-tariff-desc">Персональная программа + чат</div></div></label>
+              <label class="anketa-tariff-option"><input type="radio" name="anketaTariff" value="vip"><div class="anketa-tariff-card"><div class="anketa-tariff-name">👑 VIP</div><div class="anketa-tariff-price">3 990₽/мес</div><div class="anketa-tariff-desc">Полный контроль + Live</div></div></label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;margin-top:16px"><span class="btn-text">📋 Отправить анкету</span><span class="btn-loader" style="display:none">⏳ Отправка...</span></button>
+        </form>
+        <div class="anketa-success" id="anketaSuccess" style="display:none">
+          <div style="font-size:48px;margin-bottom:15px">🎉</div>
+          <h3 style="font-size:20px;margin-bottom:10px">Анкета отправлена!</h3>
+          <p>Программа будет готова в течение <strong>2-4 часов</strong></p>
+          <p>Пришлём её тебе в Telegram</p>
+          <div style="margin-top:20px;text-align:left">
+            <div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.1)">1️⃣ Тренер проверит анкету</div>
+            <div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.1)">2️⃣ Пришлёт ссылку на оплату</div>
+            <div style="padding:10px 0">3️⃣ После оплаты — программа 💪</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
         <!-- CTA -->
         <div class="quiz-result-actions">
           <button class="btn btn-primary" data-scroll="#ctaFinal">Получить полную программу</button>
