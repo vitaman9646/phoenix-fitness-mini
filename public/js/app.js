@@ -1607,34 +1607,39 @@ function initYear() {
 
 // ========== INIT ALL ==========
 document.addEventListener('DOMContentLoaded', function() {
-  initTheme();
-  Notify.init();
-  Modal.init();
-  Sheet.init();
-  initReveals();
-  initScroll();
-  initNav();
-  initPageProgress();
-  initStats();
-  initCases();
-  initReviews();
-  initLeaveReview();
-  initQuiz();
-  initProgressCalc();
-  initKBJU();
-  initChallenge();
-  initHabits();
-  initPricing();
-  initForm();
-  initChatFab();
-  initCabinet();
-  initReferral();
-  initBadges();
-  initBonus();
-  initAsk();
-  initAnketa();
-  initYear();
+  try {
+    initTheme();
+    Notify.init();
+    Modal.init();
+    Sheet.init();
+    initReveals();
+    initScroll();
+    initNav();
+    initPageProgress();
+    initStats();
+    initCases();
+    initReviews();
+    initLeaveReview();
+    initQuiz();
+    initProgressCalc();
+    initKBJU();
+    initChallenge();
+    initHabits();
+    initPricing();
+    initForm();
+    initChatFab();
+    initCabinet();
+    initReferral();
+    initBadges();
+    initBonus();
+    initAsk();
+    initAnketa();
+    initYear();
+  } catch(e) {
+    console.error('Init error:', e);
+  }
   hideSkeleton();
+  setTimeout(hideSkeleton, 2000);
 });
 
 })();
