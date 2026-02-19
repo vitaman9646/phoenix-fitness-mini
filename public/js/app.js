@@ -13,7 +13,7 @@ try {
 }
 
 // ========== CONFIG ==========
-var WORKER_URL = 'https://fitness-bonus-bot.mrvit9646.workers.dev';
+var WORKER_URL = 'https://phoenix-fitness.duckdns.org/webhook/website-api';
 var BOT_USERNAME = 'Victorclark_bot';
 var TRAINER_USERNAME = 'vitaman777';
 
