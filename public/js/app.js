@@ -13,9 +13,6 @@ try {
 }
 
 // ========== CONFIG ==========
-  window.onerror = function(msg, url, line) {
-  alert('JS Error: ' + msg + ' (line ' + line + ')');
-};
 var WORKER_URL = 'https://phoenix-fitness.duckdns.org/webhook/website-api';
 var BOT_USERNAME = 'Victorclark_bot';
 var TRAINER_USERNAME = 'vitaman777';
