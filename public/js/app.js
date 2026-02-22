@@ -40,10 +40,13 @@ function initTheme() {
 function hideSkeleton() {
   var s = document.getElementById('skeletonOverlay');
   if (s) {
-    s.style.opacity = '0';
-    s.style.pointerEvents = 'none';
-    setTimeout(function() { if (s.parentNode) s.parentNode.removeChild(s); }, 500);
+    s.style.cssText = 'display:none !important;opacity:0 !important;visibility:hidden !important;pointer-events:none !important;z-index:-1 !important;';
+    setTimeout(function() { 
+      if (s && s.parentNode) s.parentNode.removeChild(s); 
+    }, 300);
   }
+  document.body.style.overflow = '';
+  document.body.style.overflowX = 'hidden';
 }
 
 // ========== NOTIFY ==========
