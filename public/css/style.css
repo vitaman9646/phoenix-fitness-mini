@@ -687,3 +687,15 @@ select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
   padding: 2rem 1rem;
   color: var(--t1);
 }
+
+/* EMERGENCY FIX */
+.skeleton-overlay.hidden,
+#skeletonOverlay[style*="display:none"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+body.loaded .skeleton-overlay {
+  display: none !important;
+}
