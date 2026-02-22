@@ -1641,8 +1641,17 @@ document.addEventListener('DOMContentLoaded', function() {
   } catch(e) {
     console.error('Init error:', e);
   }
+    hideSkeleton();
+  setTimeout(hideSkeleton, 500);
+  setTimeout(hideSkeleton, 1500);
+  setTimeout(hideSkeleton, 3000);
+  console.log('App initialized OK');
+});
+
+// Дополнительная страховка
+window.addEventListener('load', function() {
   hideSkeleton();
-  setTimeout(hideSkeleton, 2000);
+  setTimeout(hideSkeleton, 200);
 });
 
 })();
