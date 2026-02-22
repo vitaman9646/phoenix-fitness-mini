@@ -1016,17 +1016,29 @@
 <script src="js/app.js"></script>
 
 <script>
-  // Аварийное скрытие скелетона — увеличено до 5 сек
-  setTimeout(function() {
+  // Аварийное скрытие скелетона
+  function killSkeleton() {
     var s = document.getElementById('skeletonOverlay');
-    if (s && s.parentNode) {
-      s.style.opacity = '0';
-      s.style.pointerEvents = 'none';
-      setTimeout(function() {
-        if (s.parentNode) s.parentNode.removeChild(s);
-      }, 500);
+    if (s) {
+      s.style.cssText = 'display:none !important;opacity:0 !important;visibility:hidden !important;pointer-events:none !important;z-index:-1 !important;';
+      if (s.parentNode) s.parentNode.removeChild(s);
+      console.log('Skeleton removed');
     }
-  }, 5000);
+    document.body.style.overflow = '';
+    document.body.style.overflowX = 'hidden';
+  }
+  
+  // Множественные попытки
+  setTimeout(killSkeleton, 1000);
+  setTimeout(killSkeleton, 2000);
+  setTimeout(killSkeleton, 3000);
+  setTimeout(killSkeleton, 5000);
+  
+  // Когда страница полностью загружена
+  window.addEventListener('load', function() {
+    setTimeout(killSkeleton, 100);
+    setTimeout(killSkeleton, 500);
+  });
 </script>
 
 </body>
